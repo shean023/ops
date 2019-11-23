@@ -1,0 +1,164 @@
+
+        <div class="col-sm-7 pull-left" style="margin-bottom: 3px">
+            <button class="btn btn-sm btn-success pull-left" data-toggle="modal" data-target="#ProjectModal"
+                    id="add-proj">
+                <i class="fa fa-plus-square"></i>
+                <span class="bigger-110">新增项目</span>
+            </button>
+        </div>
+
+        <!--dataTable-->
+        <div class="col-xs-12">
+            <!-- /.box -->
+            <div class="box">
+                <div class="box-body">
+                    <table id="proj-list" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>项目名称</th>
+                            <th>项目环境</th>
+                            <th>项目网址</th>
+                            <th>项目负责人</th>
+                            <th>项目成员</th>
+                            <th>项目备注</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for project in projects %}
+                            <tr>
+                                <td>{{ project.project_name }}</td>
+                                <td>
+                                    {% if project.project_env == 'test' %}
+                                        <span class="badge bg-green">{{ project.get_project_env_display }}</span>
+                                    {% elif project.project_env == 'fz' %}
+                                        <span class="badge bg-yellow">{{ project.get_project_env_display }}</span>
+                                    {% elif project.project_env == 'prod' %}
+                                        <span class="badge bg-red">{{ project.get_project_env_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ project.project_web|default:'' }}</td>
+                                <td>{{ project.project_admin.username }}</td>
+                                <td>{{ project.project_member.all|join:", " }}</td>
+                                <td>{{ project.project_memo }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-success btn-xs modify" data-toggle="modal"
+                                            data-id="{{ project.id }}" data-target="#ProjectModal">详细/更新
+                                    </button>
+                                    <a href="{% url 'org_chart' project.id %}" class="modaal-ajax" target="_blank">
+                                        <button type="button" class="btn btn-info btn-xs">架构</button>
+                                    </a>
+                                    <button type="button" class="btn btn-danger btn-xs delete"
+                                            data-id="{{ project.id }}">删除
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+            <!-- ProjectModal  -->
+            <div class="modal fade" id="ProjectModal" tabindex="-1" role="dialog" aria-labelledby="ProjectModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="ProjectModalLabel">
+
+                            </h4>
+                        </div>
+                        {% if perms.projs.add_project and perms.projs.change_project %}
+                            <div class="modal-body">
+                                <form id="proj_info" class="main form-horizontal">
+                                    <fieldset>
+                                        <div class="form-group">
+                                            <label for="project_name" class="col-sm-2 control-label">项目名称</label>
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" name="project_name"
+                                                       id="project_name" required/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="project_env" class="col-sm-2 control-label">项目环境</label>
+                                            <div class="col-sm-6">
+                                                <select class="form-control select2" name="project_env" id="project_env"
+                                                        style="width: 100%;">
+                                                    {% for project_env in project_envs %}
+                                                        <option value="{{ project_env.0 }}">{{ project_env.1 }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="project_web" class="col-sm-2 control-label">项目网址</label>
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" name="project_web"
+                                                       id="project_web" required/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="project_admin" class="col-sm-2 control-label">项目负责人</label>
+                                            <div class="col-sm-6">
+                                                <select class="form-control select2" name="project_admin"
+                                                        id="project_admin"
+                                                        style="width: 100%;">
+                                                    {% for project_user in project_users %}
+                                                        <option value="{{ project_user.id }}">{{ project_user.username }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="project_member" class="col-sm-2 control-label">项目成员</label>
+                                            <div class="col-sm-6">
+                                                <select class="form-control select2" name="project_member"
+                                                        multiple="multiple"
+                                                        id="project_member" style="width: 100%;">
+                                                    {% for project_user in project_users %}
+                                                        <option value="{{ project_user.id }}">{{ project_user.username }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="project_memo" class="col-sm-2 control-label">项目备注</label>
+                                            <div class="col-sm-6">
+                                            <textarea class="form-control" name="project_memo"
+                                                      id="project_memo"></textarea>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal"
+                                        id="proj_ops"></button>
+                            </div>
+                        {% else %}
+                            <div class="modal-body">
+                                抱歉！您没有此操作的权限！如有疑问，请联系管理员！
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">确认</button>
+                            </div>
+                        {% endif %}
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+        </div>
+
+

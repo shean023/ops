@@ -1,0 +1,4 @@
+{"version": 2, "width": 150, "height": 30, "timestamp": 1574061925, "title": "Demo", "env": {"TERM": "xterm-256color", "SHELL": "/bin/bash"}}
+[0.38445138931274414, "o", "Web console: https://localhost:9090/ or https://192.168.238.129:9090/\r\n\r\nLast login: Mon Nov 18 02:25:13 2019 from 192.168.238.128\r\r\n"]
+[0.4859786033630371, "o", "\u001b]0;root@localhost:~\u0007[root@localhost ~]# "]
+[180.5909218788147, "o", "\n\u7531\u4e8e\u957f\u65f6\u95f4\u6ca1\u6709\u64cd\u4f5c\uff0c\u8fde\u63a5\u5df2\u65ad\u5f00!"]

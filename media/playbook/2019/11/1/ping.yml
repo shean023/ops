@@ -1,0 +1,11 @@
+- hosts: 127.0.0.1
+  gather_facts: False
+  connection: local
+
+  tasks:
+
+    - name: ping
+      shell: ping -c 1 -w 2 192.168.238.129
+      ignore_errors: true
+      register: result
+    - debug: var=result verbosity=2

@@ -1,0 +1,87 @@
+<div class="col-sm-7 pull-left" style="margin-bottom: 3px; margin-top: 3px">
+    <button class="btn btn-sm btn-success pull-left" data-toggle="modal" id="add-platform"
+            data-target="#PlatformModal">
+        <i class="fa fa-plus-square"></i>
+        <span class="bigger-110">新增平台</span>
+    </button>
+</div>
+<div class="col-xs-12">
+    <div class="box">
+        <!-- /.box-header -->
+        <div class="box-body">
+            <table id="platform_tab" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>平台名称</th>
+                    <th>备注</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for platform in platform_names %}
+                    <tr>
+                        <td>{{ platform.id }}</td>
+                        <td>{{ platform.platform_name }}</td>
+                        <td>{{ platform.platform_memo }}</td>
+                        <td>
+                            <button type="button" class="btn btn-success btn-xs modify" data-toggle="modal"
+                                    data-id="{{ platform.id }}" data-target="#PlatformModal">修改
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs delete"
+                                    data-id="{{ platform.id }}">删除
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+
+    <!-- PlatformModal  -->
+    <div class="modal fade" id="PlatformModal" tabindex="-1" role="dialog"
+         aria-labelledby="PlatformModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="PlatformModalLabel">
+
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="platform_info" class="main form-horizontal">
+                        <fieldset>
+                            <div class="form-group">
+                                <label for="platform_name" class="col-sm-2 control-label">平台名称</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" name="platform_name"
+                                           id="platform_name" required/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="platform_memo" class="col-sm-2 control-label">备注</label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" name="platform_memo"
+                                              id="platform_memo"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="space-24"></div>
+
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="platform_ops"></button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</div>

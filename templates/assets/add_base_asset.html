@@ -1,0 +1,1142 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block head %}
+    <link rel="stylesheet"
+          href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'modaal/css/modaal.min.css' %}">
+    <style>
+
+        /* dataTables列内容居中 */
+        #platform_tab > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #platform_tab > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+
+        /* dataTables列内容居中 */
+        #proj_app > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #proj_app > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+
+        /* dataTables列内容居中 */
+        #proj_name > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #proj_name > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+
+        /* dataTables列内容居中 */
+        #proj_env > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #proj_env > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+
+        #asset_idc > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #asset_idc > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+
+        /* dataTables列内容居中 */
+        #asset_cabinet > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #asset_cabinet > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+
+        /* dataTables列内容居中 */
+        #asset_provider > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #asset_provider > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+
+        .form-horizontal .form-group {
+            margin-right: -200px;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="modal fade" id="ProjectModal" tabindex="-1" role="dialog" aria-labelledby="ProjectModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="ProjectModalLabel">
+
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+    </div>
+    <div class="row">
+        <!-- Custom Tabs -->
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab_4" data-toggle="tab">环境列表</a></li>
+                <li><a href="#tab_7" data-toggle="tab">平台列表</a></li>
+                <li><a href="#tab_5" data-toggle="tab">项目列表</a></li>
+                <li><a href="#tab_6" data-toggle="tab">应用列表</a></li>
+                <li ><a href="#tab_1" data-toggle="tab">机房列表</a></li>
+                <li><a href="#tab_2" data-toggle="tab">机柜列表</a></li>
+                <li><a href="#tab_3" data-toggle="tab">供应商列表</a></li>
+            </ul>
+            <div class="tab-content" style="padding: 0">
+                <div class="tab-pane  active" id="tab_4">
+                    {% include 'assets/proj_env.html' %}
+                </div>
+                <div class="tab-pane" id="tab_7">
+                    {% include 'assets/platform.html' %}
+                </div>
+                <div class="tab-pane" id="tab_5">
+                    {% include 'assets/proj_name.html' %}
+                </div>
+                <div class="tab-pane" id="tab_6">
+                    {% include 'assets/proj_app.html' %}
+                </div>
+                <div class="tab-pane" id="tab_1">
+                    {% include 'assets/idc_list.html' %}
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="tab_2">
+                    {% include 'assets/cabinet_list.html' %}
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="tab_3">
+                    {% include 'assets/provider_list.html' %}
+                </div>
+                <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+        </div>
+        <!-- nav-tabs-custom -->
+    </div>
+    <!-- /.row -->
+
+{% endblock %}
+
+
+{% block js %}
+    <!-- Select2 -->
+    <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+    <!-- DataTables -->
+    <script src="{% static 'AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+    <script src="{% static 'modaal/js/modaal.min.js' %}"></script>
+
+
+    <script>
+        $(function () {
+            projapp_table = $('#proj_app').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            projname_table = $('#proj_name').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            platform_table = $('#platform_tab').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            projenv_table = $('#proj_env').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            idc_table = $('#asset_idc').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            cabinet_table = $('#asset_cabinet').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            provider_table = $('#asset_provider').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            // Initialize Select2 Elements
+            $('.select2').select2({
+                allowClear: true
+            });
+
+            $('.modaal-ajax').modaal({
+                type: 'ajax',
+                width: 800
+            });
+        });
+
+
+        <!-- 机房操作 -->
+        let idc_tbody = $('#asset_idc tbody');
+        let idc_ops = $('#idc_ops');
+
+        // 添加机房
+        $('#add-idc').on('click', function () {
+            document.getElementById('idc_info').reset();
+            $('.modal-title').text('新增机房');
+            idc_ops.text('添加');
+
+            idc_ops.unbind('click').on('click', function () {
+                let data = $('#idc_info').serializeJson();
+                $.ajax({
+                    url: '/api/idc/',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        idc_table.row.add([
+                            res.id,
+                            res.idc_name,
+                            res.idc_address,
+                            res.idc_contact,
+                            res.idc_telephone,
+                            '',
+                            res.idc_memo,
+                            `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal" data-id="${res.id}" data-target="#IDCModal">修改</button> <button type="button" class="btn btn-danger btn-xs delete" data-id="${res.id}">删除</button>`
+                        ]).draw();
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            })
+        });
+
+        // 更新机房
+        idc_tbody.on('click', '.modify', function () {
+            let idc_id = $(this).attr('data-id');
+            let idc_td_obj = $(this).parents('tr').children();
+            $('.modal-title').text('修改机房信息');
+            idc_ops.text('确认修改');
+            $('#idc_name').val(idc_td_obj[1].innerText);
+            $('#idc_address').val(idc_td_obj[2].innerText);
+            $('#idc_contact').val(idc_td_obj[3].innerText);
+            $('#idc_telephone').val(idc_td_obj[4].innerText);
+            $('#idc_memo').val(idc_td_obj[6].innerText);
+
+            idc_ops.unbind('click').on('click', function () {
+                let data = $('#idc_info').serializeJson();
+                $.ajax({
+                    url: '/api/idc/' + idc_id + '/',
+                    type: 'PUT',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        idc_td_obj[1].innerText = res.idc_name;
+                        idc_td_obj[2].innerText = res.idc_address;
+                        idc_td_obj[3].innerText = res.idc_contact;
+                        idc_td_obj[4].innerText = res.idc_telephone;
+                        idc_td_obj[6].innerText = res.idc_memo;
+                        $.alert({
+                            title: 'Tips',
+                            type: 'green',
+                            content: '修改完成！',
+                        })
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            });
+        });
+
+        // 删除机房
+        idc_tbody.on('click', '.delete', function () {
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+
+            {% if perms.assets.delete_idc %}
+                $.confirm({
+                    title: 'Tips',
+                    content: '确定要删除这条记录么？',
+                    type: 'red',
+                    buttons: {
+                        Ok: function () {
+                            $.ajax({
+                                url: '/api/idc/' + pk + '/',
+                                method: 'DELETE',
+                                success: function () {
+                                    idc_table.row(tr_obj).remove().draw();
+                                },
+                                error: function (data) {
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'red',
+                                        content: '删除失败！' + data.responseText,
+                                    })
+                                }
+                            })
+                        },
+                        Cancel: function () {
+                            //
+                        }
+                    }
+                });
+            {% else %}
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: '抱歉！您没有删除机房的权限！如有疑问，请联系管理员！',
+                });
+            {% endif %}
+        });
+
+
+        <!-- 机柜操作 -->
+        let cabinet_tbody = $('#asset_cabinet tbody');
+        let cabinet_ops = $('#cabinet_ops');
+
+        // 添加机柜
+        $('#add-cabinet').on('click', function () {
+            document.getElementById('cabinet_info').reset();
+            $(".select2").val('').trigger('change');
+            $('.modal-title').text('新增机柜');
+            cabinet_ops.text('添加');
+
+            cabinet_ops.unbind('click').on('click', function () {
+                let data = $('#cabinet_info').serializeJson();
+                let idc_name = $('#idc option:selected').text();
+                $.ajax({
+                    url: '/api/cabinet/',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        cabinet_table.row.add([
+                            res.id,
+                            res.cabinet_name,
+                            idc_name,
+                            '',
+                            res.cabinet_memo,
+                            `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal" data-id="${res.id}" data-idc="${res.idc}"  data-target="#CabinetModal">修改</button> <button type="button" class="btn btn-danger btn-xs delete" data-id="${res.id}">删除</button>`
+                        ]).draw();
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            })
+        });
+
+        // 更新机柜
+        cabinet_tbody.on('click', '.modify', function () {
+            let select_obj = $("#idc");
+            let cabinet_id = $(this).attr('data-id');
+            let idc_id = $(this).attr('data-idc');
+            let cabinet_td_obj = $(this).parents('tr').children();
+            $('.modal-title').text('修改机柜信息');
+            cabinet_ops.text('确认修改');
+            $('#cabinet_name').val(cabinet_td_obj[1].innerText);
+            select_obj.val(idc_id).trigger('change');
+            $('#cabinet_memo').val(cabinet_td_obj[4].innerText);
+
+            cabinet_ops.unbind('click').on('click', function () {
+                let data = $('#cabinet_info').serializeJson();
+                let idc_name = $('#idc').find(':selected').text();
+                $.ajax({
+                    url: '/api/cabinet/' + cabinet_id + '/',
+                    type: 'PUT',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        cabinet_td_obj[1].innerText = res.cabinet_name;
+                        cabinet_td_obj[2].innerText = idc_name;
+                        cabinet_td_obj[4].innerText = res.cabinet_memo;
+                        $.alert({
+                            title: 'Tips',
+                            type: 'green',
+                            content: '修改完成！',
+                        })
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            });
+        });
+
+        // 删除机柜
+        cabinet_tbody.on('click', '.delete', function () {
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+
+            {% if perms.assets.delete_cabinet %}
+                $.confirm({
+                    title: 'Tips',
+                    content: '确定要删除这条记录么？',
+                    type: 'red',
+                    buttons: {
+                        Ok: function () {
+                            $.ajax({
+                                url: '/api/cabinet/' + pk + '/',
+                                method: 'DELETE',
+                                success: function () {
+                                    cabinet_table.row(tr_obj).remove().draw();
+                                },
+                                error: function (data) {
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'red',
+                                        content: '删除失败！' + data.responseText,
+                                    })
+                                }
+                            })
+                        },
+                        Cancel: function () {
+                            //
+                        }
+                    }
+                });
+            {% else %}
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: '抱歉！您没有删除机柜的权限！如有疑问，请联系管理员！',
+                });
+            {% endif %}
+        });
+
+
+        <!-- 供应商操作 -->
+        let provider_tbody = $('#asset_provider tbody');
+        let provider_ops = $('#provider_ops');
+
+        // 添加供应商
+        $('#add-provider').on('click', function () {
+            document.getElementById('provider_info').reset();
+            $('.modal-title').text('新增供应商');
+            provider_ops.text('添加');
+
+            provider_ops.unbind('click').on('click', function () {
+                let data = $('#provider_info').serializeJson();
+                $.ajax({
+                    url: '/api/asset_provider/',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        provider_table.row.add([
+                            res.id,
+                            res.asset_provider_name,
+                            res.asset_provider_contact,
+                            res.asset_provider_telephone,
+                            res.asset_provider_memo,
+                            `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal" data-id="${res.id}" data-target="#ProviderModal">修改</button> <button type="button" class="btn btn-danger btn-xs delete" data-id="${res.id}">删除</button>`
+                        ]).draw();
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            })
+        });
+
+        // 更新供应商
+        provider_tbody.on('click', '.modify', function () {
+            let provider_id = $(this).attr('data-id');
+            let provider_td_obj = $(this).parents('tr').children();
+            $('.modal-title').text('修改供应商信息');
+            provider_ops.text('确认修改');
+            $('#asset_provider_name').val(provider_td_obj[1].innerText);
+            $('#asset_provider_contact').val(provider_td_obj[2].innerText);
+            $('#asset_provider_telephone').val(provider_td_obj[3].innerText);
+            $('#asset_provider_memo').val(provider_td_obj[4].innerText);
+
+            provider_ops.unbind('click').on('click', function () {
+                let data = $('#provider_info').serializeJson();
+                $.ajax({
+                    url: '/api/asset_provider/' + provider_id + '/',
+                    type: 'PUT',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        provider_td_obj[1].innerText = res.asset_provider_name;
+                        provider_td_obj[2].innerText = res.asset_provider_contact;
+                        provider_td_obj[3].innerText = res.asset_provider_telephone;
+                        provider_td_obj[4].innerText = res.asset_provider_memo;
+                        $.alert({
+                            title: 'Tips',
+                            type: 'green',
+                            content: '修改完成！',
+                        })
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            });
+        });
+
+        // 删除供应商
+        provider_tbody.on('click', '.delete', function () {
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+
+            {% if perms.assets.delete_assetprovider %}
+                $.confirm({
+                    title: 'Tips',
+                    content: '确定要删除这条记录么？',
+                    type: 'red',
+                    buttons: {
+                        Ok: function () {
+                            $.ajax({
+                                url: '/api/asset_provider/' + pk + '/',
+                                method: 'DELETE',
+                                success: function () {
+                                    provider_table.row(tr_obj).remove().draw();
+                                },
+                                error: function (data) {
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'red',
+                                        content: '删除失败！' + data.responseText,
+                                    })
+                                }
+                            })
+                        },
+                        Cancel: function () {
+                            //
+                        }
+                    }
+                });
+            {% else %}
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: '抱歉！您没有删除供应商的权限！如有疑问，请联系管理员！',
+                });
+            {% endif %}
+        });
+
+        <!-- 环境操作 -->
+        let projenv_tbody = $('#proj_env tbody');
+        let projenv_ops = $('#projenv_ops');
+
+        // 新增环境
+        $('#add-projenv').on('click', function () {
+            document.getElementById('projenv_info').reset();
+            $('.modal-title').text('新增环境');
+            projenv_ops.text('添加');
+
+            projenv_ops.unbind('click').on('click', function () {
+                let data = $('#projenv_info').serializeJson();
+                $.ajax({
+                    url: '/api/projenv/',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        projenv_table.row.add([
+                            res.id,
+                            res.projenv_name,
+                            res.projenv_memo,
+                            `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal" data-id="${res.id}" data-target="#ProjenvModal">修改</button> <button type="button" class="btn btn-danger btn-xs delete" data-id="${res.id}">删除</button>`
+                        ]).draw();
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            })
+        });
+
+        // 更新环境
+        projenv_tbody.on('click', '.modify', function () {
+            let projenv_id = $(this).attr('data-id');
+            let projenv_td_obj = $(this).parents('tr').children();
+            $('.modal-title').text('修改环境');
+            projenv_ops.text('确认修改');
+            $('#projenv_name').val(projenv_td_obj[1].innerText);
+            $('#projenv_memo').val(projenv_td_obj[2].innerText);
+
+            projenv_ops.unbind('click').on('click', function () {
+                let data = $('#projenv_info').serializeJson();
+                $.ajax({
+                    url: '/api/projenv/' + projenv_id + '/',
+                    type: 'PUT',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        projenv_td_obj[1].innerText = res.projenv_name;
+                        projenv_td_obj[2].innerText = res.projenv_memo;
+                        $.alert({
+                            title: 'Tips',
+                            type: 'green',
+                            content: '修改完成！',
+                        })
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            });
+        });
+
+        // 删除环境
+        projenv_tbody.on('click', '.delete', function () {
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+
+            {% if perms.assets.delete_assetprovider %}
+                $.confirm({
+                    title: 'Tips',
+                    content: '确定要删除这条记录么？',
+                    type: 'red',
+                    buttons: {
+                        Ok: function () {
+                            $.ajax({
+                                url: '/api/projenv/' + pk + '/',
+                                method: 'DELETE',
+                                success: function () {
+                                    projenv_table.row(tr_obj).remove().draw();
+                                },
+                                error: function (data) {
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'red',
+                                        content: '删除失败！' + data.responseText,
+                                    })
+                                }
+                            })
+                        },
+                        Cancel: function () {
+                            //
+                        }
+                    }
+                });
+            {% else %}
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: '抱歉！您没有删除环境的权限！如有疑问，请联系管理员！',
+                });
+            {% endif %}
+        });
+
+
+       <!-- 平台操作 -->
+        let platform_tbody = $('#platform_tab tbody');
+        let platform_ops = $('#platform_ops');
+
+        // 新增平台
+        $('#add-platform').on('click', function () {
+            document.getElementById('platform_info').reset();
+            $('.modal-title').text('新增平台');
+            platform_ops.text('添加');
+
+            platform_ops.unbind('click').on('click', function () {
+                let data = $('#platform_info').serializeJson();
+                $.ajax({
+                    url: '/api/platform/',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        platform_table.row.add([
+                            res.id,
+                            res.platform_name,
+                            res.platform_memo,
+                            `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal" data-id="${res.id}" data-target="#PlatformModal">修改</button> <button type="button" class="btn btn-danger btn-xs delete" data-id="${res.id}">删除</button>`
+                        ]).draw();
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            })
+        });
+
+        // 更新平台
+        platform_tbody.on('click', '.modify', function () {
+            let platform_id = $(this).attr('data-id');
+            let platform_td_obj = $(this).parents('tr').children();
+            $('.modal-title').text('修改平台');
+            platform_ops.text('确认修改');
+            $('#platform_name').val(platform_td_obj[1].innerText);
+            $('#platform_memo').val(platform_td_obj[2].innerText);
+
+            platform_ops.unbind('click').on('click', function () {
+                let data = $('#platform_info').serializeJson();
+                $.ajax({
+                    url: '/api/platform/' + platform_id + '/',
+                    type: 'PUT',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        platform_td_obj[1].innerText = res.platform_name;
+                        platform_td_obj[2].innerText = res.platform_memo;
+                        $.alert({
+                            title: 'Tips',
+                            type: 'green',
+                            content: '修改完成！',
+                        })
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            });
+        });
+
+
+        // 删除平台
+        platform_tbody.on('click', '.delete', function () {
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+
+            {% if perms.assets.delete_assetprovider %}
+                $.confirm({
+                    title: 'Tips',
+                    content: '确定要删除这条记录么？',
+                    type: 'red',
+                    buttons: {
+                        Ok: function () {
+                            $.ajax({
+                                url: '/api/platform/' + pk + '/',
+                                method: 'DELETE',
+                                success: function () {
+                                    platform_table.row(tr_obj).remove().draw();
+                                },
+                                error: function (data) {
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'red',
+                                        content: '删除失败！' + data.responseText,
+                                    })
+                                }
+                            })
+                        },
+                        Cancel: function () {
+                            //
+                        }
+                    }
+                });
+            {% else %}
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: '抱歉！您没有删除平台的权限！如有疑问，请联系管理员！',
+                });
+            {% endif %}
+        });
+
+       <!-- 项目操作 -->
+        let projname_tbody = $('#proj_name tbody');
+        let projname_ops = $('#projname_ops');
+
+        // 添加项目
+        $('#add-projname').on('click', function () {
+            document.getElementById('projname_info').reset();
+            $(".select2").val('').trigger('change');
+            $('.modal-title').text('新增项目');
+            projname_ops.text('添加');
+
+            projname_ops.unbind('click').on('click', function () {
+                let data = $('#projname_info').serializeJsonlist();
+                let sel="";
+                $('#platformname option:selected').each(function() {  sel += $(this).text() + "&nbsp;&nbsp;"});
+                let platformname = sel
+                //let platformname = $('#platformname option:selected').text();
+                $.ajax({
+                    url: '/api/projname/',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        projname_table.row.add([
+                            res.id,
+                            res.projname_name,
+                            platformname,
+                            res.projname_memo,
+                            `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal" data-id="${res.id}" data-platformname="${res.platformname.id}"  data-target="#ProjnameModal">修改</button>
+                           <a href="/project/org_chart/${res.id}" class="modaal-ajax" class="modaal-ajax" target="_blank"><button type="button" class="btn btn-info btn-xs">架构</button>
+                            <button type="button" class="btn btn-danger btn-xs delete" data-id="${res.id}">删除</button>`
+                        ]).draw();
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            })
+        });
+
+        // 更新项目
+        projname_tbody.on('click', '.modify', function () {
+
+            let select_obj = $("#platformname");
+            let projname_id = $(this).attr('data-id');
+            //let platformname_id = $(this).attr('data-platformname');
+            let s=$(this).attr('data-platformname');
+            let ss=s.split(",");//以逗号为分割点
+            let projname_td_obj = $(this).parents('tr').children();
+            $('.modal-title').text('修改项目信息');
+            projname_ops.text('确认修改');
+            $('#projname_name').val(projname_td_obj[1].innerText);
+            select_obj.val(ss).trigger('change');
+            $('#projname_memo').val(projname_td_obj[3].innerText);
+
+            projname_ops.unbind('click').on('click', function () {
+                let data = $('#projname_info').serializeJsonlist();
+                let sel="";
+                $('#platformname option:selected').each(function() {  sel += $(this).text() + "   "});
+                let platformname = sel
+                //let platformname = $('#platformname').find(':selected').text();
+                $.ajax({
+                    url: '/api/projname/' + projname_id + '/',
+                    type: 'PUT',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        projname_td_obj[1].innerText = res.projname_name;
+                        projname_td_obj[2].innerText = platformname;
+                        projname_td_obj[3].innerText = res.projname_memo;
+                        $.alert({
+                            title: 'Tips',
+                            type: 'green',
+                            content: '修改完成！',
+                        })
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            });
+        });
+
+        // 删除项目
+        projname_tbody.on('click', '.delete', function () {
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+
+            {% if perms.assets.delete_cabinet %}
+                $.confirm({
+                    title: 'Tips',
+                    content: '确定要删除这条记录么？',
+                    type: 'red',
+                    buttons: {
+                        Ok: function () {
+                            $.ajax({
+                                url: '/api/projname/' + pk + '/',
+                                method: 'DELETE',
+                                success: function () {
+                                    projname_table.row(tr_obj).remove().draw();
+                                },
+                                error: function (data) {
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'red',
+                                        content: '删除失败！' + data.responseText,
+                                    })
+                                }
+                            })
+                        },
+                        Cancel: function () {
+                            //
+                        }
+                    }
+                });
+            {% else %}
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: '抱歉！您没有删除项目的权限！如有疑问，请联系管理员！',
+                });
+            {% endif %}
+        });
+
+
+        <!-- 应用操作 -->
+        let projapp_tbody = $('#proj_app tbody');
+        let projapp_ops = $('#projapp_ops');
+
+        // 添加应用
+        $('#add-projapp').on('click', function () {
+            document.getElementById('projapp_info').reset();
+            $(".select2").val('').trigger('change');
+            $('.modal-title').text('新增应用');
+            projapp_ops.text('添加');
+
+            projapp_ops.unbind('click').on('click', function () {
+                let data = $('#projapp_info').serializeJson();
+                let projectname = $('#projectname option:selected').text();
+                $.ajax({
+                    url: '/api/projapp/',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        projapp_table.row.add([
+                            res.id,
+                            res.projapp_name,
+                            projectname,
+                            res.projapp_memo,
+                            `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal" data-id="${res.id}" data-projname="${res.projectname}"  data-target="#ProjappModal">修改</button> <button type="button" class="btn btn-danger btn-xs delete" data-id="${res.id}">删除</button>`
+                        ]).draw();
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            })
+        });
+
+        // 更新应用
+        projapp_tbody.on('click', '.modify', function () {
+            let select_obj = $("#projectname");
+            let projapp_id = $(this).attr('data-id');
+            let projname_id = $(this).attr('data-projname');
+            let projapp_td_obj = $(this).parents('tr').children();
+            $('.modal-title').text('修改应用信息');
+            projapp_ops.text('确认修改');
+            $('#projapp_name').val(projapp_td_obj[1].innerText);
+            select_obj.val(projname_id).trigger('change');
+            $('#projapp_memo').val(projapp_td_obj[3].innerText);
+
+            projapp_ops.unbind('click').on('click', function () {
+                let data = $('#projapp_info').serializeJson();
+                let projectname = $('#projectname').find(':selected').text();
+                $.ajax({
+                    url: '/api/projapp/' + projapp_id + '/',
+                    type: 'PUT',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        projapp_td_obj[1].innerText = res.projapp_name;
+                        projapp_td_obj[2].innerText = projectname;
+                        projapp_td_obj[3].innerText = res.projapp_memo;
+                        $.alert({
+                            title: 'Tips',
+                            type: 'green',
+                            content: '修改完成！',
+                        })
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            });
+        });
+
+        // 删除应用
+        projapp_tbody.on('click', '.delete', function () {
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+
+            {% if perms.assets.delete_cabinet %}
+                $.confirm({
+                    title: 'Tips',
+                    content: '确定要删除这条记录么？',
+                    type: 'red',
+                    buttons: {
+                        Ok: function () {
+                            $.ajax({
+                                url: '/api/projapp/' + pk + '/',
+                                method: 'DELETE',
+                                success: function () {
+                                    projapp_table.row(tr_obj).remove().draw();
+                                },
+                                error: function (data) {
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'red',
+                                        content: '删除失败！' + data.responseText,
+                                    })
+                                }
+                            })
+                        },
+                        Cancel: function () {
+                            //
+                        }
+                    }
+                });
+            {% else %}
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: '抱歉！您没有删除应用的权限！如有疑问，请联系管理员！',
+                });
+            {% endif %}
+        });
+
+        // 将数据JSON化
+        (function ($) {
+            $.fn.serializeJson = function () {
+                let serializeObj = {};
+                let array = this.serializeArray();
+                $(array).each(function () {
+                    if (serializeObj[this.name]) {
+                        if ($.isArray(serializeObj[this.name])) {
+                            serializeObj[this.name].push(this.value);
+                        } else {
+                            serializeObj[this.name] = [serializeObj[this.name], this.value];
+                        }
+                    } else {
+                        serializeObj[this.name] = this.value;
+                    }
+                });
+                return serializeObj;
+            };
+        })(jQuery);
+
+                // 添加项目时关联平台必需是LIST类型的数据，数据JSON化
+        (function ($) {
+            $.fn.serializeJsonlist = function () {
+                let serializeObj = {};
+                let array = this.serializeArray();
+                $(array).each(function () {
+                    if (serializeObj[this.name]) {
+                        if ($.isArray(serializeObj[this.name])) {
+                            serializeObj[this.name].push(this.value);
+                        } else {
+                            serializeObj[this.name] = [serializeObj[this.name], this.value];
+                        }
+                    } else if(this.name == 'platformname') {
+                        serializeObj[this.name] = [this.value];
+
+                    } else {
+                        serializeObj[this.name] = this.value;
+                    }
+                });
+                return serializeObj;
+            };
+        })(jQuery);
+
+
+    </script>
+
+
+{% endblock %}
+

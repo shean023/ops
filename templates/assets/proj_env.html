@@ -1,0 +1,87 @@
+<div class="col-sm-7 pull-left" style="margin-bottom: 3px; margin-top: 3px">
+    <button class="btn btn-sm btn-success pull-left" data-toggle="modal" id="add-projenv"
+            data-target="#ProjenvModal">
+        <i class="fa fa-plus-square"></i>
+        <span class="bigger-110">新增环境</span>
+    </button>
+</div>
+<div class="col-xs-12">
+    <div class="box">
+        <!-- /.box-header -->
+        <div class="box-body">
+            <table id="proj_env" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>环境名称</th>
+                    <th>备注</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for project_env in project_envs %}
+                    <tr>
+                        <td>{{ project_env.id }}</td>
+                        <td>{{ project_env.projenv_name }}</td>
+                        <td>{{ project_env.projenv_memo }}</td>
+                        <td>
+                            <button type="button" class="btn btn-success btn-xs modify" data-toggle="modal"
+                                    data-id="{{ project_env.id }}" data-target="#ProjenvModal">修改
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs delete"
+                                    data-id="{{ project_env.id }}">删除
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+
+    <!-- ProjenvModal  -->
+    <div class="modal fade" id="ProjenvModal" tabindex="-1" role="dialog"
+         aria-labelledby="ProjenvModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="ProjenvModalLabel">
+
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="projenv_info" class="main form-horizontal">
+                        <fieldset>
+                            <div class="form-group">
+                                <label for="projenv_name" class="col-sm-2 control-label">环境名称</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" name="projenv_name"
+                                           id="projenv_name" required/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="projenv_memo" class="col-sm-2 control-label">备注</label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" name="projenv_memo"
+                                              id="projenv_memo"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="space-24"></div>
+
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="projenv_ops"></button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</div>

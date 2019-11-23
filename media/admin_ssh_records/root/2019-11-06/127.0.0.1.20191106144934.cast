@@ -1,0 +1,13 @@
+{"version": 2, "width": 150, "height": 30, "timestamp": 1573022952, "title": "Demo", "env": {"TERM": "xterm", "SHELL": "/bin/bash"}}
+[0.4053609371185303, "o", "Welcome to Ubuntu 18.04.3 LTS (GNU/Linux 5.0.0-32-generic x86_64)\r\n\r\n * Documentation:  https://help.ubuntu.com\r\n * Management:     https://landscape.canonical.com\r\n * Support:        https://ubuntu.com/advantage\r\n\r\n\r\n * Canonical Livepatch is available for installation.\r\n   - Reduce system reboots and improve kernel security. Activate at:\r\n     https://ubuntu.com/livepatch\r\n\r\n94 packages can be updated.\r\n0 updates are security updates.\r\n\r\nYour Hardware Enablement Stack (HWE) is supported until April 2023.\r\nLast login: Wed Nov  6 14:48:56 2019 from 127.0.0.1\r\r\n\u001b]0;aron@aron-virtual-machine: ~\u0007aron@aron-virtual-machine:~$ "]
+[6.604427814483643, "o", "S"]
+[6.706894159317017, "o", "D"]
+[6.807884931564331, "o", "F"]
+[7.265579700469971, "o", "\r\n"]
+[7.366745948791504, "o", "SDF: command not found\r\n\u001b]0;aron@aron-virtual-machine: ~\u0007aron@aron-virtual-machine:~$ "]
+[7.469968795776367, "o", "\r\n\u001b]0;aron@aron-virtual-machine: ~\u0007aron@aron-virtual-machine:~$ "]
+[16.151114225387573, "o", "S"]
+[16.25278615951538, "o", "AD"]
+[16.355917930603027, "o", "F"]
+[16.507938861846924, "o", "\r\n"]
+[16.60891318321228, "o", "SADF: command not found\r\n\u001b]0;aron@aron-virtual-machine: ~\u0007aron@aron-virtual-machine:~$ "]

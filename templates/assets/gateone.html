@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <title>{{ user }}  {{asset.asset_platform.platform_name}}</title>
+    <!-- jQuery -->
+    <script src="/static/vendor/jquery/jquery.min.js"></script>
+    <!-- Bootstrap Core CSS -->
+    <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!--    弹窗开始样式 -->
+    <script src="/static/dist/js/xcConfirm.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="/static/dist/css/xcConfirm.css" />
+</head>
+<body>
+<h4>用户:{{user}} 	&nbsp;	&nbsp;平台:{{asset.asset_platform.platform_name}}	&nbsp;	&nbsp; 环境:{{asset.asset_projenv.projenv_name}}	&nbsp;	&nbsp; IP:<a>{{asset.asset_management_ip}}</a>	&nbsp;	&nbsp; 端口:{{asset.serverassets.port}}</h4>
+{% block page-content %}
+{% if errorInfo %}
+<script type="text/javascript">
+    window.wxc.xcConfirm("{{errorInfo}}", window.wxc.xcConfirm.typeEnum.error);
+</script>
+{% else %}
+<script src="/static/js/jquery-2.1.1.js"></script>
+<script src="/static/js/gateone.js"></script>
+<script src="/static/js/ssh.js"></script>
+<div id = "gateone_container" style = "position:relative; width: 110em; height: 60em;">
+	<div id = "gateone" ></div>
+
+<script type="text/javascript">
+    var newTerminal = function() {
+        // Introducing the superSandbox()!  Use it to wrap any code that you don't want to load until dependencies are met.
+        // In this example we won't call newTerminal() until GateOne.Terminal and GateOne.Terminal.Input are loaded.
+        GateOne.Base.superSandbox("NewExternalTerm", ["GateOne.Terminal", "GateOne.Terminal.Input"], function(window, undefined) {
+            "use strict";
+            var existingContainer = GateOne.Utils.getNode('#'+GateOne.prefs.prefix+'container');
+        var container = GateOne.Utils.createElement('div', {
+                'id': 'container', 'class': 'terminal', 'style': {'height': '100%', 'width': '100%'}
+        });
+        var gateone = GateOne.Utils.getNode('#gateone');
+        // Don't actually submit the form
+        if (!existingContainer) {
+                gateone.appendChild(container);
+        } else {
+                container = existingContainer;
+        }
+        // Create the new terminal
+        termNum = GateOne.Terminal.newTerminal(null, null, container);
+        });
+    };
+        //请求认证信息
+        <!--发起认证请求-->
+        ip = '{{ asset.asset_management_ip}}';
+        user = '{{ user }}';
+        port = '{{ asset.serverassets.port }}';
+        ssh_url = 'ssh://'+user+'@'+ip+':'+port;
+        $.ajax(
+            {
+                url:'/assets/gateone/auth',
+                type:'GET',
+                dataType:'json',
+                cache:false,
+                ifModified :true,
+                success:function (data) {
+                    <!--认证-->
+                    var auth_message = data.auth;
+                    var auth_url = data.url;
+                    GateOne.init(
+                        {
+                            auth:auth_message,
+                            url:auth_url,
+                            autoConnectURL:ssh_url,
+                            theme:'solarized',
+                            goDiv:'#gateone',
+                            disableTermTransitions:'true',
+                            //showTitle:null,
+                            //showToolbar:null,
+                        },//newTerminal
+                    );
+                },
+                {#error: function(){#}
+                {#    alert('GateOne API 认证错误！请联系管理员！');#}
+                {# }#}
+
+            }
+        );
+       GateOne.Base.superSandbox("GateOne.SomePlugin", ["GateOne", "GateOne.Net", "GateOne.Terminal", "GateOne.Terminal.Input","GateOne.Terminal.sendString","GateOne.Terminal.sendChars"], function(window, undefined) {
+
+        var location =  ip;
+        GateOne.prefs.fillContainer = true;
+
+        GateOne.prefs.autoConnectURL=ssh_url;
+        GateOne.prefs.fontSize="150%";
+        GateOne.prefs.scrollback = 1500;  // scrollback buffer up to 2000 lines
+        GateOne.Terminal.loadFont("Source Code Pro", "150%");
+        GateOne.locations; // Holds the state of all current known/open locations
+        GateOne.Net.setLocation(location);
+        GateOne.Terminal.sendString('somehost\n22\nusername\n');
+        GateOne.Terminal.sendChars('python\n');
+        GateOne.Terminal.sendString('python\n');
+        GateOne.Net.sendChars('asdf');
+        GateOne.Net.sendString('11asdfasf11');
+
+
+        <!--记录登录状态-->
+        });
+</script>
+{% endif %}
+{% endblock %}
+</div>
+</body>
+</html>

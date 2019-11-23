@@ -1,0 +1,100 @@
+<div class="col-sm-7 pull-left" style="margin-bottom: 3px; margin-top: 3px">
+    <button class="btn btn-sm btn-success pull-left" data-toggle="modal" id="add-projapp"
+            data-target="#ProjappModal">
+        <i class="fa fa-plus-square"></i>
+        <span class="bigger-110">新增应用</span>
+    </button>
+</div>
+<div class="col-xs-12">
+    <!-- /.box -->
+    <div class="box">
+        <!-- dataTable -->
+        <div class="box-body">
+            <table id="proj_app" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>应用名称</th>
+                    <th>所属项目</th>
+                    <th>备注</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for project_app in project_apps %}
+                    <tr>
+                        <td>{{ project_app.id }}</td>
+                        <td>{{ project_app.projapp_name }}</td>
+                        <td>{{ project_app.projectname.projname_name }}</td>
+                        <td>{{ project_app.projapp_memo }}</td>
+                        <td>
+                            <button type="button" class="btn btn-success btn-xs modify" data-toggle="modal" data-id="{{ project_app.id }}"
+                                    data-projname="{{ project_app.projectname.id  }}" data-target="#ProjappModal">修改</button>
+                            <button type="button" class="btn btn-danger btn-xs delete" data-id="{{ project_app.id }}">删除</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+
+    <!-- projappModal  -->
+    <div class="modal fade" id="ProjappModal" tabindex="-1" role="dialog"
+         aria-labelledby="ProjappModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="ProjappModalLabel">
+
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="projapp_info" class="main form-horizontal">
+                        <fieldset>
+                            <div class="form-group">
+                                <label for="projapp_name" class="col-sm-2 control-label">应用名称</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" name="projapp_name" id="projapp_name" required/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="projname" class="col-sm-2 control-label">所属项目</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control select2" id="projectname" name="projectname"
+                                            style="width: 100%;">
+                                        {% for project_name in project_names %}
+                                            <option value="{{ project_name.id }}">{{ project_name.projname_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="projapp_memo" class="col-sm-2 control-label">备注</label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" name="projapp_memo" id="projapp_memo"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="space-24"></div>
+
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="projapp_ops"></button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+</div>

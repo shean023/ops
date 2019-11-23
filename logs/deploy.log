@@ -1,0 +1,1 @@
+ERROR 2019-11-18 16:24:02 deploy_log 添加部署操作记录失败，原因：(1452, 'Cannot add or update a child row: a foreign key constraint fails (`ops_ops`.`ops_deploy_log`, CONSTRAINT `ops_deploy_log_project_config_id_05dd790f_fk_ops_proje` FOREIGN KEY (`project_config_id`) REFERENCES `ops_project_config` (`id`))')

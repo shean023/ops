@@ -1,0 +1,13 @@
+{"version": 2, "width": 150, "height": 30, "timestamp": 1572585865, "title": "Demo", "env": {"TERM": "xterm", "SHELL": "/bin/bash"}}
+[0.37929534912109375, "o", "Welcome to Ubuntu 18.04.3 LTS (GNU/Linux 5.0.0-32-generic x86_64)\r\n\r\n * Documentation:  https://help.ubuntu.com\r\n * Management:     https://landscape.canonical.com\r\n * Support:        https://ubuntu.com/advantage\r\n\r\n\r\n * Canonical Livepatch is available for installation.\r\n   - Reduce system reboots and improve kernel security. Activate at:\r\n     https://ubuntu.com/livepatch\r\n\r\n87 packages can be updated.\r\n0 updates are security updates.\r\n\r\nYour Hardware Enablement Stack (HWE) is supported until April 2023.\r\nLast login: Fri Nov  1 13:15:47 2019 from 127.0.0.1\r\r\n\u001b]0;aron@aron-virtual-machine: ~\u0007aron@aron-virtual-machine:~$ "]
+[5.36916446685791, "o", "1"]
+[5.5404956340789795, "o", "1"]
+[5.691498756408691, "o", "1"]
+[6.504636526107788, "o", "\r\n"]
+[6.606478929519653, "o", "111: command not found\r\n\u001b]0;aron@aron-virtual-machine: ~\u0007aron@aron-virtual-machine:~$ "]
+[7.3578033447265625, "o", "d"]
+[7.49468207359314, "o", "i"]
+[7.595900774002075, "o", "r"]
+[8.170285940170288, "o", "\r\n"]
+[8.274335622787476, "o", "code  Desktop  Documents  Downloads  examples.desktop  go  Music  Ops  Ops.bak\tPictures  Public  schema.sql  snap  Templates  TEST.txt  Videos\r\n\u001b]0;aron@aron-virtual-machine: ~\u0007aron@aron-virtual-machine:~$ "]
+[188.38144278526306, "o", "\n\u7531\u4e8e\u957f\u65f6\u95f4\u6ca1\u6709\u64cd\u4f5c\uff0c\u8fde\u63a5\u5df2\u65ad\u5f00!"]
