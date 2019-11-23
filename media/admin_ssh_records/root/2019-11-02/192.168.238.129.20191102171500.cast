@@ -1,3 +1,0 @@
-{"version": 2, "width": 150, "height": 30, "timestamp": 1572686098, "title": "Demo", "env": {"TERM": "xterm", "SHELL": "/bin/bash"}}
-[0.28517889976501465, "o", "Activate the web console with: systemctl enable --now cockpit.socket\r\n\r\nLast login: Sat Nov  2 05:12:15 2019 from 192.168.238.128\r\r\n"]
-[0.38654160499572754, "o", "\u001b]0;root@localhost:~\u0007[root@localhost ~]# "]
