@@ -222,6 +222,11 @@ class ProjectConfigSerializer(serializers.ModelSerializer):
         model = ProjectConfig
         fields = '__all__'
 
+class ProjTicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project_Config_Ticket
+        fields = '__all__'
+
 
 class AssetProviderSerializer(serializers.ModelSerializer):
     assets = AssetsSerializer(many=True, read_only=True)

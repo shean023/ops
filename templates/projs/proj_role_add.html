@@ -1,0 +1,182 @@
+<div class="col-xs-12">
+    <form action="" id="project_config">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h3 class="box-title">基础配置</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="project_role" style="display: block">项目角色</label>
+                                <input type="text" class="form-control" id="project_role" name="project_role" placeholder="项目角色名称" style="display: inline-block; width: 49%">
+                        </div>
+                        <!-- /.form-group -->
+                        <div class="form-group">
+                            <label for="repo" style="display: block">选择仓库类型</label>
+                            <select class="form-control select2" style="width: 49%;" name="repo" id="repo" >
+                                <option value="" selected>请选择仓库类型</option>
+                                {% for repo in repos %}
+                                    <option value="{{ repo.0 }}">{{ repo.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="svn_auth" style="display: none">
+                            <label for="repo" style="display: block">SVN账号密码</label>
+                            <input type="text" class="form-control" id="repo_user" name="repo_user"
+                                   placeholder="输入SVN账号"
+                                   style="display: inline-block; width: 49%">
+                            <input type="password" class="form-control" id="repo_password" name="repo_password"
+                                   placeholder="输入SVN密码"
+                                   style="display: inline-block; width: 49%; float: right">
+                        </div>
+                        <!-- /.form-group -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="repo_url">仓库地址</label>
+                            <input type="text" class="form-control" id="repo_url" name="repo_url">
+                        </div>
+                        <!-- /.form-group -->
+                        <div class="form-group">
+                            <label for="repo_model">分支/Tag</label>
+                            <select class="form-control select2" style="width: 100%;" name="repo_model" id="repo_model">
+
+                            </select>
+                        </div>
+                        <!-- /.form-group -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+        </div>
+
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h3 class="box-title">宿主机配置</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="src_dir">代码检出地址&nbsp;<span data-toggle="tooltip" title="宿主机存放所有源代码的统一路径">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <input type="text" class="form-control" id="src_dir" name="src_dir">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="exclude">排除文件&nbsp;<span data-toggle="tooltip"
+                                                                 title="排除不需要打包同步至服务器的文件或目录，一行一个，支持通配符，如：*.log">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <textarea class="form-control" rows="4" id="exclude" name="exclude"></textarea>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+        </div>
+
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h3 class="box-title">目标服务器配置</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="deploy_webroot">部署路径&nbsp;<span data-toggle="tooltip"
+                                                                        title="指定webroot目录，如：/usr/local/tomcat/webapps">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <input type="text" class="form-control" id="deploy_webroot" name="deploy_webroot">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="run_user">用户&nbsp;<span data-toggle="tooltip" title="指定运行服务的用户，默认是root">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <input type="text" class="form-control" id="run_user" name="run_user">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="deploy_releases">版本仓库路径&nbsp;<span data-toggle="tooltip" title="用于存储、回滚等版本管理">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <input type="text" class="form-control" id="deploy_releases" name="deploy_releases">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="releases_num">版本保留数&nbsp;<span data-toggle="tooltip" title="默认保留20个">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <input type="text" class="form-control" id="releases_num" name="releases_num">
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+        </div>
+
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h3 class="box-title">任务配置</h3> <span
+                    style="color: #FF0000">* 所有任务必须是shell可以执行的命令，一行一条，注释以#开头</span>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="prev_deploy">代码检出前任务&nbsp;<span data-toggle="tooltip" title="如安装依赖、配置环境变量等">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <div id="prev_deploy" name="prev_deploy"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prev_release">部署前任务&nbsp;<span data-toggle="tooltip"
+                                                                       title="在目标服务器同步代码至版本库后的操作，如暂停服务等">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <div id="prev_release" name="prev_release"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="post_deploy">代码检出后任务&nbsp;<span data-toggle="tooltip" title="如编译、清除文件等">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <span class="text-red">系统默认会切换到代码路径，所以无需再手工切换目录</span>
+                            <div id="post_deploy" name="post_deploy"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="post_release">部署后任务&nbsp;<span data-toggle="tooltip"
+                                                                       title="在目标服务器新版本服务切换后的操作，如删除缓存、启动服务等">
+                            <i class="fa fa-exclamation-circle"></i></span></label>
+                            <div id="post_release" name="post_release"></div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+        </div>
+
+
+        <div class="box-footer">
+            <button type="button" class="btn btn-default pull-right" onclick="history.go(-1)">返回</button>
+            <button type="button" class="btn btn-info pull-right add-role-conf" style="margin-right: 5px">添加</button>
+        </div>
+    </form>
+</div>

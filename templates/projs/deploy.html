@@ -14,12 +14,12 @@
                     <div class="form-group">
                         <label for="project">当前项目</label>
                         <input type="text" class="form-control" id="project" name="project"
-                               value="{{ config.project.project_name }} | {{ config.project.get_project_env_display }}"
+                               value="{{ config.proj_name }} | {{ config.proj_env }}"
                                readonly>
                     </div>
                     <!-- /.form-group -->
 
-                    {% if config.repo_model == 'branch' %}
+                    {% if config.proj_role.repo_model == 'branch' %}
                         <div class="form-group">
                             <label for="repo_model">选择分支</label>
                             <div class="input-group">
@@ -50,7 +50,7 @@
                                 </div>
                             </div>
                         </div>
-                    {% elif config.repo_model == 'tag' %}
+                    {% elif config.proj_role.repo_model == 'tag' %}
                         <div class="form-group">
                             <label for="repo_model">选择tag</label>
                             <div class="input-group">
@@ -67,7 +67,7 @@
                             </div>
                         </div>
 
-                    {% elif config.repo_model == 'trunk' %}
+                    {% elif config.proj_role.repo_model == 'trunk' %}
                         <div class="form-group">
                             <label for="repo_model">当前节点</label>
                             <select class="form-control select2" name="repo_model" id="repo_model" disabled>

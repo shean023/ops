@@ -32,18 +32,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="project">选择项目</label>
-                            <select class="form-control select2" style="width: 100%;" id="project" name="project"
-                                    disabled="disabled">
-                                {% for project in projects %}
-                                    <option value="{{ project.id }}">{{ project.project_name }}&nbsp;|&nbsp;{{ project.get_project_env_display }}</option>
-                                {% endfor %}
-                            </select>
+                            <label for="project_role" style="display: block">项目角色</label>
+                                <input type="text" class="form-control" id="project_role" name="project_role" placeholder="项目角色名称" style="display: inline-block; width: 49%">
                         </div>
                         <!-- /.form-group -->
                         <div class="form-group">
-                            <label for="repo">选择仓库类型</label>
-                            <select class="form-control select2" style="width: 100%;" name="repo" id="repo">
+                            <label for="repo" style="display: block">选择仓库类型</label>
+                            <select class="form-control select2" style="width: 49%;" name="repo" id="repo">
                                 {% for repo in repos %}
                                     <option value="{{ repo.0 }}">{{ repo.1 }}</option>
                                 {% endfor %}
@@ -121,16 +116,16 @@
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="deploy_server">目标服务器&nbsp;<span data-toggle="tooltip" title="部署代码的机器">
-                            <i class="fa fa-exclamation-circle"></i></span></label>
-                            <select class="form-control select2" style="width: 100%;" multiple="multiple"
-                                    name="deploy_server" id="deploy_server">
-                                {% for server_asset in server_assets %}
-                                    <option value="{{ server_asset.id }}">{{ server_asset.assets.asset_management_ip }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+{#                        <div class="form-group">#}
+{#                            <label for="deploy_server">目标服务器&nbsp;<span data-toggle="tooltip" title="部署代码的机器">#}
+{#                            <i class="fa fa-exclamation-circle"></i></span></label>#}
+{#                            <select class="form-control select2" style="width: 100%;" multiple="multiple"#}
+{#                                    name="deploy_server" id="deploy_server">#}
+{#                                {% for server_asset in server_assets %}#}
+{#                                    <option value="{{ server_asset.id }}">{{ server_asset.assets.asset_management_ip }}</option>#}
+{#                                {% endfor %}#}
+{#                            </select>#}
+{#                        </div>#}
 
                         <div class="form-group">
                             <label for="deploy_webroot">部署路径&nbsp;<span data-toggle="tooltip"
@@ -210,45 +205,45 @@
             </div>
             <!-- /.box-body -->
         </div>
-
-        <div class="box box-info">
-            <div class="box-header with-border">
-                <h3 class="box-title">部署通知</h3>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label style="cursor: pointer">
-                                <input type="checkbox" class="minimal" id="wx_notice">&nbsp;&nbsp;&nbsp;微信通知
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label style="cursor: pointer">
-                                <input type="checkbox" class="minimal" id="mail_notice">&nbsp;&nbsp;&nbsp;邮箱通知
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6" id="mail_info" style="display: none">
-                        <div class="form-group">
-                            <label for="exclude">收件人</label>
-                            <textarea class="form-control" rows="2" id="to_mail" name="to_mail"
-                                      placeholder="多个邮箱用英文逗号隔开"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="exclude">抄送人</label>
-                            <textarea class="form-control" rows="2" id="cc_mail" name="cc_mail"
-                                      placeholder="多个邮箱用英文逗号隔开"></textarea>
-                        </div>
-                    </div>
-                    <!-- /.col -->
-                </div>
-                <!-- /.row -->
-            </div>
-            <!-- /.box-body -->
-        </div>
+{##}
+{#        <div class="box box-info">#}
+{#            <div class="box-header with-border">#}
+{#                <h3 class="box-title">部署通知</h3>#}
+{#            </div>#}
+{#            <!-- /.box-header -->#}
+{#            <div class="box-body">#}
+{#                <div class="row">#}
+{#                    <div class="col-md-6">#}
+{#                        <div class="form-group">#}
+{#                            <label style="cursor: pointer">#}
+{#                                <input type="checkbox" class="minimal" id="wx_notice">&nbsp;&nbsp;&nbsp;微信通知#}
+{#                            </label>#}
+{#                        </div>#}
+{#                        <div class="form-group">#}
+{#                            <label style="cursor: pointer">#}
+{#                                <input type="checkbox" class="minimal" id="mail_notice">&nbsp;&nbsp;&nbsp;邮箱通知#}
+{#                            </label>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <div class="col-md-6" id="mail_info" style="display: none">#}
+{#                        <div class="form-group">#}
+{#                            <label for="exclude">收件人</label>#}
+{#                            <textarea class="form-control" rows="2" id="to_mail" name="to_mail"#}
+{#                                      placeholder="多个邮箱用英文逗号隔开"></textarea>#}
+{#                        </div>#}
+{#                        <div class="form-group">#}
+{#                            <label for="exclude">抄送人</label>#}
+{#                            <textarea class="form-control" rows="2" id="cc_mail" name="cc_mail"#}
+{#                                      placeholder="多个邮箱用英文逗号隔开"></textarea>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <!-- /.col -->#}
+{#                </div>#}
+{#                <!-- /.row -->#}
+{#            </div>#}
+{#            <!-- /.box-body -->#}
+{#        </div>#}
 
         <div class="box-footer">
             <button type="button" class="btn btn-default pull-right" onclick="history.go(-1)">返回</button>
@@ -281,7 +276,7 @@
             });
 
             $.get('/api/project_config/' + {{ pk }} +'/', function (res) {
-                $('#project').val(res.project).trigger('change');
+                $('#project_role').val(res.project_role).trigger('change');
                 $('#repo').val(res.repo).trigger('change');
                 $('#repo_url').val(res.repo_url);
                 $('#repo_model').val(res.repo_model).trigger('change');
@@ -290,12 +285,10 @@
                 $('#src_dir').val(res.src_dir);
                 $('#exclude').val(res.exclude);
                 $('#run_user').val(res.run_user);
-                $('#deploy_server').val(res.deploy_server).trigger('change');
                 $('#deploy_webroot').val(res.deploy_webroot);
                 $('#deploy_releases').val(res.deploy_releases);
                 $('#releases_num').val(res.releases_num);
                 init_editor(editors, res);
-                notice(res.wx_notice, res.to_mail, res.cc_mail)
             });
         });
 
@@ -315,28 +308,6 @@
             }
         }
 
-        function notice(wx_notice, to_mail, cc_mail) {
-            if (wx_notice) {
-                $('#wx_notice').iCheck('check');
-            }
-
-            if (to_mail.length > 0) {
-                $('#mail_notice').iCheck('check');
-                $('#mail_info').css('display', 'block');
-                $('#to_mail').val(to_mail);
-                $('#cc_mail').val(cc_mail)
-            }
-        }
-
-        $('#mail_notice').on('ifChecked', function () {
-            $('#mail_info').css('display', 'block');
-            $('#to_mail').attr('name', 'to_mail');
-            $('#cc_mail').attr('name', 'cc_mail');
-        }).on('ifUnchecked', function () {
-            $('#mail_info').css('display', 'none');
-            $('#to_mail, #cc_mail').removeAttr('name')
-        });
-
         $('#repo').on('change', function () {
             let repo = $(this).val();
             let repo_model = $('#repo_model');
@@ -354,8 +325,8 @@
         $('.update-conf').on('click', function () {
             let data = $('#project_config').serializeJson();
             let v = get_editor_value(editors);
-            $.extend(data, v, {project: $('#project').val(), wx_notice: false});
-            data.wx_notice = !!$('#wx_notice').is(':checked');
+            $.extend(data, v, {project: $('#project_role').val(), wx_notice: false});
+
 
             $.ajax({
                 url: '/api/project_config/' + {{ pk }} +'/',

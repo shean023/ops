@@ -1,0 +1,80 @@
+<div class="col-sm-7 pull-left" style="margin-bottom: 3px; margin-top: 3px">
+    <a href="{% url 'proj_config' %}?type=#tab_2">
+        <button class="btn btn-sm btn-success pull-left" id="add-ticket_config">
+            <i class="fa fa-plus-square"></i>
+            <span class="bigger-110">新增工单</span>
+        </button>
+    </a>
+</div>
+
+<div class="col-xs-12">
+    <!-- /.box -->
+    <div class="box">
+        <!-- dataTable -->
+
+        <div class="box-body">
+            <table id="proj-ticket" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>环境</th>
+                    <th>项目</th>
+                    <th>部署组</th>
+                    <th>角色</th>
+                    <th>状态</th>
+                    <th>通知</th>
+                    <th>备注</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for pt in proj_Tickets %}
+                    <tr>
+                        <td>{{ pt.id }}</td>
+                        <td>{% for projenv in projenvs %}{% if projenv.id == pt.proj_env %}{{ projenv.projenv_name }}{% endif %}{% endfor %}</td>
+                        <td>{% for projname in projnames %}{% if projname.id == pt.proj_name %}{{ projname.projname_name }}{% endif %}{% endfor %}</td>
+                        <td>{% for gl in groupList %}{% if gl.id == pt.proj_audit_group%}{{ gl.name }}{% endif %}{% endfor %}</td>
+                        <td>{{ pt.proj_role.project_role }}</td>
+                        <td>
+
+                            {% if pt.proj_status == 0 %}
+                                <button type="button" class="btn  btn-warning">不可用</button>
+                            {% else %}
+                                <button type="button" class="btn  btn-success">可用</button>
+                            {% endif %}
+
+                        </td>
+                        <td>{% if pt.wx_notice == 1 %}微信{% endif %}|{% if pt.to_mail %}郵件{% endif %}</td>
+                        <td>{{ pt.proj_memo }}</td>
+                        <td>
+                            {% if request.user.is_superuser %}
+                                <a href="{% url 'proj_ticket' %}?id={{ pt.id }}" target="_blank">
+                                    <button type="button" class="btn btn-success btn-xs modify">工单明细</button>
+                                </a>
+                            {% endif %}
+
+                            <a href="{% url 'deploy_apply' pk=pt.id %}" target="_blank">
+                                <button type="button" class="btn btn-info btn-xs">部署申请</button>
+                            </a>
+
+                            <a href="{% url 'deploy' pk=pt.id %}" target="_blank">
+                                <button type="button" class="btn btn-info btn-xs">部署</button>
+                            </a>
+                            <a href="{% url 'rollback' pk=pt.id %}?mode=rollback" target="_blank">
+                                <button type="button" class="btn btn-warning btn-xs">回滚</button>
+                            </a>
+
+                            {% if request.user.is_superuser %}
+                                <button type="button" class="btn btn-danger btn-xs delete"
+                                        data-id="{{ pt.id }}"> 删除工单
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- /.box-body -->
+    </div>
+</div>

@@ -1,0 +1,118 @@
+<div class="col-xs-12">
+    <form action="" id="proj_ticket_add">
+        <div class="box box-info" style="display: inline-block; width: 49%">
+            <div class="box-header with-border">
+                <h3 class="box-title">部署工单</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="proj_env" style="display: block">环境</label>
+                            <select class="form-control" selected="selected" name="proj_env" id='proj_env' required
+                                    style="display: inline-block; width: 100%">
+                                <option selected="selected" name="proj_env">请选择环境</option>
+                                {% for projenv in projenvs %}
+                                    <option value="{{ projenv.id }}" name="proj_env">{{ projenv.projenv_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="proj_name">项目名称</label>
+                            <select class="form-control" name="proj_name" id="proj_name" required>
+                                <option selected="selected" name="proj_name">请选择项目</option>
+                                {% for projname in projnames %}
+                                    <option value="{{ projname.id }}" name="proj_name">{{ projname.projname_name }}</option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label>部署授权组<i class="fa fa-info-circle" data-toggle="tooltip"
+                                           title="选择的用户组能够授权部署工单"></i></label> <br>
+                            <select class="form-control" name="proj_audit_group">
+                                <option name="proj_audit_group" selected="selected" value="0">选择一个授权组</option>
+                                {% for ds in groupList %}
+                                    <option name="proj_audit_group" value="{{ ds.id }}">{{ ds.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>角色<i class="fa fa-info-circle" data-toggle="tooltip"
+                                           title=工单与角色关联"></i></label> <br>
+                            <select class="form-control" name="proj_role">
+                                <option name="proj_role" selected="selected" value="0">选择一个角色</option>
+                                {% for rl in roleList %}
+                                    <option name="proj_role" value="{{ rl.id }}">{{ rl.project_role }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- /.form-group -->
+                        <div class="form-group">
+                            <label for="proj_status">启用</label>
+                            <select class="form-control" name="proj_status" id="proj_status" required>
+                                <option selected="selected" name="proj_status">请选择是否启用</option>
+                                <option selected="selected" value="0" name="proj_status">否</option>
+                                <option value="1" name="proj_status">是</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="proj_memo">备注</label>
+                            <input class="form-control" name="proj_memo">
+                        </div>
+
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">部署通知</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label style="cursor: pointer">
+                                    <input type="checkbox" class="minimal" id="wx_notice">&nbsp;&nbsp;&nbsp;微信通知
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label style="cursor: pointer">
+                                    <input type="checkbox" class="minimal" id="mail_notice">&nbsp;&nbsp;&nbsp;邮箱通知
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" id="mail_info" style="display: none">
+                            <div class="form-group">
+                                <label for="exclude">收件人</label>
+                                <textarea class="form-control" rows="2" id="to_mail" name="to_mail"
+                                          placeholder="多个邮箱用英文逗号隔开"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="exclude">抄送人</label>
+                                <textarea class="form-control" rows="2" id="cc_mail" name="cc_mail"
+                                          placeholder="多个邮箱用英文逗号隔开"></textarea>
+                            </div>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <div class="box-footer">
+                <button type="button" class="btn btn-default pull-right" onclick="history.go(-1)">返回</button>
+                <button type="button" class="btn btn-info pull-right add-ticket-conf" style="margin-right: 5px">添加</button>
+            </div>
+        </div>
+    </form>
+</div>

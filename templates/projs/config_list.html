@@ -21,69 +21,26 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-sm-7 pull-left" style="margin-bottom: 3px; margin-top: 3px; display: none">
-            <a href="{% url 'proj_config' %}">
-                <button class="btn btn-sm btn-success pull-left" id="add-project_config">
-                    <i class="fa fa-plus-square"></i>
-                    <span class="bigger-110">新增项目配置</span>
-                </button>
-            </a>
-        </div>
-        <div class="col-xs-12">
-            <!-- /.box -->
-            <div class="box">
-                <!-- dataTable -->
-                <div class="box-body">
-                    <table id="project-conf" class="table table-bordered table-striped">
-                        <thead>
-                        <tr>
-                            <th>项目名称</th>
-                            <th>项目环境</th>
-                            <th>操作</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for config in configs %}
-                            <tr>
-                                <td>{{ config.project.project_name }}</td>
-                                <td>
-                                    {% if config.project.project_env == 'test' %}
-                                        <span class="badge bg-green">{{ config.project.get_project_env_display }}</span>
-                                    {% elif config.project.project_env == 'fz' %}
-                                        <span class="badge bg-yellow">{{ config.project.get_project_env_display }}</span>
-                                    {% elif config.project.project_env == 'prod' %}
-                                        <span class="badge bg-red">{{ config.project.get_project_env_display }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if request.user.is_superuser %}
-                                        <a href="{% url 'proj_config' %}?id={{ config.id }}" target="_blank">
-                                            <button type="button" class="btn btn-success btn-xs modify">配置明细</button>
-                                        </a>
-                                    {% endif %}
-                                    <a href="{% url 'deploy' pk=config.id %}" target="_blank">
-                                        <button type="button" class="btn btn-info btn-xs">部署</button>
-                                    </a>
-                                    <a href="{% url 'rollback' pk=config.id %}?mode=rollback" target="_blank">
-                                        <button type="button" class="btn btn-warning btn-xs">回滚</button>
-                                    </a>
-                                    {% if request.user.is_superuser %}
-                                        <button type="button" class="btn btn-danger btn-xs delete"
-                                                data-id="{{ config.id }}"> 删除配置
-                                        </button>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+        <!-- Custom Tabs -->
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs" id="myTab">
+                <li class="active" role="presentation"><a href="#tab_1" data-toggle="tab">角色列表</a></li>
+                <li role="presentation"><a href="#tab_2" data-toggle="tab">发布工单列表</a></li>
+            </ul>
+            <div class="tab-content" style="padding: 0">
+                <div class="tab-pane  active" id="tab_1">
+                    {% include 'projs/proj_roles_list.html' %}
                 </div>
-                <!-- /.box-body -->
+                <div class="tab-pane" id="tab_2">
+                    {% include 'projs/proj_ticket_list.html' %}
+                </div>
             </div>
-            <!-- /.box -->
+            <!-- /.tab-content -->
         </div>
+        <!-- nav-tabs-custom -->
     </div>
     <!-- /.row -->
+
 
 {% endblock %}
 
@@ -94,20 +51,30 @@
     <script src="{% static 'AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
 
     <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+    <script>
+        var url = document.location.toString();
+        if (url.match('#')) {
+            $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+        }
+        // Change hash for page-reload
+        $('.nav-tabs a').on('shown.bs.tab', function (e) {
+            window.location.hash = e.target.hash;
+        })
+    </script>
 
     <script>
         $(function () {
-            project_conf_table = $('#project-conf').DataTable({
+            proj_role_table = $('#proj-role').DataTable({
                 'ordering': false,
             });
 
             {% if request.user.is_superuser %}
-                $('#add-project_config').css('display', 'block');
+                $('#add-role_config').css('display', 'block');
             {% endif %}
         });
 
         // 删除project-conf
-        $('#project-conf tbody').on('click', '.delete', function () {
+        $('#proj-role tbody').on('click', '.delete', function () {
 
             let pk = $(this).attr('data-id');
             let tr_obj = $(this).parents('tr');
@@ -121,7 +88,52 @@
                             url: '/api/project_config/' + pk + '/',
                             method: 'DELETE',
                             success: function () {
-                                project_conf_table.row(tr_obj).remove().draw();
+                                proj_role_table.row(tr_obj).remove().draw();
+                            },
+                            error: function (data) {
+                                $.alert({
+                                    title: 'Tips',
+                                    type: 'red',
+                                    content: '删除失败！' + data.responseText,
+                                })
+                            }
+                        })
+                    },
+                    Cancel: function () {
+                        //
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(function () {
+            proj_ticket_table = $('#proj-ticket').DataTable({
+                'ordering': false,
+            });
+
+            {% if request.user.is_superuser %}
+                $('#add-ticket_config').css('display', 'block');
+            {% endif %}
+        });
+
+        // 删除proj-ticket
+        $('#proj-ticket tbody').on('click', '.delete', function () {
+
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+            $.confirm({
+                title: 'Tips',
+                content: '确定要删除这条记录么？',
+                type: 'red',
+                buttons: {
+                    Ok: function () {
+                        $.ajax({
+                            url: '/api/proj_ticket/' + pk + '/',
+                            method: 'DELETE',
+                            success: function () {
+                                proj_ticket_table.row(tr_obj).remove().draw();
                             },
                             error: function (data) {
                                 $.alert({

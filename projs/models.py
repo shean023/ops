@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 
 class Project(models.Model):
     """项目表"""
@@ -39,7 +40,7 @@ class ProjectConfig(models.Model):
         ('tag', 'tag'),
         ('trunk', 'trunk'),
     )
-    project = models.OneToOneField('Project', on_delete=models.CASCADE)
+    project_role = models.CharField(max_length=20, verbose_name='项目角色名称', null=False, blank=False)
     repo = models.CharField(choices=project_models, max_length=3, verbose_name='仓库类型')
     repo_user = models.CharField(max_length=10, verbose_name='仓库用户名', blank=True, default='')
     repo_password = models.CharField(max_length=16, verbose_name='仓库密码', blank=True, default='')
@@ -48,7 +49,7 @@ class ProjectConfig(models.Model):
     src_dir = models.CharField(max_length=100, verbose_name='代码检出目录')
     exclude = models.TextField(blank=True, verbose_name='排除文件', default='')
     run_user = models.CharField(max_length=10, verbose_name='运行服务用户', default='root')
-    deploy_server = models.ManyToManyField('assets.ServerAssets', verbose_name='目标部署机器')
+    #deploy_server = models.ManyToManyField('assets.ServerAssets', verbose_name='目标部署机器')
     deploy_webroot = models.CharField(max_length=100, verbose_name='目标机器webroot')
     deploy_releases = models.CharField(max_length=100, verbose_name='目标机器版本库地址')
     releases_num = models.PositiveSmallIntegerField(verbose_name='版本保留个数', default=20)
@@ -57,16 +58,34 @@ class ProjectConfig(models.Model):
     prev_release = models.TextField(blank=True, verbose_name='切换版本前操作', default='')
     post_release = models.TextField(blank=True, verbose_name='切换版本后操作', default='')
     versions = models.TextField(blank=True, verbose_name='存储部署过的版本', default='')
-    wx_notice = models.BooleanField(blank=True, verbose_name='是否开启微信通知', default=False)
-    to_mail = models.TextField(blank=True, default='', verbose_name='收件人邮箱')
-    cc_mail = models.TextField(blank=True, default='', verbose_name='抄送人邮箱')
+    #wx_notice = models.BooleanField(blank=True, verbose_name='是否开启微信通知', default=False)
+    #to_mail = models.TextField(blank=True, default='', verbose_name='收件人邮箱')
+    #cc_mail = models.TextField(blank=True, default='', verbose_name='抄送人邮箱')
 
     class Meta:
         db_table = 'ops_project_config'
         verbose_name = '项目配置表'
         verbose_name_plural = '项目配置表'
 
+class Project_Config_Ticket(models.Model):
 
+    proj_name = models.SmallIntegerField(verbose_name='项目名称')
+    proj_env = models.SmallIntegerField(verbose_name='项目环境')
+    proj_audit_group = models.SmallIntegerField(verbose_name='项目授权组', blank=True, null=True, default=None)
+    proj_role = models.ForeignKey('ProjectConfig', on_delete=models.CASCADE, verbose_name='项目角色')
+    proj_uuid = models.UUIDField(default=uuid.uuid4)
+    proj_status = models.SmallIntegerField(verbose_name='是否可用', default=0)
+    proj_memo = models.CharField(max_length=20, blank=True,null=True, verbose_name='备注')
+    wx_notice = models.BooleanField(blank=True, verbose_name='是否开启微信通知', default=False)
+    mail_notice = models.BooleanField(blank=True, verbose_name='是否开启郵件通知', default=False)
+    to_mail = models.TextField(blank=True, default='', verbose_name='收件人邮箱')
+    cc_mail = models.TextField(blank=True, default='', verbose_name='抄送人邮箱')
+
+    class Meta:
+        db_table = 'project_config_ticket'
+        unique_together = ("proj_name", "proj_env")
+        verbose_name = '配置发布工單表'
+        verbose_name_plural = '配置发布工單表'
 class DeployLog(models.Model):
     """部署记录表"""
     d_types = (

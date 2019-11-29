@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'AdminLTE/plugins/iCheck/all.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+    <style>
+
+
+        .box.box-info {
+            border-top: 1px solid #d2d6de;
+        }
+
+        .box-title {
+            color: #00c0ef;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="col-xs-12">
+    <form action="" id="proj_ticket_update">
+        <div class="box box-info" style="display: inline-block; width: 49%">
+            <div class="box-header with-border">
+                <h3 class="box-title">部署工单</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="proj_env" style="display: block">环境</label>
+                            <select class="form-control" selected="selected" name="proj_env" id='proj_env' required
+                                    style="display: inline-block; width: 100%">
+                                <option selected="selected" name="proj_env">请选择环境</option>
+                                {% for projenv in projenvs %}
+                                    <option value="{{ projenv.id }}" name="proj_env">{{ projenv.projenv_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="proj_name">项目名称</label>
+                            <select class="form-control" name="proj_name" id="proj_name" required>
+                                <option selected="selected" name="proj_name">请选择项目</option>
+                                {% for projname in projnames %}
+                                    <option value="{{ projname.id }}" name="proj_name">{{ projname.projname_name }}</option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label>部署授权组<i class="fa fa-info-circle" data-toggle="tooltip"
+                                           title="选择的用户组能够授权部署工单"></i></label> <br>
+                            <select class="form-control" name="proj_audit_group" id="proj_audit_group">
+                                <option name="proj_audit_group" selected="selected" value="0">选择一个授权组</option>
+                                {% for ds in groupList %}
+                                    <option name="proj_audit_group" value="{{ ds.id }}">{{ ds.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>角色<i class="fa fa-info-circle" data-toggle="tooltip"
+                                           title=工单与角色关联"></i></label> <br>
+                            <select class="form-control" name="proj_role" id="proj_role">
+                                <option name="proj_role" selected="selected" value="0">选择一个角色</option>
+                                {% for rl in roleList %}
+                                    <option name="proj_role" value="{{ rl.id }}">{{ rl.project_role }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- /.form-group -->
+                        <div class="form-group">
+                            <label for="proj_status">启用</label>
+                            <select class="form-control" name="proj_status" id="proj_status" required>
+                                <option selected="selected" name="proj_status">请选择是否启用</option>
+                                <option selected="selected" value="0" name="proj_status">否</option>
+                                <option value="1" name="proj_status">是</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="proj_memo">备注</label>
+                            <input class="form-control" name="proj_memo">
+                        </div>
+
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">部署通知</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label style="cursor: pointer">
+                                    <input type="checkbox" class="minimal" id="wx_notice">&nbsp;&nbsp;&nbsp;微信通知
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label style="cursor: pointer">
+                                    <input type="checkbox" class="minimal" id="mail_notice">&nbsp;&nbsp;&nbsp;邮箱通知
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" id="mail_info" style="display: none">
+                            <div class="form-group">
+                                <label for="exclude">收件人</label>
+                                <textarea class="form-control" rows="2" id="to_mail" name="to_mail"
+                                          placeholder="多个邮箱用英文逗号隔开"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="exclude">抄送人</label>
+                                <textarea class="form-control" rows="2" id="cc_mail" name="cc_mail"
+                                          placeholder="多个邮箱用英文逗号隔开"></textarea>
+                            </div>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <div class="box-footer">
+                <button type="button" class="btn btn-info pull-right update-ticket-conf" style="margin-right: 5px">修改</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+    <script src="{% static 'ace/js/ace.js' %}"></script>
+    <script src="{% static 'ace/js/mode-sh.js' %}"></script>
+    <script src="{% static 'ace/js/theme-tomorrow.js' %}"></script>
+    <script src="{% static 'ace/js/ext-language_tools.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/iCheck/icheck.min.js' %}"></script>
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+
+    <script>
+
+
+        $(function () {
+            $("[data-toggle='tooltip']").tooltip();
+            // Initialize Select2 Elements
+            $('.select2').select2({
+                allowClear: true
+            });
+
+            $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+                checkboxClass: 'icheckbox_minimal-blue',
+            });
+
+            $.get('/api/proj_ticket/' + {{ pk }} +'/', function (res) {
+                $('#proj_env').val(res.proj_env).trigger('change');
+                $('#proj_name').val(res.proj_name).trigger('change');
+                $('#proj_audit_group').val(res.proj_audit_group).trigger('change');
+                $('#proj_role').val(res.proj_role).trigger('change');
+                $('#proj_status').val(res.proj_status).trigger('change');
+                $('#proj_memo').val(res.proj_memo);
+
+                notice(res.mail_notice, res.wx_notice, res.to_mail, res.cc_mail)
+            });
+        });
+
+
+        function notice(mail_notice, wx_notice, to_mail, cc_mail) {
+            if (wx_notice) {
+                $('#wx_notice').iCheck('check');
+            }
+
+            if (mail_notice == 1) {
+
+                $('#mail_notice').iCheck('check');
+                $('#mail_info').css('display', 'block');
+                $('#to_mail').val(to_mail);
+                $('#cc_mail').val(cc_mail)
+
+            } else {
+
+                $('#mail_notice').iCheck('uncheck');
+                $('#mail_info').css('none', 'block');
+                $('#to_mail').val(to_mail);
+                $('#cc_mail').val(cc_mail)
+
+            }
+        }
+
+        $('#mail_notice').on('ifChecked', function () {
+            $('#mail_info').css('display', 'block');
+            $('#to_mail').attr('name', 'to_mail');
+            $('#cc_mail').attr('name', 'cc_mail');
+        }).on('ifUnchecked', function () {
+            $('#mail_info').css('display', 'none');
+            $('#to_mail, #cc_mail').removeAttr('name')
+        });
+        // 修改项目配置
+        $('.update-ticket-conf').on('click', function () {
+            let data = $('#proj_ticket_update').serializeJson();
+            $.extend(data, {proj_name: $('#proj_name').val(),mail_notice:false, wx_notice: false});
+            data.wx_notice = !!$('#wx_notice').is(':checked');
+            data.mail_notice = !!$('#mail_notice').is(':checked');
+
+            $.ajax({
+                url: '/api/proj_ticket/' + {{ pk }} +'/',
+                type: 'PUT',
+                data: JSON.stringify(data),
+                dataType: 'json',
+                contentType: "application/json",
+                success: function () {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'green',
+                        content: '修改成功！',
+                    })
+                },
+                error: function (response) {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'red',
+                        content: response.responseText,
+                    })
+                }
+            })
+        });
+
+        function get_editor_value(elements) {
+            let editor_values = {};
+            for (let element of elements) {
+                let editor_name = element + 'editor';
+                editor_name = ace.edit(element);
+                editor_values[element] = editor_name.getSession().getValue();
+            }
+            return editor_values
+        }
+
+        // 将数据JSON化
+        (function ($) {
+            $.fn.serializeJson = function () {
+                let serializeObj = {};
+                let array = this.serializeArray();
+                $(array).each(function () {
+                    if (serializeObj[this.name]) {
+                        if ($.isArray(serializeObj[this.name])) {
+                            serializeObj[this.name].push(this.value);
+                        } else {
+                            serializeObj[this.name] = [serializeObj[this.name], this.value];
+                        }
+                    } else {
+                        if (this.name === 'deploy_server') {
+                            serializeObj[this.name] = [this.value];
+                        } else {
+                            serializeObj[this.name] = this.value;
+                        }
+                    }
+                });
+                return serializeObj;
+            };
+        })(jQuery);
+    </script>
+
+{% endblock %}

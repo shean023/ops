@@ -282,11 +282,11 @@ desired effect
                             <ul class="treeview-menu">
                                 {% if request.user.is_superuser %}
                                     <li><a href="{% url 'proj_config' %}"><i class="fa fa-external-link"></i>
-                                        发布配置</a>
+                                        角色配置</a>
                                     </li>
                                 {% endif %}
                                 {% if perms.projs.deploy_project %}
-                                    <li><a href="{% url 'config_list' %}"><i class="fa fa-bar-chart"></i> 发布管理</a>
+                                    <li><a href="{% url 'config_list' %}"><i class="fa fa-bar-chart"></i> 发布配置</a>
                                     </li>
                                 {% endif %}
                                 {% if request.user.is_superuser %}

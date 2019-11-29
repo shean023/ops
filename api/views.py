@@ -96,6 +96,12 @@ class ProjectConfigViewSet(viewsets.ModelViewSet):
     permission_classes = (CustomDjangoModelPermission,)
 
 
+class ProjTicketViewSet(viewsets.ModelViewSet):
+    queryset = Project_Config_Ticket.objects.all().order_by('id')
+    serializer_class = ProjTicketSerializer
+    permission_classes = (CustomDjangoModelPermission,)
+
+
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all().order_by('id')
     serializer_class = ServiceSerializer

@@ -1,0 +1,58 @@
+<div class="col-sm-7 pull-left" style="margin-bottom: 3px; margin-top: 3px">
+    <a href="{% url 'proj_config' %}">
+        <button class="btn btn-sm btn-success pull-left" id="add-role_config">
+            <i class="fa fa-plus-square"></i>
+            <span class="bigger-110">新增角色</span>
+        </button>
+    </a>
+</div>
+
+<div class="col-xs-12">
+    <!-- /.box -->
+    <div class="box">
+        <!-- dataTable -->
+
+        <div class="box-body">
+            <table id="proj-role" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>项目角色名称</th>
+                    <th>仓库</th>
+                    <th>分支/Tag</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for config in configs %}
+                    <tr>
+                        <td>{{ config.id }}</td>
+                        <td>{{ config.project_role }}</td>
+                        <td>{{ config.repo_url }}</td>
+                        <td>{{ config.repo_model }}</td>
+                        <td>
+                            {% if request.user.is_superuser %}
+                                <a href="{% url 'proj_config' %}?id={{ config.id }}" target="_blank">
+                                    <button type="button" class="btn btn-success btn-xs modify">配置明细</button>
+                                </a>
+                            {% endif %}
+    {#                                    <a href="{% url 'deploy' pk=config.id %}" target="_blank">#}
+    {#                                        <button type="button" class="btn btn-info btn-xs">部署</button>#}
+    {#                                    </a>#}
+    {#                                    <a href="{% url 'rollback' pk=config.id %}?mode=rollback" target="_blank">#}
+    {#                                        <button type="button" class="btn btn-warning btn-xs">回滚</button>#}
+    {#                                    </a>#}
+                            {% if request.user.is_superuser %}
+                                <button type="button" class="btn btn-danger btn-xs delete"
+                                        data-id="{{ config.id }}"> 删除配置
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- /.box-body -->
+    </div>
+</div>

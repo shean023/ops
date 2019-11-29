@@ -1,0 +1,13 @@
+ <script src="https://github.com/lou/multi-select/blob/master/js/jquery.multi-select.js"></script>
+<select class="form-control" multiple="multiple" size="2" id="ticket_platform"
+                                                name="ticket_platform" style="width: 100%;">
+                                            {% for proj in projnames %}
+                                                {% if proj.id == ticket.proj_name %}
+                                                    {% for pt in proj.platformname.all %}
+                                                        <option value="{{ pt.id }}"
+                                                                name="ticket_platform">{{ pt.platform_name }}</option>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+

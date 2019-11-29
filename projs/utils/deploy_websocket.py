@@ -4,7 +4,8 @@ from collections import deque
 from django.conf import settings
 from projs.tasks import deploy_log
 from conf.logger import deploy_logger
-from projs.models import ProjectConfig
+from projs.models import Project_Config_Ticket
+from assets.models import Assets
 from utils.db.redis_ops import RedisOps
 from projs.utils.git_tools import GitTools
 from projs.utils.svn_tools import SVNTools
@@ -33,9 +34,9 @@ class DeployConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         info = json.loads(text_data)
-        self.config = ProjectConfig.objects.select_related('project').get(id=info.get('config_id'))
+        self.config = Project_Config_Ticket.objects.get(id=info.get('config_id'))
 
-        unique_key = self.config.project.project_name + self.config.project.project_env
+        unique_key = self.config.proj_uuid
 
         if self.redis_instance.get(unique_key):
             self.send('有相同的任务正在进行！请稍后重试！')
@@ -56,15 +57,16 @@ class DeployConsumer(WebsocketConsumer):
             self.release_name = commit if commit else self.branch_tag
 
             # 初始化ansible
-            server_objs = self.config.deploy_server.all()
+            #server_objs = self.config.deploy_server.all()
+            server_objs = Assets.objects.all()
             host_ids = [server.id for server in server_objs]
             resource = gen_resource.GenResource().gen_host_list(host_ids=host_ids)
-            self.host_list = [server.assets.asset_management_ip for server in server_objs]
+            self.host_list = [server.asset_management_ip for server in server_objs]
             ans = ansible_api_v2.ANSRunner(resource, sock=self)
 
-            if self.config.repo == 'git':
-                tool = GitTools(repo_url=self.config.repo_url, path=self.config.src_dir,
-                                env=self.config.project.project_env)
+            if self.config.proj_role.repo == 'git':
+                tool = GitTools(repo_url=self.config.proj_role.repo_url, path=self.config.proj_role.src_dir,
+                                env='test')
 
                 tool.checkout(self.branch_tag)
                 if commit:
@@ -75,14 +77,14 @@ class DeployConsumer(WebsocketConsumer):
 
                 self.deploy(rollback, timeline_header, cmd_detail, timeline_body_green, timeline_body_red, ans, info,
                             tool)
-            elif self.config.repo == 'svn':
-                tool = SVNTools(repo_url=self.config.repo_url, path=self.config.src_dir,
-                                env=self.config.project.project_env, username=self.config.repo_user,
-                                password=self.config.repo_password)
+            elif self.config.proj_role.repo == 'svn':
+                tool = SVNTools(repo_url=self.config.proj_role.repo_url, path=self.config.proj_role.src_dir,
+                                env='test', username=self.config.proj_role.repo_user,
+                                password=self.config.proj_role.repo_password)
 
                 if commit:
-                    model_name = '' if self.config.repo_model == 'trunk' else self.branch_tag
-                    self.release_desc = tool.get_commit_msg(int(commit), self.config.repo_model, model_name=model_name)
+                    model_name = '' if self.config.proj_role.repo_model == 'trunk' else self.branch_tag
+                    self.release_desc = tool.get_commit_msg(int(commit), self.config.proj_role.repo_model, model_name=model_name)
                 else:
                     self.release_desc = self.release_name
 
@@ -94,7 +96,7 @@ class DeployConsumer(WebsocketConsumer):
             self.redis_instance.delete(unique_key)
 
     def disconnect(self, close_code):
-        branch_tag = self.config.repo_model if self.release_name == self.release_desc else self.branch_tag
+        branch_tag = self.config.proj_role.repo_model if self.release_name == self.release_desc else self.branch_tag
         try:
             if len(self.host_list) == 0:
                 status = '所有主机均部署失败，主机：{}'.format(', '.join(self.host_list))
@@ -127,11 +129,11 @@ class DeployConsumer(WebsocketConsumer):
         if not rollback:
             if repo == 'svn':
                 # 执行检出代码之前的命令，比如安装依赖等
-                if self.config.prev_deploy:
+                if self.config.proj_role.prev_deploy:
                     self.send_save(timeline_header.format('执行检出代码前置任务'))
-                    self.send_save(cmd_detail.format(self.config.prev_deploy))
+                    self.send_save(cmd_detail.format(self.config.proj_role.prev_deploy))
                     try:
-                        code = tool.run_cmd(self.config.prev_deploy)
+                        code = tool.run_cmd(self.config.proj_role.prev_deploy)
                         if code == 0:
                             self.send_save(timeline_body_green.format('执行检出代码前置任务成功！'))
                         else:
@@ -143,19 +145,19 @@ class DeployConsumer(WebsocketConsumer):
                 # 执行检出代码任务
                 try:
                     self.send_save(timeline_header.format('执行检出代码任务'))
-                    if self.config.repo_model == 'trunk':
-                        tool.checkout(self.config.repo_model, revision=commit)
+                    if self.config.proj_role.repo_model == 'trunk':
+                        tool.checkout(self.config.proj_role.repo_model, revision=commit)
                     else:
-                        tool.checkout(self.config.repo_model, self.branch_tag, revision=commit)
+                        tool.checkout(self.config.proj_role.repo_model, self.branch_tag, revision=commit)
                     self.send_save(timeline_body_green.format('执行检出代码任务成功！'))
                 except Exception as e:
                     self.send_save(timeline_body_red.format('执行检出代码任务失败！'.format(e)), close=True)
             # 执行同步代码之前的命令，比如编译等
-            if self.config.post_deploy:
+            if self.config.proj_role.post_deploy:
                 self.send_save(timeline_header.format('执行同步代码前置任务'))
-                self.send_save(cmd_detail.format(self.config.post_deploy))
+                self.send_save(cmd_detail.format(self.config.proj_role.post_deploy))
                 try:
-                    code = tool.run_cmd(self.config.post_deploy)
+                    code = tool.run_cmd(self.config.proj_role.post_deploy)
                     if code == 0:
                         self.send_save(timeline_body_green.format('执行同步代码前置任务成功！'))
                     else:
@@ -167,7 +169,7 @@ class DeployConsumer(WebsocketConsumer):
             # 检测目标机器是否连通，如果连通，判断是否存在存储代码版本的路径，如果不存在就创建
             self.send_save(timeline_header.format('检测目标机器是否连通'))
             ans.run_module(self.host_list, module_name='file', module_args='path={} state=directory'.format(
-                os.path.join(self.config.deploy_releases, tool.proj_name)), deploy=True)
+                os.path.join(self.config.proj_role.deploy_releases, tool.proj_name)), deploy=True)
 
             # 将代码同步至目标服务器
             try:
@@ -181,40 +183,40 @@ class DeployConsumer(WebsocketConsumer):
 
                 self.send_save(timeline_header.format('执行同步代码任务'))
 
-                self.sync_code(ans, self.host_list, src_dir, des_dir, excludes=self.config.exclude)
+                self.sync_code(ans, self.host_list, src_dir, des_dir, excludes=self.config.proj_role.exclude)
 
                 # 如果运行服务的用户不是root，就将代码目录的属主改为指定的user
-                if self.config.run_user != 'root':
+                if self.config.proj_role.run_user != 'root':
                     ans.run_module(self.host_list, module_name='file',
-                                   module_args='path={} owner={} recurse=yes'.format(des_dir, self.config.run_user),
+                                   module_args='path={} owner={} recurse=yes'.format(des_dir, self.config.proj_role.run_user),
                                    deploy=True, send_msg=False)
 
                 # 将版本保存到数据库
-                if self.config.versions:
-                    version_list = self.config.versions.split(',')
-                    v = deque(version_list, self.config.releases_num)
+                if self.config.proj_role.versions:
+                    version_list = self.config.proj_role.versions.split(',')
+                    v = deque(version_list, self.config.proj_role.releases_num)
                     v.append(self.release_name)
-                    self.config.versions = ','.join(v)
+                    self.config.proj_role.versions = ','.join(v)
 
                     d = set(version_list) - set(v)
                     if d:
                         dir_name = ''.join(d)
                         self.del_release(ans, self.host_list,
-                                         path=os.path.join(self.config.deploy_releases, tool.proj_name),
+                                         path=os.path.join(self.config.proj_role.deploy_releases, tool.proj_name),
                                          dir_name=dir_name)
                 else:
-                    self.config.versions = self.release_name
+                    self.config.proj_role.versions = self.release_name
                 self.config.save()
 
             except Exception as e:
                 self.send_save(timeline_body_red.format('执行同步代码任务失败！{}'.format(e)), close=True)
 
         # 执行部署前任务
-        if self.config.prev_release:
+        if self.config.proj_role.prev_release:
             self.send_save(timeline_header.format('执行部署前置任务'))
-            self.send_save(cmd_detail.format(self.config.prev_release))
+            self.send_save(cmd_detail.format(self.config.proj_role.prev_release))
             try:
-                self.run_cmds(ans, self.host_list, self.config.prev_release)
+                self.run_cmds(ans, self.host_list, self.config.proj_role.prev_release)
             except Exception as e:
                 self.send_save(timeline_body_red.format('执行部署前置任务失败！{}'.format(e)), close=True)
 
@@ -222,18 +224,19 @@ class DeployConsumer(WebsocketConsumer):
         self.send_save(timeline_header.format('执行部署任务'))
         try:
             src = self.gen_dir(tool, info)
-            dest = os.path.join(self.config.deploy_webroot, tool.proj_name)
+            dest = os.path.join(self.config.proj_role.deploy_webroot, tool.proj_name)
+            print(src,dest)
             ans.run_module(self.host_list, module_name='shell',
-                           module_args='rm -rf {} && ln -s {} {}'.format(dest, src, dest), deploy=True)
+                           module_args='rm -rf {} && ln -sf {} {}'.format(dest, src + '/', dest), deploy=True)
         except Exception as e:
             self.send_save(timeline_body_red.format('执行部署任务失败！{}'.format(e)), close=True)
 
         # 执行部署后任务
-        if self.config.post_release:
+        if self.config.proj_role.post_release:
             self.send_save(timeline_header.format('执行部署后置任务'))
-            self.send_save(cmd_detail.format(self.config.post_release))
+            self.send_save(cmd_detail.format(self.config.proj_role.post_release))
             try:
-                self.run_cmds(ans, self.host_list, self.config.post_release)
+                self.run_cmds(ans, self.host_list, self.config.proj_role.post_release)
             except Exception as e:
                 self.send_save(timeline_body_red.format('执行部署后置任务失败！{}'.format(e)), close=True)
 
@@ -265,8 +268,8 @@ class DeployConsumer(WebsocketConsumer):
 
     def gen_dir(self, tool, info):
         commit = info.get('commit', None)
-        des_dir = os.path.join(self.config.deploy_releases, tool.proj_name,
-                               '{}'.format(commit)) if commit else os.path.join(self.config.deploy_releases,
+        des_dir = os.path.join(self.config.proj_role.deploy_releases, tool.proj_name,
+                               '{}'.format(commit)) if commit else os.path.join(self.config.proj_role.deploy_releases,
                                                                                 tool.proj_name,
                                                                                 '{}'.format(self.branch_tag))
         return des_dir

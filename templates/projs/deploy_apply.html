@@ -1,0 +1,409 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block head %}
+    <link rel="stylesheet"
+          href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/css/bootstrap-select.css">
+
+
+    <style>
+        /* dataTables列内容居中 */
+        #project-conf > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #project-conf > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header"><i class="fa fa-pencil-square-o"></i><code>{{ project.project_name }}</code> 项目部署申请
+            </h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+
+                <div class="box box-info" style="display: inline-block; width: 49%">
+                    <div class="box-header with-border">
+                        <legend><i class="fa  fa-hand-o-right"></i>部署工单--<em>1111</em></legend>
+                    </div>
+                    <!-- /.box-header -->
+
+                        <form class="main form-horizontal" id="deploy_apply">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">单号<i class="fa fa-info-circle"
+                                                                               data-toggle="tooltip"
+                                                                               title="单号和所发布项目保持唯一"></i></label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" id="ticket_no" name="ticket_no" required>
+                                    </div>
+
+{#                                        <div class="col-sm-2">#}
+{#                                            <input class="form-control" type="button" onclick="ticket_creat();"#}
+{#                                                   value="站点单号"/>#}
+{#                                        </div>#}
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">环境</label>
+                                    <div class="col-sm-6">
+                                        {% for env in projenvs %}
+                                            {% if env.id == ticket.proj_env %}
+                                                <input class="form-control" name="ticket_env"
+                                                       value="{{ env.projenv_name }}" disabled>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">项目</label>
+                                    <div class="col-sm-6">
+                                        {% for proj in projnames %}
+                                            {% if proj.id == ticket.proj_name %}
+                                                <input class="form-control" name="ticket_proj"
+                                                       value="{{ proj.projname_name }}" disabled>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><i class="fa fa-group"></i> 平台</label>
+                                    <div class="col-sm-6">
+
+                                        <select multiple="multiple" class="form-control selectpicker" id="ticket_platform"
+                                                name="ticket_platform" style="width: 100%;">
+                                            {% for proj in projnames %}
+                                                {% if proj.id == ticket.proj_name %}
+                                                    {% for pt in proj.platformname.all %}
+                                                        <option value="{{ pt.id }}"
+                                                                name="ticket_platform">{{ pt.platform_name }}</option>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><i class="fa fa-group"></i> 应用</label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control selectpicker" id="ticket_app" name="ticket_app"
+                                                required>
+                                            {% for proj in projnames %}
+                                                {% if proj.id == ticket.proj_name %}
+                                                    {% for app in proj.projectapp.all %}
+                                                        <option value="{{ app.id }}"
+                                                                name="ticket_app">{{ app.projapp_name }}</option>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                {% if ticket.proj_role.repo_model == 'branch' %}
+                                    <div class="form-group">
+
+                                        <label class="col-sm-2 control-label">分支</label>
+                                        <div class="input-group col-sm-3">
+                                            <select class="form-control " name="repo_model"
+                                                    id="repo_model">
+                                                <option value="" selected>请选择分支</option>
+                                                {% for local_branch in local_branches %}
+                                                    <option value="{{ local_branch }}">{{ local_branch }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="input-group-addon fresh" data-toggle="tooltip"
+                                                 data-placement="top"
+                                                 title="获取远程仓库最新分支，如果没有添加新的分支，不需要点击获取" style="cursor: pointer">
+                                                <i class="fa fa-refresh"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">选择版本</label>
+                                        <div class="input-group col-sm-3" >
+                                            <select class="form-control" style="width: 100%;"
+                                                    name="repo_release"
+                                                    id="repo_release">
+
+                                            </select>
+                                            <div class="input-group-addon commit" data-toggle="tooltip"
+                                                 data-placement="top"
+                                                 title="获取该分支最新的commits" style="cursor: pointer">
+                                                <i class="fa fa-refresh"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% elif ticket.proj_role.repo_model == 'tag' %}
+                                    <div class="form-group">
+                                        <label for="repo_model">选择tag</label>
+                                        <div class="input-group">
+                                            <select class="form-control select2" name="repo_model" id="repo_model">
+                                                <option value="" selected>请选择tag</option>
+                                                {% for local_tag in local_tags %}
+                                                    <option value="{{ local_tag }}">{{ local_tag }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="input-group-addon fresh" data-toggle="tooltip"
+                                                 data-placement="top"
+                                                 title="获取远程仓库最新tag，如果没有添加新的tag，不需要点击获取" style="cursor: pointer">
+                                                <i class="fa fa-refresh"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% elif ticket.proj_role.repo_model == 'trunk' %}
+                                    <div class="form-group">
+                                        <label for="repo_model">当前节点</label>
+                                        <select class="form-control select2" name="repo_model" id="repo_model" disabled>
+                                            <option value="trunk" selected>Trunk</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="repo_release">选择版本</label>
+                                        <div class="input-group">
+                                            <select class="form-control select2" style="width: 100%;"
+                                                    name="repo_release"
+                                                    id="repo_release">
+
+                                            </select>
+                                            <div class="input-group-addon commit" data-toggle="tooltip"
+                                                 data-placement="top"
+                                                 title="获取该分支最新的commits" style="cursor: pointer">
+                                                <i class="fa fa-refresh"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">发布主题</label>
+                                    <div class="col-sm-6">
+                                        <input class="form-control" name="ticket_subject" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">发布内容</label>
+                                    <div class="col-sm-6">
+                                            <textarea id="ordertextcou" class="form-control" rows="5"
+                                                      name="ticket_content"
+                                                      required></textarea>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">部署指派<i class="fa fa-info-circle"
+                                                                                 data-toggle="tooltip"
+                                                                                 title="指定发布用户"></i></label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" name="ticket_audit" required>
+                                            <option selected="selected" value="" name="ticket_audit">请选择发布用户</option>
+                                            {% for u in userList %}
+                                                {% if u.login_status == True %}
+                                                    <option value="{{ u.username }}" name="ticket_audit"
+                                                            style="color:lightgrey;" title="离线">{{ u.username }}</option>
+                                                {% else %}
+                                                    <option value="{{ u.username }}" name="ticket_audit"
+                                                            style="color:green;" title="在线" >{{ u.username }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">紧急程度</label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" name="ticket_level">
+                                            <option selected="selected" value="0" name="ticket_level">非紧急</option>
+                                            <option value="1" name="ticket_level">紧急</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </fieldset>
+
+
+                        </form>
+                        <!-- /.box-body -->
+                </div>
+                <div class="box-footer" style="width: 49%">
+
+                    <button type="button" class="btn btn-info pull-right add-ticket-conf" style="margin-right: 5px">提交申请
+                    </button>
+                </div>
+
+
+        </div>
+    </div>
+<h4>On Change Result</h4>
+
+
+
+{% endblock %}
+
+{% block js %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/js/bootstrap-select.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script>
+        $('select').selectpicker();
+
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            $("[data-toggle='tooltip']").tooltip();
+        });
+    </script>
+
+    <script>
+        $(function () {
+            $('#ticket_app').change(function () {
+                $('#JQResult').html('');
+                $('option:selected', $(this)).each(function () {
+                    $('#JQResult').append(
+                        $('<li/>').html($(this).val())
+                    );
+                });
+            });
+        });
+
+    </script>
+        <script>
+        $(function () {
+            // Initialize Select2 Elements
+            $('.select2').select2();
+            Pace.options.ajax.trackWebSockets = false;
+
+            {% if mode == 'rollback' and config.repo == 'git' %}
+                $('.fresh, .commit').off('click').css({'cursor': 'auto'});
+            {% else %}
+                $('[data-toggle="tooltip"]').tooltip();
+            {% endif %}
+        });
+
+        // 获取branch或tag
+        $('.fresh').on('click', function () {
+            $.get("{% url 'deploy' pk %}", {key: "model", mode: "{{ mode }}"}, function (res) {
+                if (res.code === 200) {
+                    let repo_model = $('#repo_model');
+                    repo_model.empty();
+                    for (let item of res.models) {
+                        repo_model.append(`<option value="${item}">${item}</option>`)
+                    }
+                    $('.fresh').off('click').css({'cursor': 'auto'});
+                } else {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'red',
+                        content: res.msg,
+                    })
+                }
+            }).fail(function (response) {
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: response.responseText,
+                })
+            })
+        });
+
+        // 获取远程仓库最新的commits
+        $('.commit').on('click', function () {
+            let branch = $('#repo_model').val();
+            let ajax_data = {key: "commit", branch: branch, new_commit: true, mode: "{{ mode }}"};
+
+            $.get("{% url 'deploy' pk %}", ajax_data, function (res) {
+                let repo_release = $('#repo_release');
+                repo_release.empty();
+                for (let item of res.data) {
+                    let short_commit_id = item['commit_id'].length > 7 ? item['commit_id'].slice(0, 8) : item['commit_id'];
+                    repo_release.append(`<option value="${item['commit_id']}">${short_commit_id} | ${item['message']} | ${item['committer']}</option>`)
+                }
+            }).fail(function (response) {
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: response.responseText,
+                })
+            });
+        });
+
+        // 获取本地仓库的commits
+        $('#repo_model').on('change', function () {
+            {% if config.repo_model == 'branch' and config.repo == 'git' %}
+                let branch = $(this).val();
+                let ajax_data = {key: "commit", branch: branch, mode: "{{ mode }}"};
+
+                $.get("{% url 'deploy' pk %}", ajax_data, function (res) {
+                    let repo_release = $('#repo_release');
+                    repo_release.empty();
+                    for (let item of res.data) {
+                        let short_commit_id = item['commit_id'].slice(0, 8);
+                        repo_release.append(`<option value="${item['commit_id']}">${short_commit_id} | ${item['message']} | ${item['committer']}</option>`)
+                    }
+                }).fail(function (response) {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'red',
+                        content: response.responseText,
+                    })
+                });
+            {% endif %}
+        });
+
+        // 开始部署/回滚
+        $('.deploy,.rollback').on('click', function () {
+            let count = 0;
+            let repo_release = $('#repo_release');
+            let branch_tag = $('#repo_model').val();
+            let commit = repo_release !== null ? repo_release.val() : null;
+
+            let ws_data = {config_id: '{{ config.id }}', branch_tag: branch_tag, commit: commit, rollback: true};
+            ws_data.rollback = ("{{ mode }}" === "rollback");
+
+            let ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+            let socket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/deploy/");
+            let obj = $('.timeline');
+
+            socket.onopen = function () {
+                obj.html('');
+                socket.send(JSON.stringify(ws_data));
+            };
+
+            socket.onmessage = function (e) {
+                if (e.data.indexOf('<p') === -1) {
+                    obj.append(e.data);
+                    count++
+                } else {
+                    $('.timeline li:eq(' + (count - 1) + ') .timeline-item .timeline-body').append(e.data);
+                }
+            };
+
+            socket.onclose = function () {
+                obj.append('<li><i class="fa fa-clock-o bg-gray"></i><div class="timeline-item"><h3 class="timeline-header"><a href="javascript:void(0)">任务执行完毕！</a></h3></div></li>')
+            }
+        })
+    </script>
+
+{% endblock %}

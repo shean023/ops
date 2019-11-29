@@ -4,6 +4,8 @@ from ast import literal_eval
 from django.shortcuts import render
 from django.http import JsonResponse
 from projs.models import *
+from assets.models import ProjectEnv,ProjectName
+from django.contrib.auth.models import Group
 from users.models import UserProfile
 from assets.models import Assets, ServerAssets, ProjectName
 from utils.decorators import admin_auth, deploy_auth
@@ -47,9 +49,11 @@ def org_chart(request, pk):
 
 @admin_auth
 def proj_config(request):
-    projects = Project.objects.select_related('project_admin').all()
+    projnames = ProjectName.objects.all()
+    projenvs = ProjectEnv.objects.all()
+    groupList =  Group.objects.all()
+    roleList = ProjectConfig.objects.all()
     repos = ProjectConfig.project_models
-    server_assets = ServerAssets.objects.select_related('assets').all()
     pk = request.GET.get('id')
 
     if pk:
@@ -57,33 +61,48 @@ def proj_config(request):
     else:
         return render(request, 'projs/proj_config.html', locals())
 
+@admin_auth
+def proj_ticket(request):
+    projnames = ProjectName.objects.all()
+    projenvs = ProjectEnv.objects.all()
+    groupList =  Group.objects.all()
+    roleList = ProjectConfig.objects.all()
+    pk = request.GET.get('id')
+
+    if pk:
+        return render(request, 'projs/ticket_detail.html', locals())
+
+
 
 @permission_required('projs.deploy_project', raise_exception=True)
 def config_list(request):
     user = request.user
-    projects = user.proj_admin.all() | user.proj_member.all()
-    configs = ProjectConfig.objects.select_related('project').all() if user.is_superuser else \
-        [project.projectconfig for project in projects if
-         hasattr(project, 'projectconfig') and project.project_env != 'prod']
+    configs = ProjectConfig.objects.all
+    projnames = ProjectName.objects.all()
+    projenvs = ProjectEnv.objects.all()
+    groupList = Group.objects.all()
+    proj_Tickets = Project_Config_Ticket.objects.all()
     return render(request, 'projs/config_list.html', locals())
 
 
-@deploy_auth
+#@deploy_auth
 def deploy(request, pk):
-    config = ProjectConfig.objects.select_related('project').get(id=pk)
+    config = Project_Config_Ticket.objects.get(id=pk)
+
     if request.method == 'GET':
         key = request.GET.get('key', None)
         mode = request.GET.get('mode', 'deploy')
-        if config.repo == 'git':
-            git_tool = GitTools(repo_url=config.repo_url, path=config.src_dir, env=config.project.project_env)
+
+        if config.proj_role.repo == 'git':
+            git_tool = GitTools(repo_url=config.proj_role.repo_url, path=config.proj_role.src_dir,env='test')
             if key:
                 if key == 'model':
                     try:
-                        git_tool.clone(prev_cmds=config.prev_deploy)
-                        if config.repo_model == 'branch':
+                        git_tool.clone(prev_cmds=config.proj_role.prev_deploy)
+                        if config.proj_role.repo_model == 'branch':
                             branches = git_tool.remote_branches
                             return JsonResponse({'code': 200, 'models': branches, 'msg': '获取成功！'})
-                        elif config.repo_model == 'tag':
+                        elif config.proj_role.repo_model == 'tag':
                             tags = git_tool.tags(versions=config.versions.split(','), mode=mode)
                             return JsonResponse({'code': 200, 'models': tags, 'msg': '获取成功！'})
                     except Exception as e:
@@ -94,7 +113,7 @@ def deploy(request, pk):
                         mode = request.GET.get('mode')
                         if request.GET.get('new_commit'):
                             git_tool.pull(branch)
-                        commits = git_tool.get_commits(branch, versions=config.versions.split(','), mode=mode,
+                        commits = git_tool.get_commits(branch, versions=config.proj_role.versions.split(','), mode=mode,
                                                        max_count=20)
                         return JsonResponse({'code': 200, 'data': commits, 'msg': '获取成功！'})
                     except Exception as e:
@@ -102,7 +121,8 @@ def deploy(request, pk):
             else:
                 if os.path.exists(git_tool.proj_path):
                     local_branches = git_tool.local_branches
-                    local_tags = tags = git_tool.tags(versions=config.versions.split(','), mode=mode)
+                    local_tags = tags = git_tool.tags(versions=config.proj_role.versions.split(','), mode=mode)
+
                 return render(request, 'projs/deploy.html', locals())
 
         elif config.repo == 'svn':
@@ -132,6 +152,20 @@ def deploy(request, pk):
                         return JsonResponse({'code': 500, 'msg': '获取失败：{}'.format(e)})
             else:
                 return render(request, 'projs/deploy.html', locals())
+
+#@deploy_auth
+def deploy_apply(request, pk):
+    if request.method == 'GET':
+        mode = request.GET.get('mode', 'deploy')
+        ticket = Project_Config_Ticket.objects.get(id=pk)
+        projnames = ProjectName.objects.all()
+        projenvs = ProjectEnv.objects.all()
+        groupList = Group.objects.all()
+        audit_group = Group.objects.get(id=ticket.proj_audit_group)
+        userList = [u for u in audit_group.user_set.values('username', 'login_status')]
+
+        if request.method == 'GET':
+            return render(request, 'projs/deploy_apply.html', locals())
 
 
 @admin_auth
