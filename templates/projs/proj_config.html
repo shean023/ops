@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'AdminLTE/plugins/iCheck/all.css' %}">
     <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+
     <style>
         #prev_deploy, #post_deploy, #prev_release, #post_release {
             width: 100%;
@@ -56,6 +57,52 @@
     <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
 
     <script>
+
+        function getProj() {
+            let projname_id = $('#proj_name').val();
+            $.ajax({
+                url: '/api/projname/' + projname_id + '/',
+                type: 'GET',
+                success: function (res) {
+                    let asset_projapp_obj = $('#proj_app');
+                    let asset_projapps = res['projectapp'];
+                    asset_projapp_obj.html('');
+                    for (let i = 0; i < asset_projapps.length; i++) {
+                        asset_projapp_obj.append(
+                            '<option value=' + asset_projapps[i]['id'] + '>' + asset_projapps[i]['projapp_name'] + '</option>'
+                        )
+                    }
+                }
+            })
+        }
+
+
+        // 获取branch或tag
+        $('.fresh').on('click', function () {
+            pk = $('#proj_role option:selected').val();
+            $.get("/project/read_branch/" + pk, {key: "model", mode: "deploy"}, function (res) {
+                if (res.code === 200) {
+                    let proj_branch_tag = $('#proj_branch_tag');
+                    proj_branch_tag.empty();
+                    for (let item of res.models) {
+                        proj_branch_tag.append(`<option value="${item}">${item}</option>`)
+                    }
+                    $('.fresh').off('click').css({'cursor': 'auto'});
+                } else {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'red',
+                        content: res.msg,
+                    })
+                }
+            }).fail(function (response) {
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: response.responseText,
+                })
+            })
+        });
 
         let editors = ["prev_deploy", "post_deploy", "prev_release", "post_release"];
         $(function () {

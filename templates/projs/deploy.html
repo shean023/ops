@@ -167,7 +167,7 @@
 
         // 获取远程仓库最新的commits
         $('.commit').on('click', function () {
-            let branch = $('#repo_model').val();
+            let branch = $('#repo_model option:selected').val();
             let ajax_data = {key: "commit", branch: branch, new_commit: true, mode: "{{ mode }}"};
 
             $.get("{% url 'deploy' pk %}", ajax_data, function (res) {

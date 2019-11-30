@@ -71,8 +71,10 @@ class Project_Config_Ticket(models.Model):
 
     proj_name = models.SmallIntegerField(verbose_name='项目名称')
     proj_env = models.SmallIntegerField(verbose_name='项目环境')
+    proj_app = models.SmallIntegerField(verbose_name='应用名称')
     proj_audit_group = models.SmallIntegerField(verbose_name='项目授权组', blank=True, null=True, default=None)
     proj_role = models.ForeignKey('ProjectConfig', on_delete=models.CASCADE, verbose_name='项目角色')
+    proj_branch_tag = models.CharField(max_length=20, blank=False,null=False, verbose_name='项目分支或Tag')
     proj_uuid = models.UUIDField(default=uuid.uuid4)
     proj_status = models.SmallIntegerField(verbose_name='是否可用', default=0)
     proj_memo = models.CharField(max_length=20, blank=True,null=True, verbose_name='备注')
@@ -82,8 +84,8 @@ class Project_Config_Ticket(models.Model):
     cc_mail = models.TextField(blank=True, default='', verbose_name='抄送人邮箱')
 
     class Meta:
-        db_table = 'project_config_ticket'
-        unique_together = ("proj_name", "proj_env")
+        db_table = 'ops_project_config_ticket'
+        unique_together = ("proj_name", "proj_env", "proj_app")
         verbose_name = '配置发布工單表'
         verbose_name_plural = '配置发布工單表'
 class DeployLog(models.Model):

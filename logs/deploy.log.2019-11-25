@@ -1,0 +1,7 @@
+ERROR 2019-11-25 16:14:33 clone 拉取代码失败！Cmd('git') failed due to: exit code(128)
+  cmdline: git clone --origin=origin -v https://github.com/welliamcao/OpsManage.git /data/test
+  stderr: 'Cloning into '/data/test'...
+POST git-upload-pack (627 bytes)
+fatal: unable to open /data/test/.git/objects/pack/tmp_pack_jo2b3Z: No such file or directory
+fatal: index-pack failed
+'

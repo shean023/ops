@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/css/bootstrap-select.css">
 
 
+
     <style>
         /* dataTables列内容居中 */
         #project-conf > tbody > tr > td {
@@ -100,56 +101,42 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label"><i class="fa fa-group"></i> 应用</label>
                                     <div class="col-sm-6">
-                                        <select class="form-control selectpicker" id="ticket_app" name="ticket_app"
-                                                required>
-                                            {% for proj in projnames %}
-                                                {% if proj.id == ticket.proj_name %}
-                                                    {% for app in proj.projectapp.all %}
-                                                        <option value="{{ app.id }}"
-                                                                name="ticket_app">{{ app.projapp_name }}</option>
+                                            {% for projname in projnames %}
+                                                {% if projname.id == ticket.proj_name %}
+                                                    {% for app in projname.projectapp.all %}
+                                                        {% if app.id == ticket.proj_app %}
+                                                       <input class="form-control" name="proj_app"
+                                                       value="{{ app.projapp_name }}" disabled>
+                                                        {% endif %}
                                                     {% endfor %}
                                                 {% endif %}
                                             {% endfor %}
-                                        </select>
                                     </div>
                                 </div>
 
-
                                 {% if ticket.proj_role.repo_model == 'branch' %}
                                     <div class="form-group">
-
-                                        <label class="col-sm-2 control-label">分支</label>
-                                        <div class="input-group col-sm-3">
-                                            <select class="form-control " name="repo_model"
-                                                    id="repo_model">
-                                                <option value="" selected>请选择分支</option>
-                                                {% for local_branch in local_branches %}
-                                                    <option value="{{ local_branch }}">{{ local_branch }}</option>
-                                                {% endfor %}
-                                            </select>
-                                            <div class="input-group-addon fresh" data-toggle="tooltip"
-                                                 data-placement="top"
-                                                 title="获取远程仓库最新分支，如果没有添加新的分支，不需要点击获取" style="cursor: pointer">
-                                                <i class="fa fa-refresh"></i>
-                                            </div>
+                                        <label class="col-sm-2 control-label">分支/Tag</label>
+                                        <div class="col-sm-6">
+                                            <input class="form-control" name="proj_branch_tag" id="proj_branch_tag"
+                                                   value="{{ ticket.proj_branch_tag }}" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                         <label class="col-sm-2 control-label">选择版本</label>
-                                        <div class="input-group col-sm-3" >
-                                            <select class="form-control" style="width: 100%;"
-                                                    name="repo_release"
+                                        <div class="col-sm-6">
+                                            <select class="form-control" name="repo_release"
                                                     id="repo_release">
-
                                             </select>
-                                            <div class="input-group-addon commit" data-toggle="tooltip"
-                                                 data-placement="top"
-                                                 title="获取该分支最新的commits" style="cursor: pointer">
-                                                <i class="fa fa-refresh"></i>
-                                            </div>
+                                        </div>
+                                        <div class="input-group-addon col-sm-4 commit" data-toggle="tooltip"
+                                             data-placement="top"
+                                             title="获取该分支最新的commits" style="cursor: pointer">
+                                            <i class="fa fa-refresh"></i>
                                         </div>
                                     </div>
+
                                 {% elif ticket.proj_role.repo_model == 'tag' %}
                                     <div class="form-group">
                                         <label for="repo_model">选择tag</label>
@@ -266,6 +253,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/js/bootstrap-select.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
+
     <script>
         $('select').selectpicker();
 
@@ -273,6 +261,7 @@
     <script type="text/javascript">
         $(function () {
             $("[data-toggle='tooltip']").tooltip();
+
         });
     </script>
 
@@ -330,7 +319,7 @@
 
         // 获取远程仓库最新的commits
         $('.commit').on('click', function () {
-            let branch = $('#repo_model').val();
+            let branch = $('#proj_branch_tag').val();
             let ajax_data = {key: "commit", branch: branch, new_commit: true, mode: "{{ mode }}"};
 
             $.get("{% url 'deploy' pk %}", ajax_data, function (res) {

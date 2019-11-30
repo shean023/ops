@@ -42,13 +42,27 @@
                         </div>
                         <div class="form-group">
                             <label for="proj_name">项目名称</label>
-                            <select class="form-control" name="proj_name" id="proj_name" required>
+                            <select class="form-control" name="proj_name" id="proj_name"  onchange="getProj()" required>
                                 <option selected="selected" name="proj_name">请选择项目</option>
                                 {% for projname in projnames %}
                                     <option value="{{ projname.id }}" name="proj_name">{{ projname.projname_name }}</option>
                                 {% endfor %}
                             </select>
 
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pro_japp">应用</label>
+                            <select class="form-control" name="proj_app" id="proj_app" required>
+
+                                {% for projname in projnames %}
+                                    {% if projname.id == proj_ticket.proj_name %}
+                                        {% for app in projname.projectapp.all %}
+                                            <option value="{{ app.id }}" name="proj_app">{{ app.projapp_name }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -72,7 +86,22 @@
                                 {% endfor %}
                             </select>
                         </div>
-
+                        <div class="form-group">
+                            <label>分支/Tag<i class="fa fa-info-circle" data-toggle="tooltip"
+                                           title=分支/Tag"></i></label> <br>
+                            <div class="input-group col-sm-12">
+                                <select class="form-control " name="proj_branch_tag"
+                                        id="proj_branch_tag">
+                                    <option value="" selected>请选择分支</option>
+                                        <option value="{{ proj_ticket.proj_branch_tag }}">{{ proj_ticket.proj_branch_tag }}</option>
+                                </select>
+                                <div class="input-group-addon fresh" data-toggle="tooltip"
+                                     data-placement="top"
+                                     title="获取远程仓库最新分支，如果没有添加新的分支，不需要点击获取" style="cursor: pointer">
+                                    <i class="fa fa-refresh"></i>
+                                </div>
+                            </div>
+                        </div>
                         <!-- /.form-group -->
                         <div class="form-group">
                             <label for="proj_status">启用</label>
@@ -152,6 +181,52 @@
     <script>
 
 
+       //获取项目APP
+        function getProj() {
+            let projname_id = $('#proj_name').val();
+            $.ajax({
+                url: '/api/projname/' + projname_id + '/',
+                type: 'GET',
+                success: function (res) {
+                    let asset_projapp_obj = $('#proj_app');
+                    let asset_projapps = res['projectapp'];
+                    asset_projapp_obj.html('');
+                    for (let i = 0; i < asset_projapps.length; i++) {
+                        asset_projapp_obj.append(
+                            '<option value=' + asset_projapps[i]['id'] + '>' + asset_projapps[i]['projapp_name'] + '</option>'
+                        )
+                    }
+                }
+            })
+        }
+
+        // 获取branch或tag
+        $('.fresh').on('click', function () {
+            pk = $('#proj_role option:selected').val();
+            $.get("/project/read_branch/" + pk, {key: "model", mode: "deploy"}, function (res) {
+                if (res.code === 200) {
+                    let proj_branch_tag = $('#proj_branch_tag');
+                    proj_branch_tag.empty();
+                    for (let item of res.models) {
+                        proj_branch_tag.append(`<option value="${item}">${item}</option>`)
+                    }
+                    {#$('.fresh').off('click').css({'cursor': 'auto'});#}
+                } else {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'red',
+                        content: res.msg,
+                    })
+                }
+            }).fail(function (response) {
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: response.responseText,
+                })
+            })
+        });
+
         $(function () {
             $("[data-toggle='tooltip']").tooltip();
             // Initialize Select2 Elements
@@ -166,8 +241,10 @@
             $.get('/api/proj_ticket/' + {{ pk }} +'/', function (res) {
                 $('#proj_env').val(res.proj_env).trigger('change');
                 $('#proj_name').val(res.proj_name).trigger('change');
+                $('#proj_app').val(res.proj_app).trigger('change');
                 $('#proj_audit_group').val(res.proj_audit_group).trigger('change');
                 $('#proj_role').val(res.proj_role).trigger('change');
+                $('#proj_branch_tag').val(res.proj_branch_tag);
                 $('#proj_status').val(res.proj_status).trigger('change');
                 $('#proj_memo').val(res.proj_memo);
 

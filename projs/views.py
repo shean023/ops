@@ -63,11 +63,13 @@ def proj_config(request):
 
 @admin_auth
 def proj_ticket(request):
+    pk = request.GET.get('id')
     projnames = ProjectName.objects.all()
     projenvs = ProjectEnv.objects.all()
     groupList =  Group.objects.all()
     roleList = ProjectConfig.objects.all()
-    pk = request.GET.get('id')
+    proj_ticket = Project_Config_Ticket.objects.get(id=pk)
+
 
     if pk:
         return render(request, 'projs/ticket_detail.html', locals())
@@ -83,6 +85,73 @@ def config_list(request):
     groupList = Group.objects.all()
     proj_Tickets = Project_Config_Ticket.objects.all()
     return render(request, 'projs/config_list.html', locals())
+
+
+@permission_required('projs.deploy_project', raise_exception=True)
+def read_branch(request, pk):
+    print(pk)
+    config = ProjectConfig.objects.get(id=pk)
+    if request.method == 'GET':
+        key = request.GET.get('key', None)
+        mode = request.GET.get('mode', 'deploy')
+        if config.repo == 'git':
+            git_tool = GitTools(repo_url=config.repo_url, path=config.src_dir, env='test')
+            if key:
+                if key == 'model':
+                    try:
+                        git_tool.clone(prev_cmds=config.prev_deploy)
+                        if config.repo_model == 'branch':
+                            branches = git_tool.remote_branches
+                            return JsonResponse({'code': 200, 'models': branches, 'msg': '获取成功！'})
+                        elif config.repo_model == 'tag':
+                            tags = git_tool.tags(versions=config.versions.split(','), mode=mode)
+                            return JsonResponse({'code': 200, 'models': tags, 'msg': '获取成功！'})
+                    except Exception as e:
+                        return JsonResponse({'code': 500, 'msg': '获取失败：{}'.format(e)})
+                elif key == 'commit':
+                    try:
+                        branch = request.GET.get('branch')
+                        mode = request.GET.get('mode')
+                        if request.GET.get('new_commit'):
+                            git_tool.pull(branch)
+                        commits = git_tool.get_commits(branch, versions=config.versions.split(','), mode=mode,
+                                                       max_count=20)
+                        return JsonResponse({'code': 200, 'data': commits, 'msg': '获取成功！'})
+                    except Exception as e:
+                        return JsonResponse({'code': 500, 'msg': '获取失败：{}'.format(e)})
+            else:
+                if os.path.exists(git_tool.proj_path):
+                    local_branches = git_tool.local_branches
+                    local_tags = tags = git_tool.tags(versions=config.versions.split(','), mode=mode)
+                return render(request, 'projs/deploy.html', locals())
+
+        elif config.repo == 'svn':
+            svn_tool = SVNTools(repo_url=config.repo_url, path=config.src_dir, env=config.project.project_env,
+                                username=config.repo_user, password=config.repo_password)
+            if key:
+                if key == 'model':
+                    try:
+                        if config.repo_model == 'branch':
+                            branches = svn_tool.branches
+                            return JsonResponse({'code': 200, 'models': branches, 'msg': '获取成功！'})
+                        elif config.repo_model == 'tag':
+                            tags = svn_tool.tags(versions=config.versions.split(','), mode=mode)
+                            return JsonResponse({'code': 200, 'models': tags, 'msg': '获取成功！'})
+                    except Exception as e:
+                        return JsonResponse({'code': 500, 'msg': '获取失败：{}'.format(e)})
+                elif key == 'commit':
+                    branch = request.GET.get('branch')
+                    try:
+                        if branch == 'trunk':
+                            commits = svn_tool.get_commits(versions=config.versions.split(','), mode=mode, limit=30)
+                        else:
+                            commits = svn_tool.get_commits(versions=config.versions.split(','), repo_model='branch',
+                                                           model_name=branch, mode=mode, limit=30)
+                        return JsonResponse({'code': 200, 'data': commits, 'msg': '获取成功！'})
+                    except Exception as e:
+                        return JsonResponse({'code': 500, 'msg': '获取失败：{}'.format(e)})
+            else:
+                return render(request, 'projs/deploy.html', locals())
 
 
 #@deploy_auth
