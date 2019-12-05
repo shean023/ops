@@ -19,6 +19,7 @@
                     <th>ID</th>
                     <th>环境</th>
                     <th>项目</th>
+                    <th>应用</th>
                     <th>部署组</th>
                     <th>角色</th>
                     <th>分支/Tag</th>
@@ -32,8 +33,9 @@
                 {% for pt in proj_Tickets %}
                     <tr>
                         <td>{{ pt.id }}</td>
-                        <td>{% for projenv in projenvs %}{% if projenv.id == pt.proj_env %}{{ projenv.projenv_name }}{% endif %}{% endfor %}</td>
-                        <td>{% for projname in projnames %}{% if projname.id == pt.proj_name %}{{ projname.projname_name }}{% endif %}{% endfor %}</td>
+                        <td>{{ pt.proj_env.projenv_name }}</td>
+                        <td>{{ pt.proj_name.projname_name }}</td>
+                        <td>{{ pt.proj_app.projapp_name}}</td>
                         <td>{% for gl in groupList %}{% if gl.id == pt.proj_audit_group%}{{ gl.name }}{% endif %}{% endfor %}</td>
                         <td>{{ pt.proj_role.project_role }}</td>
                         <td>{{ pt.proj_branch_tag }}</td>

@@ -288,8 +288,11 @@ desired effect
                                 {% if perms.projs.deploy_project %}
                                     <li><a href="{% url 'config_list' %}"><i class="fa fa-bar-chart"></i> 发布配置</a>
                                     </li>
+                                    <li><a href="{% url 'ticket_list' %}"><i class="fa glyphicon glyphicon-briefcase"></i> 部署工单</a>
+                                    </li>
                                 {% endif %}
                                 {% if request.user.is_superuser %}
+
                                     <li><a href="{% url 'deploy_log' %}"><i class="fa fa-user-secret"></i> 发布记录</a>
                                     </li>
                                 {% endif %}
@@ -541,7 +544,7 @@ desired effect
     });
 
     function hide_header() {
-        let paths = ['wiki_view', 'wiki_edit', 'wiki_search', 'playbook_info', 'role_detail', 'role_add', '/deploy/', 'rollback', 'system_log'];
+        let paths = ['wiki_view', 'wiki_edit', 'wiki_search', 'playbook_info', 'role_detail', 'role_add', '/deploy/', 'rollback', 'system_log', 'deploy_ticket'];
 
         for (let item of paths) {
             if (pathname.indexOf(item) !== -1) {

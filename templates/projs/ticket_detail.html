@@ -42,25 +42,27 @@
                         </div>
                         <div class="form-group">
                             <label for="proj_name">项目名称</label>
-                            <select class="form-control" name="proj_name" id="proj_name"  onchange="getProj()" required>
+                        <div class="input-group col-sm-12">
+                            <select class="form-control" name="proj_name" id="proj_name"  required>
                                 <option selected="selected" name="proj_name">请选择项目</option>
                                 {% for projname in projnames %}
                                     <option value="{{ projname.id }}" name="proj_name">{{ projname.projname_name }}</option>
                                 {% endfor %}
                             </select>
+                        <div class="input-group-addon fresh_proj" data-toggle="tooltip"
+                                     data-placement="top"
+                                     title="项目改变列出对应应用" style="cursor: pointer">
+                                    <i class="fa fa-refresh"></i>
+                                </div>
+                        </div>
 
                         </div>
 
                         <div class="form-group">
-                            <label for="pro_japp">应用</label>
+                            <label for="proj_app">应用</label>
                             <select class="form-control" name="proj_app" id="proj_app" required>
-
-                                {% for projname in projnames %}
-                                    {% if projname.id == proj_ticket.proj_name %}
-                                        {% for app in projname.projectapp.all %}
+                                {% for app in projapps %}
                                             <option value="{{ app.id }}" name="proj_app">{{ app.projapp_name }}</option>
-                                        {% endfor %}
-                                    {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
@@ -182,7 +184,7 @@
 
 
        //获取项目APP
-        function getProj() {
+        $('.fresh_proj').on('click', function () {
             let projname_id = $('#proj_name').val();
             $.ajax({
                 url: '/api/projname/' + projname_id + '/',
@@ -198,7 +200,7 @@
                     }
                 }
             })
-        }
+        });
 
         // 获取branch或tag
         $('.fresh').on('click', function () {

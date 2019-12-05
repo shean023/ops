@@ -1,0 +1,439 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'dist/css/xcConfirm.css' %}" />
+{% endblock %}
+
+{% block content %}
+    <div class="box box-info">
+    <div class="box-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <form role="form" id="deploy_ticket" class="main form-horizontal">
+                                <div class="col-lg-5">
+                                    <legend><i class="fa  fa-paper-plane"></i>部署信息</legend>
+
+                                    <fieldset>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">单号</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" name="ticket_no"
+                                                       id="ticket_no" value="{{ deploy_ticket.ticket_no }}"
+                                                       class="input-xlarge" readonly="readonly">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">环境</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" name="proj_env"
+                                                   id="proj_env"
+                                                   value="{{ deploy_ticket.ticket_config.proj_env.projenv_name }}" readonly="readonly"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">项目</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" name="proj_name"
+                                                       id="proj_name" value="{{ deploy_ticket.ticket_config.proj_name.projname_name }}"
+                                                       readonly="readonly"/>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">应用</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" name="proj_app"
+                                                       id="proj_app" value="{{ deploy_ticket.ticket_config.proj_app.projapp_name }}"
+                                                       readonly="readonly"/>
+                                            </div>
+                                        </div>
+                                      <div class="form-group">
+                                            <label class="col-sm-2 control-label">分支/TAG</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" name="proj_branch_tag"
+                                                       id="proj_branch_tag" value="{{ deploy_ticket.ticket_config.proj_branch_tag }}"
+                                                       readonly="readonly"/>
+                                            </div>
+                                        </div>
+                                    <div class="form-group">
+                                            <label class="col-sm-2 control-label">提交ID</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" name="ticket_commit"
+                                                       id="ticket_commit" value="{{ deploy_ticket.ticket_commit|slice:"7" }}"
+                                                       readonly="readonly"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label"><i class="fa fa-group"></i>平台</label>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" name="ticket_platform" id="ticket_platform" required onchange="javascript:oBtServiceSelect('dserver');">
+                                                    <option selected="selected" value="">选择平台</option>
+                                                    {% for pt in deploy_ticket.ticket_platform.all %}
+                                                                <option value="{{ pt.id }}"
+                                                                        name="ticket_platform">{{ pt.platform_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label"><i class="fa fa-group"></i>重启</label>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" name="ticket_restart" required>
+                                                    <option value="y" name="app_restart">是</option>
+                                                    <option selected="selected" value="n" name="app_restart">
+                                                        否
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">备份</label>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" name="app_backup" required>
+                                                    <option selected="selected" value="y" name="app_backup">
+                                                        是
+                                                    </option>
+                                                    <option value="n" name="app_backup">否</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">发布主题</label>
+                                            <div class="col-sm-6">
+                                                <input class="form-control" value="{{ deploy_ticket.ticket_subject }}"
+                                                       readonly="readonly">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">发布内容</label>
+                                            <div class="col-sm-6">
+                                                <textarea class="form-control" rows="6"
+                                                          readonly="readonly">{{ deploy_ticket.ticket_content }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">部署用户</label>
+                                            <div class="col-sm-2">
+                                                <input class="form-control" value="{{ deploy_ticket.ticket_audit }}"
+                                                       readonly="readonly">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">紧急程度</label>
+                                            <div class="col-sm-6">
+                                                {% if deploy_ticket.ticket_level == 0 %}
+                                                    <button type="button" class="btn  btn-info btn-xs">
+                                                        非紧急
+                                                    </button>
+                                                {% else %}
+                                                    <button type="button" class="btn  btn-danger btn-xs">
+                                                        紧急
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">工单状态</label>
+                                            <div class="col-sm-6">
+                                                {% if deploy_ticket.ticket_status == 0 %}
+                                                    <button type="button" class="btn  btn-info btn-xs">
+                                                        已通过
+                                                    </button>
+                                                {% elif deploy_ticket.ticket_status == 1 %}
+                                                    <button type="button" class="btn  btn-danger btn-xs">
+                                                        <del>已撤销</del>
+                                                    </button>
+                                                {% elif deploy_ticket.ticket_status == 2 %}
+                                                    <button type="button" class="btn  btn-warning  btn-xs">
+                                                        审核中
+                                                    </button>
+                                                {% elif deploy_ticket.ticket_status == 3 %}
+                                                    <button type="button" class="btn  btn-success btn-xs">
+                                                        已部署
+                                                    </button>
+                                                 {% elif deploy_ticket.ticket_status == 4 %}
+                                                    <button type="button" class="btn  btn-dark btn-xs">
+                                                        已回滚
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        {% if deploy_ticket.ticket_status == 0 or deploy_ticket.ticket_status == 2 %}
+                                            <div class="form-group" id="permOrder">
+                                                <label class="col-sm-2 control-label">工单操作</label>
+                                                <div class="col-sm-6">
+                                                    {% if deploy_ticket.ticket_status == 0 %}
+                                                        <button type="button" class="btn btn-success btn-xs"
+                                                                onclick="cupdateOrderStatus(this,{{ corder.id }},'cdisable',1)">
+                                                            撤销部署
+                                                        </button>
+                                                    {% elif deploy_ticket.ticket_status == 2 %}
+                                                        <button type="button" class="btn  btn-success btn-xs"
+                                                                onclick="cupdateOrderStatus(this,{{ corder.id }},'cdisable',1)">
+                                                            撤销部署
+                                                        </button>
+                                                        <button type="button" class="btn  btn-success btn-xs"
+                                                                onclick='cupdateOrderStatus(this,{{ corder.id }},"cauth",0)'>
+                                                            确认授权
+                                                        </button>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if deploy_ticket.ticket_status == 1 %}
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">撤销原因</label>
+                                                <div class="col-sm-6">
+                                                    <textarea class="form-control" rows="3"
+                                                              disabled>{{ deploy_ticket.ticket_cancel }}</textarea>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                    </fieldset>
+                                    <legend></legend>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label"></label>
+
+                                        {% if deploy_ticket.ticket_status == 0 %}
+                                            <button type="button" class="btn btn-warning"
+                                                    onclick="crunDeploy(this,'rollback')">回滚
+                                            </button>
+                                            <button type="button" class="btn btn-success disabled">完成部署</button>
+                                            <button type="button" class="btn btn-info"
+                                                    onclick="crunDeploy(this,'deploy')">点击部署
+                                            </button>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                                <!-- /.col-lg-6 (nested) -->
+                                <div class="hr hr32 hr-dotted"></div>
+                                <div class="col-lg-6">
+                                    <legend>
+                                        <i class="fa  fa-paper-plane-o"></i> 目标服务器
+                                    </legend>
+                                    <div class="form-group">
+                                        <label>目标服务器</label>
+                                        <select multiple class="form-control" style="font-size:16px;color:black"
+                                                name="project_server" id="project_server" size="6" required>
+
+                                        </select>
+                                    </div>
+                                    <!-- /.col-lg-6 (nested) -->
+                                </div>
+                            </form>
+                            <div class="col-lg-6">
+                                <legend><i class="fa  fa-paper-plane-o"></i>部署结果</legend>
+                                <div id="result_msg" class="well well-lg form-group"
+                                     style='border:0px;padding:3px; PADDING:0px; width:730px; height:430px; LINE-HEIGHT: 20px; OVERFLOW: auto;'>
+                                    <div id="result" class="form-group" class="timeline">
+                                        {% if deploy_ticket.ticket_status == 0 %}
+                                            <i class="fa fa-smile-o"></i>让我们开始部署之旅吧~
+                                        {% elif deploy_ticket.ticket_status == 1 %}
+                                            <i class="fa fa-frown-o"></i>Ops！任务被取消了~
+                                        {% elif deploy_ticket.ticket_status == 2 %}
+                                            <i class="fa fa-meh-o"></i>嘿、快去找那家伙授权吧~
+                                        {% elif deploy_ticket.ticket_status == 3 %}
+                                            <i class="fa fa-smile-o"></i>下次合作愉快~
+                                        {% endif %}
+
+                                    </div>
+{#                                    <ul class="timeline">#}
+{##}
+{#                                    </ul>#}
+                                </div>
+                            </div>
+
+
+                            <!-- /.row (nested) -->
+
+                            <!-- /.panel-body -->
+                        </div>
+                        <!-- /.panel -->
+                    </div>
+                </div>
+                <!-- /.form-group -->
+                <!-- /.col -->
+{#                <div class="col-md-8">#}
+{#                    <div class="form-group">#}
+{#                        {% if mode == 'deploy' %}#}
+{#                            <label id="res-label">部署结果</label>#}
+{#                        {% elif mode == 'rollback' %}#}
+{#                            <label id="res-label">回滚结果</label>#}
+{#                        {% endif %}#}
+{#                        <ul class="timeline">#}
+{##}
+{#                        </ul>#}
+{##}
+{#                    </div>#}
+{#                </div>#}
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.box-body -->
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+    <script src="{% static 'dist/js/xcConfirm.js' %}" type="text/javascript" charset="utf-8"></script>
+
+<script>
+    // 开始部署/回滚
+    function crunDeploy(obj, dtype) {
+        var btnObj = $(obj);
+        btnObj.attr('disabled', true);
+
+        var options = $("#project_server option:selected");
+        var serverList = [];
+        if (options.length == 0) {
+            window.wxc.xcConfirm("【目标服务器】未选择~", window.wxc.xcConfirm.typeEnum.error);
+            btnObj.removeAttr('disabled');
+            return false;
+        } else {
+            for (var i = 0; i < options.length; ++i) {
+                serverList.push(options[i].value);
+            }
+            ;
+        }
+        ;
+                //获取平台ID
+        var pobj = document.getElementById("ticket_platform");
+        var pindex = pobj.selectedIndex;
+        var pid = pobj.options[pindex].value;
+
+        $("#result").html("服务器正在处理，请稍等。。。<br>");
+
+        let count = 0;
+        let ws_data = {tid: '{{ deploy_ticket.id }}', pid: pid, dserver: serverList};
+        let ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+        let socket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/deploy_ticket/");
+        //let objul = $('.timeline');
+         let objul = $("#result");
+
+        socket.onopen = function () {
+            objul.html('');
+            socket.send(JSON.stringify(ws_data));
+        };
+
+        socket.onmessage = function (e) {
+            if (e.data.indexOf('<p') === -1) {
+                objul.append(e.data);
+                count++
+            } else {
+                $('.timeline li:eq(' + (count - 1) + ') .timeline-item .timeline-body').append(e.data);
+            }
+        };
+
+        socket.onclose = function () {
+            //obj.append('<li><i class="fa fa-clock-o bg-gray"></i><div class="timeline-item"><h3 class="timeline-header"><a href="javascript:void(0)">任务执行完毕！</a></h3></div></li>')
+            objul.append('<a href="javascript:void(0)">任务执行完毕！</a>')
+
+        }
+        btnObj.removeAttr('disabled');
+
+    };
+
+
+        // 开始部署/回滚
+        {#$('.deploy,.rollback').on('click', function () {#}
+        {#    let count = 0;#}
+        {#    let repo_release = $('#repo_release');#}
+        {#    let branch_tag = $('#repo_model').val();#}
+        {#    let commit = repo_release !== null ? repo_release.val() : null;#}
+        {##}
+        {#    let ws_data = {config_id: '{{ config.id }}', branch_tag: branch_tag, commit: commit, rollback: true};#}
+        {#    ws_data.rollback = ("{{ mode }}" === "rollback");#}
+        {##}
+        {#    let ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";#}
+        {#    let socket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/deploy/");#}
+        {#    let obj = $('.timeline');#}
+        {##}
+        {#    socket.onopen = function () {#}
+        {#        obj.html('');#}
+        {#        socket.send(JSON.stringify(ws_data));#}
+        {#    };#}
+        {##}
+        {#    socket.onmessage = function (e) {#}
+        {#        if (e.data.indexOf('<p') === -1) {#}
+        {#            obj.append(e.data);#}
+        {#            count++#}
+        {#        } else {#}
+        {#            $('.timeline li:eq(' + (count - 1) + ') .timeline-item .timeline-body').append(e.data);#}
+        {#        }#}
+        {#    };#}
+        {##}
+        {#    socket.onclose = function () {#}
+        {#        obj.append('<li><i class="fa fa-clock-o bg-gray"></i><div class="timeline-item"><h3 class="timeline-header"><a href="javascript:void(0)">任务执行完毕！</a></h3></div></li>')#}
+        {#    }#}
+        //})
+
+    //获发布服务器列表
+    function oBtServiceSelect(model) {
+        $('#project_server').removeAttr("disabled");
+
+        //获取平台ID
+        var pobj = document.getElementById("ticket_platform");
+        var pindex = pobj.selectedIndex;
+        var pid = pobj.options[pindex].value;
+
+        $.ajax({
+            dataType: "JSON",
+            url: '/project/deploy_ticket/' + {{ deploy_ticket.id }} +"/", //请求地址
+            type: "POST",  //提交类似
+            data: {
+                "query": model,
+                "pid": pid,   //平台ID
+
+            },
+            success: function (response) {
+                var binlogHtml = '<select multiple class="form-control"  name="project_server" id="project_server" required>'
+                var selectHtml = '';
+                for (var i = 0; i < response["data"].length; i++) {
+                    if (response["data"][i]["as"] == 0) {
+//						 selectHtml += '<option name="project_server" value="'+ response["data"][i]["id"] +'">' + response["data"][i]["ip"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + response["data"][i]["hs"] + '</option>'
+                        selectHtml += '<option style="font-size:15px;color:black" name="project_server" value="' + response["data"][i]["id"] + '">' + response["data"][i]["ip"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + response["data"][i]["hs"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + "已上线" + '</option>'
+                    } else if (response["data"][i]["as"] == 1) {
+                        selectHtml += '<option disabled style="font-size:15px;color:darkgray" name="project_server" value="' + response["data"][i]["id"] + '">' + response["data"][i]["ip"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + response["data"][i]["hs"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + "已下线" + '</option>'
+                    } else if (response["data"][i]["as"] == 2) {
+                        selectHtml += '<option disabled style="font-size:15px;color:darkgray" name="project_server" value="' + response["data"][i]["id"] + '">' + response["data"][i]["ip"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + response["data"][i]["hs"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + "维修中" + '</option>'
+                    } else if (response["data"][i]["as"] == 3) {
+                        selectHtml += '<option disabled style="font-size:15px;color:darkgray" name="project_server" value="' + response["data"][i]["id"] + '">' + response["data"][i]["ip"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + response["data"][i]["hs"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + "已入库" + '</option>'
+                    } else {
+                        selectHtml += '<option disabled style="font-size:15px;color:darkgray" name="project_server" value="' + response["data"][i]["id"] + '">' + response["data"][i]["ip"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + response["data"][i]["hs"] + "&nbsp;&nbsp;&nbsp;&nbsp;" + "未使用" + '</option>'
+                    }
+                }
+                ;
+                binlogHtml = binlogHtml + selectHtml + '</select>';
+                document.getElementById("project_server").innerHTML = binlogHtml;
+
+            },
+        });
+    };
+
+    $(function () {
+        // Initialize Select2 Elements
+        $('.select2').select2();
+        Pace.options.ajax.trackWebSockets = false;
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    {% if errorInfo %}
+        window.wxc.xcConfirm("{{errorInfo}}", window.wxc.xcConfirm.typeEnum.error);
+    {% endif %}
+
+</script>
+{% endblock %}

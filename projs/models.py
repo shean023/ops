@@ -49,7 +49,6 @@ class ProjectConfig(models.Model):
     src_dir = models.CharField(max_length=100, verbose_name='代码检出目录')
     exclude = models.TextField(blank=True, verbose_name='排除文件', default='')
     run_user = models.CharField(max_length=10, verbose_name='运行服务用户', default='root')
-    #deploy_server = models.ManyToManyField('assets.ServerAssets', verbose_name='目标部署机器')
     deploy_webroot = models.CharField(max_length=100, verbose_name='目标机器webroot')
     deploy_releases = models.CharField(max_length=100, verbose_name='目标机器版本库地址')
     releases_num = models.PositiveSmallIntegerField(verbose_name='版本保留个数', default=20)
@@ -58,9 +57,7 @@ class ProjectConfig(models.Model):
     prev_release = models.TextField(blank=True, verbose_name='切换版本前操作', default='')
     post_release = models.TextField(blank=True, verbose_name='切换版本后操作', default='')
     versions = models.TextField(blank=True, verbose_name='存储部署过的版本', default='')
-    #wx_notice = models.BooleanField(blank=True, verbose_name='是否开启微信通知', default=False)
-    #to_mail = models.TextField(blank=True, default='', verbose_name='收件人邮箱')
-    #cc_mail = models.TextField(blank=True, default='', verbose_name='抄送人邮箱')
+
 
     class Meta:
         db_table = 'ops_project_config'
@@ -69,9 +66,9 @@ class ProjectConfig(models.Model):
 
 class Project_Config_Ticket(models.Model):
 
-    proj_name = models.SmallIntegerField(verbose_name='项目名称')
-    proj_env = models.SmallIntegerField(verbose_name='项目环境')
-    proj_app = models.SmallIntegerField(verbose_name='应用名称')
+    proj_name = models.ForeignKey('assets.ProjectName', on_delete=models.CASCADE, verbose_name='项目名称')
+    proj_env = models.ForeignKey('assets.ProjectEnv', on_delete=models.CASCADE, verbose_name='项目环境')
+    proj_app = models.ForeignKey('assets.ProjectApp', on_delete=models.CASCADE, verbose_name='应用名称')
     proj_audit_group = models.SmallIntegerField(verbose_name='项目授权组', blank=True, null=True, default=None)
     proj_role = models.ForeignKey('ProjectConfig', on_delete=models.CASCADE, verbose_name='项目角色')
     proj_branch_tag = models.CharField(max_length=20, blank=False,null=False, verbose_name='项目分支或Tag')
@@ -88,6 +85,41 @@ class Project_Config_Ticket(models.Model):
         unique_together = ("proj_name", "proj_env", "proj_app")
         verbose_name = '配置发布工單表'
         verbose_name_plural = '配置发布工單表'
+
+
+class Project_Deploy_Ticket(models.Model):
+    STATUS = (
+        (0, '已通过'),
+        (1, '已拒绝'),
+        (2, '审核中'),
+        (3, '已部署'),
+    )
+    LEVEL = (
+        (0, '非紧急'),
+        (1, '紧急'),
+    )
+    ticket_no = models.BigIntegerField(verbose_name='发布项目ID',null=False)
+    ticket_user = models.CharField(max_length=30, verbose_name='工单申请人')
+    ticket_platform = models.ManyToManyField("assets.platformname", related_name='deploy_platform',blank=False, verbose_name='发布平台')
+    ticket_config = models.ForeignKey("Project_Config_Ticket",related_name='ticket_config', on_delete=models.CASCADE, blank=False, verbose_name='关联工单配置表')
+    ticket_commit = models.CharField(max_length=100, verbose_name='commit ID')
+    ticket_subject = models.CharField(max_length=200, verbose_name='工单申请主题')
+    ticket_content = models.TextField(verbose_name='工单申请内容')
+    ticket_audit = models.CharField(max_length=30, verbose_name='部署指派人')
+    ticket_status = models.IntegerField(choices=STATUS, default='审核中', verbose_name='工单状态')
+    ticket_level = models.IntegerField(choices=LEVEL, default='非紧急', verbose_name='工单紧急程度')
+    ticket_cancel = models.TextField(blank=True, null=True, verbose_name='取消原因')
+    create_time = models.DateTimeField(auto_now_add=True, blank=True, null=True, verbose_name='工单创建时间')
+    modify_time = models.DateTimeField(auto_now=True, blank=True, verbose_name='工单最后修改时间')
+    '''自定义权限'''
+
+    class Meta:
+        db_table = 'ops_project_deploy_ticket'
+        unique_together = ("ticket_no", "ticket_config", "ticket_commit")
+        verbose_name = '部署工单表'
+        verbose_name_plural = '部署工单表'
+
+
 class DeployLog(models.Model):
     """部署记录表"""
     d_types = (

@@ -21,6 +21,7 @@ from assets.utils.guacamole import AdminGuacamole
 from task.utils.ans_module_websocket import AnsModuleConsumer
 from task.utils.ans_playbook_websocket import AnsPlaybookConsumer
 from projs.utils.deploy_websocket import DeployConsumer
+from projs.utils.ticket_deploy_websocket import TicketDeployConsumer
 
 application = ProtocolTypeRouter({
 
@@ -28,6 +29,7 @@ application = ProtocolTypeRouter({
         URLRouter([
             # URLRouter just takes standard Django path() or url() entries.
             path(r'ws/deploy/', DeployConsumer),
+            path(r'ws/deploy_ticket/', TicketDeployConsumer),
             path(r'ws/ans_module_log/', AnsModuleConsumer),
             path(r'ws/ans_playbook_log/', AnsPlaybookConsumer),
             path(r'ws/deploy_log/', LogConsumer),

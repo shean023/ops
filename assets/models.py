@@ -14,8 +14,9 @@ class Assets(models.Model):
     asset_status_ = (
         (0, '已上线'),
         (1, '已下线'),
-        (2, '故障中'),
-        (3, '未使用'),
+        (2, '维修中'),
+        (3, '已入库'),
+        (4, '未使用'),
     )
     asset_type = models.CharField(choices=asset_types, max_length=100, default='server', verbose_name='资产类型')
     asset_nu = models.CharField(max_length=100, unique=True, verbose_name='资产编号')
@@ -38,6 +39,7 @@ class Assets(models.Model):
     asset_projapp = models.ManyToManyField('ProjectApp', related_name='assets', blank=True, verbose_name='所属应用')
     asset_projenv = models.ForeignKey('ProjectEnv', related_name='assets', null=False, blank=False, verbose_name='所属项目',
                                       on_delete=models.PROTECT)
+    asset_hostname = models.CharField(max_length=30, blank=True, null=True, verbose_name='主机名称')
     asset_purchase_day = models.DateField(null=True, blank=True, verbose_name="购买日期")
     asset_expire_day = models.DateField(null=True, blank=True, verbose_name="过保日期")
     asset_price = models.CharField(max_length=100, null=True, blank=True, verbose_name="价格(万元)")

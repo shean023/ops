@@ -3,11 +3,12 @@ import datetime
 from ast import literal_eval
 from django.shortcuts import render
 from django.http import JsonResponse
+import time
+
 from projs.models import *
-from assets.models import ProjectEnv,ProjectName
 from django.contrib.auth.models import Group
 from users.models import UserProfile
-from assets.models import Assets, ServerAssets, ProjectName
+from assets.models import Assets, ServerAssets, ProjectName,ProjectApp,ProjectEnv
 from utils.decorators import admin_auth, deploy_auth
 from projs.utils.git_tools import GitTools
 from projs.utils.svn_tools import SVNTools
@@ -69,6 +70,7 @@ def proj_ticket(request):
     groupList =  Group.objects.all()
     roleList = ProjectConfig.objects.all()
     proj_ticket = Project_Config_Ticket.objects.get(id=pk)
+    projapps = ProjectApp.objects.filter(projectname=proj_ticket.proj_name)
 
 
     if pk:
@@ -224,9 +226,10 @@ def deploy(request, pk):
 
 #@deploy_auth
 def deploy_apply(request, pk):
+
+    ticket = Project_Config_Ticket.objects.get(id=pk)
     if request.method == 'GET':
         mode = request.GET.get('mode', 'deploy')
-        ticket = Project_Config_Ticket.objects.get(id=pk)
         projnames = ProjectName.objects.all()
         projenvs = ProjectEnv.objects.all()
         groupList = Group.objects.all()
@@ -235,6 +238,56 @@ def deploy_apply(request, pk):
 
         if request.method == 'GET':
             return render(request, 'projs/deploy_apply.html', locals())
+
+
+def ticket_list(request):
+
+    if request.method == "GET":
+        deploy_tickets = Project_Deploy_Ticket.objects.order_by("-id")[0:200]
+        return render(request, 'projs/ticket_list.html', locals())
+
+    elif request.method == "POST":
+        if request.POST.get('model') in ['disable', 'auth', 'finish']:
+            try:
+                Project_Deploy_Ticket.objects.filter(id=request.POST.get('id')).update(
+                    ticket_status=request.POST.get('ticket_status'),
+                    ticket_cancel=request.POST.get('ticket_cancel', None),
+                    modify_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                )
+                if request.POST.get('model') == 'auth':
+                    #sendDeployNotice.delay(order_id=request.POST.get('id'), mask='【已授权】')
+                    pass
+                elif request.POST.get('model') == 'finish':
+                    #sendDeployNotice.delay(order_id=request.POST.get('id'), mask='【已部署】')
+                    pass
+                elif request.POST.get('model') == 'disable':
+                    #sendDeployNotice.delay(order_id=request.POST.get('id'), mask='【已取消】')
+                    pass
+            except Exception as e:
+                return JsonResponse({'msg': "操作失败：" + str(e), "code": 500, 'data': []})
+            return JsonResponse({'msg': "操作成功", "code": 200, 'data': []})
+
+
+def deploy_ticket(request, pk):
+    deploy_ticket = Project_Deploy_Ticket.objects.get(id=pk)
+    if request.method == "GET":
+        return render(request, 'projs/deploy_ticket.html', locals())
+
+    elif request.method == "POST":
+        if request.POST.get('query') in ['service', 'project', 'group', 'dserver']:
+            pid = request.POST.get('pid')  # platformID
+            print(pid)
+            serverList = []
+            if request.POST.get('query') == 'dserver':
+                for ser in Assets.objects.filter(asset_projenv=deploy_ticket.ticket_config.proj_env.id).filter(
+                        asset_platform=pid).filter(asset_projapp__id=deploy_ticket.ticket_config.proj_app.id):
+                    serverList.append({"id": ser.id, "ip": ser.asset_management_ip, "hs": ser.asset_hostname,
+                                       "as": ser.asset_status})
+            return JsonResponse({'msg': "主机查询成功", "code": 200, 'data': serverList})
+        else:
+            JsonResponse({'msg': "不支持的操作", "code": 500, 'data': []})
+    else:
+        return JsonResponse({'msg': "操作失败", "code": 500, 'data': "不支持的操作"})
 
 
 @admin_auth

@@ -14,7 +14,7 @@
                     <div class="form-group">
                         <label for="project">当前项目</label>
                         <input type="text" class="form-control" id="project" name="project"
-                               value="{{ config.proj_name }} | {{ config.proj_env }}"
+                               value="{{ config.proj_env.projenv_name }}|{{ config.proj_name.projname_name }}|{{ config.proj_app.projapp_name }} | "
                                readonly>
                     </div>
                     <!-- /.form-group -->

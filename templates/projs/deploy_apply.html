@@ -8,6 +8,8 @@
 
 
 
+
+
     <style>
         /* dataTables列内容居中 */
         #project-conf > tbody > tr > td {
@@ -43,7 +45,7 @@
                     </div>
                     <!-- /.box-header -->
 
-                        <form class="main form-horizontal" id="deploy_apply">
+                        <form class="main form-horizontal" id="deploy_ticket">
                             <fieldset>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">单号<i class="fa fa-info-circle"
@@ -62,23 +64,17 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">环境</label>
                                     <div class="col-sm-6">
-                                        {% for env in projenvs %}
-                                            {% if env.id == ticket.proj_env %}
+
                                                 <input class="form-control" name="ticket_env"
-                                                       value="{{ env.projenv_name }}" disabled>
-                                            {% endif %}
-                                        {% endfor %}
+                                                       value="{{ ticket.proj_env.projenv_name }}" disabled>
+
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">项目</label>
                                     <div class="col-sm-6">
-                                        {% for proj in projnames %}
-                                            {% if proj.id == ticket.proj_name %}
                                                 <input class="form-control" name="ticket_proj"
-                                                       value="{{ proj.projname_name }}" disabled>
-                                            {% endif %}
-                                        {% endfor %}
+                                                       value="{{ ticket.proj_name.projname_name }}" disabled>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -87,30 +83,17 @@
 
                                         <select multiple="multiple" class="form-control selectpicker" id="ticket_platform"
                                                 name="ticket_platform" style="width: 100%;">
-                                            {% for proj in projnames %}
-                                                {% if proj.id == ticket.proj_name %}
-                                                    {% for pt in proj.platformname.all %}
-                                                        <option value="{{ pt.id }}"
-                                                                name="ticket_platform">{{ pt.platform_name }}</option>
+                                                    {% for plf in ticket.proj_name.platformname.all %}
+                                                        <option value="{{ plf.id }}"
+                                                                name="ticket_platform">{{ plf.platform_name }}</option>
                                                     {% endfor %}
-                                                {% endif %}
-                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label"><i class="fa fa-group"></i> 应用</label>
+                                    <label class="col-sm-2 control-label"> 应用</label>
                                     <div class="col-sm-6">
-                                            {% for projname in projnames %}
-                                                {% if projname.id == ticket.proj_name %}
-                                                    {% for app in projname.projectapp.all %}
-                                                        {% if app.id == ticket.proj_app %}
-                                                       <input class="form-control" name="proj_app"
-                                                       value="{{ app.projapp_name }}" disabled>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                {% endif %}
-                                            {% endfor %}
+                                           <input class="form-control" name="proj_app" value="{{ ticket.proj_app.projapp_name }}" disabled>
                                     </div>
                                 </div>
 
@@ -126,8 +109,8 @@
                                     <div class="form-group">
                                         <label class="col-sm-2 control-label">选择版本</label>
                                         <div class="col-sm-6">
-                                            <select class="form-control" name="repo_release"
-                                                    id="repo_release">
+                                            <select class="form-control" name="ticket_commit"
+                                                    id="ticket_commit">
                                             </select>
                                         </div>
                                         <div class="input-group-addon col-sm-4 commit" data-toggle="tooltip"
@@ -235,7 +218,7 @@
                 </div>
                 <div class="box-footer" style="width: 49%">
 
-                    <button type="button" class="btn btn-info pull-right add-ticket-conf" style="margin-right: 5px">提交申请
+                    <button type="button" class="btn btn-info pull-right add-deploy-ticket" style="margin-right: 5px">提交申请
                     </button>
                 </div>
 
@@ -252,70 +235,10 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/js/bootstrap-select.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
 
 
-    <script>
-        $('select').selectpicker();
-
-    </script>
-    <script type="text/javascript">
-        $(function () {
-            $("[data-toggle='tooltip']").tooltip();
-
-        });
-    </script>
-
-    <script>
-        $(function () {
-            $('#ticket_app').change(function () {
-                $('#JQResult').html('');
-                $('option:selected', $(this)).each(function () {
-                    $('#JQResult').append(
-                        $('<li/>').html($(this).val())
-                    );
-                });
-            });
-        });
-
-    </script>
         <script>
-        $(function () {
-            // Initialize Select2 Elements
-            $('.select2').select2();
-            Pace.options.ajax.trackWebSockets = false;
-
-            {% if mode == 'rollback' and config.repo == 'git' %}
-                $('.fresh, .commit').off('click').css({'cursor': 'auto'});
-            {% else %}
-                $('[data-toggle="tooltip"]').tooltip();
-            {% endif %}
-        });
-
-        // 获取branch或tag
-        $('.fresh').on('click', function () {
-            $.get("{% url 'deploy' pk %}", {key: "model", mode: "{{ mode }}"}, function (res) {
-                if (res.code === 200) {
-                    let repo_model = $('#repo_model');
-                    repo_model.empty();
-                    for (let item of res.models) {
-                        repo_model.append(`<option value="${item}">${item}</option>`)
-                    }
-                    $('.fresh').off('click').css({'cursor': 'auto'});
-                } else {
-                    $.alert({
-                        title: 'Tips',
-                        type: 'red',
-                        content: res.msg,
-                    })
-                }
-            }).fail(function (response) {
-                $.alert({
-                    title: 'Tips',
-                    type: 'red',
-                    content: response.responseText,
-                })
-            })
-        });
 
         // 获取远程仓库最新的commits
         $('.commit').on('click', function () {
@@ -323,7 +246,7 @@
             let ajax_data = {key: "commit", branch: branch, new_commit: true, mode: "{{ mode }}"};
 
             $.get("{% url 'deploy' pk %}", ajax_data, function (res) {
-                let repo_release = $('#repo_release');
+                let repo_release = $('#ticket_commit');
                 repo_release.empty();
                 for (let item of res.data) {
                     let short_commit_id = item['commit_id'].length > 7 ? item['commit_id'].slice(0, 8) : item['commit_id'];
@@ -337,62 +260,57 @@
                 })
             });
         });
-
-        // 获取本地仓库的commits
-        $('#repo_model').on('change', function () {
-            {% if config.repo_model == 'branch' and config.repo == 'git' %}
-                let branch = $(this).val();
-                let ajax_data = {key: "commit", branch: branch, mode: "{{ mode }}"};
-
-                $.get("{% url 'deploy' pk %}", ajax_data, function (res) {
-                    let repo_release = $('#repo_release');
-                    repo_release.empty();
-                    for (let item of res.data) {
-                        let short_commit_id = item['commit_id'].slice(0, 8);
-                        repo_release.append(`<option value="${item['commit_id']}">${short_commit_id} | ${item['message']} | ${item['committer']}</option>`)
-                    }
-                }).fail(function (response) {
+                // 添加發布工單
+        $('.add-deploy-ticket').on('click', function () {
+            let data = $('#deploy_ticket').serializeJson();
+            $.extend(data, {ticket_user: '{{ user.username }}', ticket_config: {{ pk }}, ticket_status: 2});
+            $.ajax({
+                url: '/api/deploy_ticket/',
+                type: 'POST',
+                data: JSON.stringify(data),
+                dataType: 'json',
+                contentType: "application/json",
+                success: function () {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'green',
+                        content: '添加成功！',
+                    })
+                },
+                error: function (response) {
                     $.alert({
                         title: 'Tips',
                         type: 'red',
                         content: response.responseText,
                     })
-                });
-            {% endif %}
+                }
+            })
+
         });
 
-        // 开始部署/回滚
-        $('.deploy,.rollback').on('click', function () {
-            let count = 0;
-            let repo_release = $('#repo_release');
-            let branch_tag = $('#repo_model').val();
-            let commit = repo_release !== null ? repo_release.val() : null;
-
-            let ws_data = {config_id: '{{ config.id }}', branch_tag: branch_tag, commit: commit, rollback: true};
-            ws_data.rollback = ("{{ mode }}" === "rollback");
-
-            let ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
-            let socket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/deploy/");
-            let obj = $('.timeline');
-
-            socket.onopen = function () {
-                obj.html('');
-                socket.send(JSON.stringify(ws_data));
+        // 将数据JSON化
+        (function ($) {
+            $.fn.serializeJson = function () {
+                let serializeObj = {};
+                let array = this.serializeArray();
+                $(array).each(function () {
+                    if (serializeObj[this.name]) {
+                        if ($.isArray(serializeObj[this.name])) {
+                            serializeObj[this.name].push(this.value);
+                        } else {
+                            serializeObj[this.name] = [serializeObj[this.name], this.value];
+                        }
+                    } else {
+                        if (this.name === 'ticket_platform') {
+                            serializeObj[this.name] = [this.value];
+                        } else {
+                            serializeObj[this.name] = this.value;
+                        }
+                    }
+                });
+                return serializeObj;
             };
-
-            socket.onmessage = function (e) {
-                if (e.data.indexOf('<p') === -1) {
-                    obj.append(e.data);
-                    count++
-                } else {
-                    $('.timeline li:eq(' + (count - 1) + ') .timeline-item .timeline-body').append(e.data);
-                }
-            };
-
-            socket.onclose = function () {
-                obj.append('<li><i class="fa fa-clock-o bg-gray"></i><div class="timeline-item"><h3 class="timeline-header"><a href="javascript:void(0)">任务执行完毕！</a></h3></div></li>')
-            }
-        })
+        })(jQuery);
     </script>
 
 {% endblock %}

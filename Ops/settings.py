@@ -139,6 +139,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
+
 ROOT_URLCONF = 'Ops.urls'
 
 TEMPLATES = [

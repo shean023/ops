@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block head %}
+    <link rel="stylesheet"
+          href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'AdminLTE/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dist/css/xcConfirm.css' %}" />
+    <style>
+        /* dataTables列内容居中 */
+        #deploy-list > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #deploy-list > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <!--dataTable-->
+        <div class="col-xs-12">
+            <!-- /.box -->
+            <div class="box">
+                <div class="box-body">
+                    <table id="deploy-list" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>类型</th>
+                            <th>单号</th>
+                            <th>环境</th>
+                            <th>平台</th>
+                            <th>项目</th>
+                            <th>应用</th>
+                            <th>主题</th>
+                            <th>申请人</th>
+                            <th>创建时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for tc in deploy_tickets %}
+                            <tr>
+                                <td>
+                                    {% if tc.ticket_level == 0 %}
+                                        <button type="button" class="btn btn-success btn-xs">非紧急</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-warning btn-xs">紧急</button>
+                                    {% endif %}
+                                </td>
+                                <td>{{ tc.ticket_no }}</td>
+                                <td>{{ tc.ticket_config.proj_env.projenv_name }}</td>
+                                <td>{% for ptf in tc.ticket_platform.all %}{{ ptf.platform_name }}&nbsp;{% endfor %}</td>
+                                <td>{{ tc.ticket_config.proj_name.projname_name }}</td>
+                                <td>
+                                    <div title="{{ tc.ticket_commit|slice:"7" }}-{{ tc.ticket_config.proj_branch_tag }}">{{ tc.ticket_config.proj_app.projapp_name }}</div>
+                                </td>
+                                <td>
+                                    <div title="{{ tc.ticket_content }}">{{tc.ticket_subject}}</div>
+                                </td>
+                                <td>
+                                    <div title="发布人: {{ tc.ticket_audit }}">{{tc.ticket_user}}</div>
+                                </td>
+                                <td>{{ tc.create_time|date:"Y/m/d H:i  " }}</td>
+                                <td>
+                                    {% if tc.ticket_status == 0 %}
+                                        <button type="button" class="btn btn-info btn-xs">已通过</button>
+                                    {% elif tc.ticket_status == 1 %}
+                                        <button type="button" class="btn btn-danger btn-xs"
+                                                data-toggle="tooltip"
+                                                data-placement="left" title="{{ tc.ticket_cancel }}">
+                                            <del>已撤销</del>
+                                        </button>
+
+                                    {% elif tc.ticket_status == 2 %}
+                                        <button type="button" class="btn btn-warning btn-xs">审核中</button>
+
+                                    {% elif tc.ticket_status == 3 %}
+                                        <button type="button" class="btn btn-success btn-xs">已部署</button>
+                                    {% elif tc.ticket_status == 4 %}
+                                        <button type="button" class="btn  btn-dark btn-xs">已回滚</button>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default dropdown-toggle btx-xs"
+                                                data-toggle="dropdown">
+                                            <span class="glyphicon glyphicon glyphicon-edit"></span>
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            {% if tc.ticket_status == 2 or tc.ticket_status == 0 %}
+                                                <!-- 如果有写入工单权限表权限，并且状态是审核状态，就返回授权跟撤销以及详情按钮 -->
+                                                {% if tc.ticket_status == 2 %}
+                                                    <li>
+                                                        <a href="javascript:"
+                                                           onclick='updateOrderStatus(this,{{ tc.id }},"auth",0, {{ tc.ticket_no }})'>授权</a>
+                                                    </li>
+                                                    <li><a href="javascript:"
+                                                           onclick="updateOrderStatus(this,{{ tc.id }},'disable',1, {{ tc.ticket_no }})">撤销</a>
+                                                    </li>
+                                                {% endif %}
+                                                <!-- 如果工单已经审核通过，并且有改变工单状态权限 -->
+                                                {% if tc.ticket_status == 0 %}
+                                                    <li><a href="/project/deploy_ticket/{{ tc.id }}" >部署</a></li>
+                                                    <li><a href="javascript:"
+                                                           onclick="updateOrderStatus(this,{{ tc.id }},'disable',1, {{ tc.ticket_no }})">撤销</a>
+                                                    </li>
+                                                    <li><a href="javascript:"
+                                                           onclick="updateOrderStatus(this,{{ tc.id }},'finish',3, {{ tc.ticket_no }})">完成</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endif %}
+                                            {% if tc.ticket_status == 3 %}
+                                                <li><a href="/project/rollback_ticket/{{ tc.id }}">回滚</a></li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+    <!-- /.row -->
+
+{% endblock %}
+
+
+{% block js %}
+    <!-- DataTables -->
+    <script src="{% static 'AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/jquery-dateFormat.min.js' %}"></script>
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+    <!--    弹窗开始样式 -->
+<script src="{% static 'dist/js/xcConfirm.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script>
+        $(function () {
+            deploy_table = $('#deploy-list').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [7, "desc"]
+            });
+
+            //Date picker
+            $('#LogStartTime, #LogEndTime').datepicker({
+                autoclose: true
+            });
+        });
+    </script>
+
+    <script>
+        function updateOrderStatus(obj, id, model, status, ticket) {
+            var btnObj = $(obj);
+            if (model == 'auth' || model == 'finish') {
+                if (model == 'auth') {
+                    var txt = "工单:" + ticket + " 是否确认授权？";
+                    var title = "部署工单授权";
+                } else if (model == 'finish') {
+                    var txt = "工单:" + ticket + " 是否确认完成?";
+                    var title = "部署工单完成";
+                } ;
+
+                var option = {
+                    title: title,
+                    btn: parseInt("0011", 2),
+                    onOk: function () {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/project/ticket_list/',
+                            data: {
+							  "id":id,
+							  "model":model,
+							  "ticket_status":status
+						  },
+                            success: function (response) {
+                                if (response["code"] == "200") {
+                                    window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
+                                    location.reload();
+                                } else {
+                                    window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
+                                }
+                            },
+                            error: function (response) {
+                                window.wxc.xcConfirm("请求数据错误！", window.wxc.xcConfirm.typeEnum.error);
+                            },
+                        });
+                    },
+                    onCancel: function () {
+                    },
+                    onClose: function () {
+                    }
+                }
+                window.wxc.xcConfirm(txt, "custom", option);
+            } else if (model == 'disable') {
+                window.wxc.xcConfirm("工单:" + ticket + " 撤销原因:", window.wxc.xcConfirm.typeEnum.input, {
+                    onOk: function (result) {
+                        if (result.length == 0) {
+                            /* 如果没有输入字符串则直接退出 */
+                            return;
+                        }
+                        ;
+                        $.ajax({
+                            type: 'POST',
+                            url: '/project/ticket_list/',
+                            data: {
+                                "model": model,
+                                'ticket_cancel': result,
+                                'id': id,
+                                "ticket_status": status
+                            },
+                            success: function (response) {
+                                if (response["code"] == "200") {
+                                    window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
+                                    location.reload();
+                                } else {
+                                    window.wxc.xcConfirm("撤销失败：" + response["msg"], window.wxc.xcConfirm.typeEnum.error);
+                                }
+                                ;
+                                btnObj.removeAttr('disabled');
+                            },
+                            error: function (response) {
+                                btnObj.removeAttr('disabled');
+                                window.wxc.xcConfirm("服务器响应错误，撤销失败", window.wxc.xcConfirm.typeEnum.error);
+                            },
+                        });
+
+                    }
+                })
+            }
+        }
+
+    </script>
+
+
+{% endblock %}
+
