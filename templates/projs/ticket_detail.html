@@ -205,7 +205,8 @@
         // 获取branch或tag
         $('.fresh').on('click', function () {
             pk = $('#proj_role option:selected').val();
-            $.get("/project/read_branch/" + pk, {key: "model", mode: "deploy"}, function (res) {
+            env = $('#proj_env option:selected').text();
+            $.get("/project/read_branch/" + pk, {key: "model", mode: "deploy", env: env}, function (res) {
                 if (res.code === 200) {
                     let proj_branch_tag = $('#proj_branch_tag');
                     proj_branch_tag.empty();

@@ -1,9 +1,0 @@
-ERROR 2019-12-04 17:21:44 get 获取数据（get）失败：Error 111 connecting to 192.168.238.129:6379. Connection refused.
-ERROR 2019-12-04 17:21:44 set 设置数据失败：Error 111 connecting to 192.168.238.129:6379. Connection refused.
-ERROR 2019-12-04 17:21:48 delete 删除数据失败：Error 111 connecting to 192.168.238.129:6379. Connection refused.
-ERROR 2019-12-04 19:41:13 get 获取数据（get）失败：Error 111 connecting to 192.168.238.129:6379. Connection refused.
-ERROR 2019-12-04 19:41:13 set 设置数据失败：Error 111 connecting to 192.168.238.129:6379. Connection refused.
-ERROR 2019-12-04 19:41:16 delete 删除数据失败：Error 111 connecting to 192.168.238.129:6379. Connection refused.
-ERROR 2019-12-04 19:42:09 get 获取数据（get）失败：Error 111 connecting to 192.168.238.129:6379. Connection refused.
-ERROR 2019-12-04 19:42:09 set 设置数据失败：Error 111 connecting to 192.168.238.129:6379. Connection refused.
-ERROR 2019-12-04 19:42:11 delete 删除数据失败：Error 111 connecting to 192.168.238.129:6379. Connection refused.

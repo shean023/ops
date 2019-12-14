@@ -56,8 +56,6 @@ class ProjectConfig(models.Model):
     post_deploy = models.TextField(blank=True, verbose_name='代码检出后操作', default='')
     prev_release = models.TextField(blank=True, verbose_name='切换版本前操作', default='')
     post_release = models.TextField(blank=True, verbose_name='切换版本后操作', default='')
-    versions = models.TextField(blank=True, verbose_name='存储部署过的版本', default='')
-
 
     class Meta:
         db_table = 'ops_project_config'
@@ -79,6 +77,7 @@ class Project_Config_Ticket(models.Model):
     mail_notice = models.BooleanField(blank=True, verbose_name='是否开启郵件通知', default=False)
     to_mail = models.TextField(blank=True, default='', verbose_name='收件人邮箱')
     cc_mail = models.TextField(blank=True, default='', verbose_name='抄送人邮箱')
+    versions = models.TextField(blank=True, verbose_name='存储部署过的版本', default='')
 
     class Meta:
         db_table = 'ops_project_config_ticket'
@@ -87,7 +86,7 @@ class Project_Config_Ticket(models.Model):
         verbose_name_plural = '配置发布工單表'
 
 
-class Project_Deploy_Ticket(models.Model):
+class Project_Deploy_Ticket(models.Model):  #工单记录表
     STATUS = (
         (0, '已通过'),
         (1, '已拒绝'),
@@ -101,7 +100,7 @@ class Project_Deploy_Ticket(models.Model):
     ticket_no = models.BigIntegerField(verbose_name='发布项目ID',null=False)
     ticket_user = models.CharField(max_length=30, verbose_name='工单申请人')
     ticket_platform = models.ManyToManyField("assets.platformname", related_name='deploy_platform',blank=False, verbose_name='发布平台')
-    ticket_config = models.ForeignKey("Project_Config_Ticket",related_name='ticket_config', on_delete=models.CASCADE, blank=False, verbose_name='关联工单配置表')
+    ticket_config = models.ForeignKey("Project_Config_Ticket",related_name='config_ticket', on_delete=models.CASCADE, blank=False, verbose_name='关联工单配置表')
     ticket_commit = models.CharField(max_length=100, verbose_name='commit ID')
     ticket_subject = models.CharField(max_length=200, verbose_name='工单申请主题')
     ticket_content = models.TextField(verbose_name='工单申请内容')
@@ -118,6 +117,33 @@ class Project_Deploy_Ticket(models.Model):
         unique_together = ("ticket_no", "ticket_config", "ticket_commit")
         verbose_name = '部署工单表'
         verbose_name_plural = '部署工单表'
+
+
+class Project_Deploy_Record(models.Model):
+    STATUS = (
+        (0, '发布失败'),
+        (1, '连接成功'),
+        (2, '备份成功'),
+        (3, '代码同步'),
+        (4, '更改属主'),
+        (5, '部署前任务'),
+        (6, '部署代码'),
+        (9, '部署后任务'),
+    )
+    deploy_ip = models.GenericIPAddressField(verbose_name='发布IP=资产ID')
+    deploy_status = models.IntegerField(choices=STATUS, default=0,verbose_name='发布状态', null=False)
+    deploy_times = models.IntegerField(verbose_name='发布次数', default=0, null=False)
+    rollback_status = models.IntegerField(default=0,verbose_name='回滚状态', null=False)
+    rollback_times = models.IntegerField(verbose_name='回滚次数', default=0, null=False)
+    d_ticket_id = models.ForeignKey("Project_Deploy_Ticket", related_name='deploy_ticket', on_delete=models.CASCADE, blank=False, verbose_name='关联工单记录表')
+    create_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'ops_project_deploy_record'
+        unique_together = ("deploy_ip", "d_ticket_id")
+        verbose_name = '发布记录'
+        verbose_name_plural = '发布记录'
 
 
 class DeployLog(models.Model):

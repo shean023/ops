@@ -1,2 +1,0 @@
-ERROR 2019-11-18 21:46:14 connect 用户administrator通过webssh连接172.100.10.129失败！原因：Error reading SSH protocol banner[Errno 104] Connection reset by peer
-ERROR 2019-11-19 13:54:42 connect 用户administrator通过webssh连接172.100.10.129失败！原因：Error reading SSH protocol banner[Errno 104] Connection reset by peer

@@ -26,7 +26,7 @@ class GitTools:
         """
         self.base_path = path
         self.repo_url = repo_url
-        self.proj_name = repo_url.split('/')[1].rstrip('.git')
+        self.proj_name = repo_url.split('/')[-1].rstrip('.git')
         self.proj_path = os.path.join(self.base_path, self.proj_name, env)
         self.remote_name = remote_name
         self.repo = self.__repo
@@ -39,8 +39,8 @@ class GitTools:
         try:
             if not os.path.exists(self.base_path):
                 os.makedirs(self.base_path)
-            if os.path.exists(self.proj_path) and os.listdir(self.proj_path):
-                shutil.rmtree(self.proj_path, ignore_errors=True)
+            # if os.path.exists(self.proj_path) and os.listdir(self.proj_path):
+            #     shutil.rmtree(self.proj_path, ignore_errors=True)
             if len(prev_cmds) == 0:
                 git.Repo.clone_from(url=self.repo_url, to_path=self.proj_path, origin=self.remote_name)
             else:
@@ -125,7 +125,6 @@ class GitTools:
                 continue
             c += cmd + ' && '
         c = c.rstrip(' && ')
-
         code, _ = subprocess.getstatusoutput('({})'.format(c))
 
         return code

@@ -73,12 +73,18 @@
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label"><i class="fa fa-group"></i>平台</label>
                                             <div class="col-sm-4">
-                                                <select class="form-control" name="ticket_platform" id="ticket_platform" required onchange="javascript:oBtServiceSelect('dserver');">
-                                                    <option selected="selected" value="">选择平台</option>
-                                                    {% for pt in deploy_ticket.ticket_platform.all %}
-                                                                <option value="{{ pt.id }}"
-                                                                        name="ticket_platform">{{ pt.platform_name }}</option>
-                                                    {% endfor %}
+                                                {% if deploy_ticket.ticket_status == 0 %}
+                                                    <select class="form-control" name="ticket_platform" id="ticket_platform" required onchange="javascript:oBtServiceSelect('dserver');">
+                                                        <option selected="selected" value="">选择平台</option>
+                                                        {% for pt in deploy_ticket.ticket_platform.all %}
+                                                                    <option value="{{ pt.id }}"
+                                                                            name="ticket_platform">{{ pt.platform_name }}</option>
+                                                        {% endfor %}
+                                                {% else %}
+                                                    <input type="text" class="form-control" name="ticket_platform"
+                                                       id="ticket_platform" value="选择平台"
+                                                       readonly="readonly"/>
+                                                {% endif %}
                                                 </select>
                                             </div>
                                         </div>
@@ -173,16 +179,16 @@
                                                 <div class="col-sm-6">
                                                     {% if deploy_ticket.ticket_status == 0 %}
                                                         <button type="button" class="btn btn-success btn-xs"
-                                                                onclick="cupdateOrderStatus(this,{{ corder.id }},'cdisable',1)">
+                                                                onclick="updateOrderStatus(this,{{ deploy_ticket.id }},'disable', 1, {{ deploy_ticket.ticket_no }})">
                                                             撤销部署
                                                         </button>
                                                     {% elif deploy_ticket.ticket_status == 2 %}
                                                         <button type="button" class="btn  btn-success btn-xs"
-                                                                onclick="cupdateOrderStatus(this,{{ corder.id }},'cdisable',1)">
+                                                                onclick="updateOrderStatus(this,{{ deploy_ticket.id }},'disable', 1, {{ deploy_ticket.ticket_no }})">
                                                             撤销部署
                                                         </button>
                                                         <button type="button" class="btn  btn-success btn-xs"
-                                                                onclick='cupdateOrderStatus(this,{{ corder.id }},"cauth",0)'>
+                                                                onclick='updateOrderStatus(this,{{ deploy_ticket.id }},"auth", 0, {{ deploy_ticket.ticket_no }})'>
                                                             确认授权
                                                         </button>
                                                     {% endif %}
@@ -207,11 +213,16 @@
 
                                         {% if deploy_ticket.ticket_status == 0 %}
                                             <button type="button" class="btn btn-warning"
-                                                    onclick="crunDeploy(this,'rollback')">回滚
+                                                    onclick="crunDeploy(this,'Rollback')">回滚
                                             </button>
-                                            <button type="button" class="btn btn-success disabled">完成部署</button>
+                                            <button type="button" class="btn btn-success"
+                                            onclick='updateOrderStatus(this,{{ deploy_ticket.id }},"finish", 3, {{ deploy_ticket.ticket_no }})'>完成部署
+                                            </button>
                                             <button type="button" class="btn btn-info"
-                                                    onclick="crunDeploy(this,'deploy')">点击部署
+                                                    onclick="crunDeploy(this,'Deploy')">点击部署
+                                            </button>
+                                            <button type="button" class="btn  btn-primary"
+                                                    onclick="crunDeploy(this,'Dcheck')">部署检查
                                             </button>
                                         {% endif %}
                                     </div>
@@ -247,7 +258,6 @@
                                         {% elif deploy_ticket.ticket_status == 3 %}
                                             <i class="fa fa-smile-o"></i>下次合作愉快~
                                         {% endif %}
-
                                     </div>
 {#                                    <ul class="timeline">#}
 {##}
@@ -290,6 +300,7 @@
     <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
     <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
     <script src="{% static 'dist/js/xcConfirm.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script src="{% static 'dist/js/xcConfirm.js' %}" type="text/javascript" charset="utf-8"></script>
 
 <script>
     // 开始部署/回滚
@@ -299,30 +310,36 @@
 
         var options = $("#project_server option:selected");
         var serverList = [];
-        if (options.length == 0) {
-            window.wxc.xcConfirm("【目标服务器】未选择~", window.wxc.xcConfirm.typeEnum.error);
-            btnObj.removeAttr('disabled');
-            return false;
-        } else {
-            for (var i = 0; i < options.length; ++i) {
-                serverList.push(options[i].value);
+        if (dtype == 'Deploy' || dtype == 'Rollback') {
+            if (options.length == 0) {
+                window.wxc.xcConfirm("【目标服务器】未选择~", window.wxc.xcConfirm.typeEnum.error);
+                btnObj.removeAttr('disabled');
+                return false;
+            } else {
+                for (var i = 0; i < options.length; ++i) {
+                    serverList.push(options[i].value);
+                }
+                ;
             }
             ;
         }
         ;
-                //获取平台ID
+
+        //获取平台ID
         var pobj = document.getElementById("ticket_platform");
         var pindex = pobj.selectedIndex;
         var pid = pobj.options[pindex].value;
 
-        $("#result").html("服务器正在处理，请稍等。。。<br>");
-
         let count = 0;
-        let ws_data = {tid: '{{ deploy_ticket.id }}', pid: pid, dserver: serverList};
+        if (dtype == 'Deploy' || dtype == 'Rollback') {
+            var ws_data = {tid: '{{ deploy_ticket.id }}', pid: pid, dserver: serverList, d_type: dtype};
+        } else if (dtype == 'Dcheck') {
+            var ws_data = {tid: '{{ deploy_ticket.id }}',d_type: dtype};
+        }
         let ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
         let socket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/deploy_ticket/");
         //let objul = $('.timeline');
-         let objul = $("#result");
+        let objul = $("#result");
 
         socket.onopen = function () {
             objul.html('');
@@ -337,54 +354,120 @@
                 $('.timeline li:eq(' + (count - 1) + ') .timeline-item .timeline-body').append(e.data);
             }
         };
-
+        var time2 = new Date().Format("yyyy-MM-dd hh:mm:ss");
         socket.onclose = function () {
             //obj.append('<li><i class="fa fa-clock-o bg-gray"></i><div class="timeline-item"><h3 class="timeline-header"><a href="javascript:void(0)">任务执行完毕！</a></h3></div></li>')
-            objul.append('<a href="javascript:void(0)">任务执行完毕！</a>')
+            objul.append('[' + time2 + ' '+ ws_data['d_type']　+'] <font size="2" color="blue">任务结束</font></br>')
 
         }
         btnObj.removeAttr('disabled');
 
     };
 
+    Date.prototype.Format = function (fmt) { // author: meizz
+        var o = {
+            "M+": this.getMonth() + 1, // 月份
+            "d+": this.getDate(), // 日
+            "h+": this.getHours(), // 小时
+            "m+": this.getMinutes(), // 分
+            "s+": this.getSeconds(), // 秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), // 季度
+            "S": this.getMilliseconds() // 毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
 
-        // 开始部署/回滚
-        {#$('.deploy,.rollback').on('click', function () {#}
-        {#    let count = 0;#}
-        {#    let repo_release = $('#repo_release');#}
-        {#    let branch_tag = $('#repo_model').val();#}
-        {#    let commit = repo_release !== null ? repo_release.val() : null;#}
-        {##}
-        {#    let ws_data = {config_id: '{{ config.id }}', branch_tag: branch_tag, commit: commit, rollback: true};#}
-        {#    ws_data.rollback = ("{{ mode }}" === "rollback");#}
-        {##}
-        {#    let ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";#}
-        {#    let socket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/deploy/");#}
-        {#    let obj = $('.timeline');#}
-        {##}
-        {#    socket.onopen = function () {#}
-        {#        obj.html('');#}
-        {#        socket.send(JSON.stringify(ws_data));#}
-        {#    };#}
-        {##}
-        {#    socket.onmessage = function (e) {#}
-        {#        if (e.data.indexOf('<p') === -1) {#}
-        {#            obj.append(e.data);#}
-        {#            count++#}
-        {#        } else {#}
-        {#            $('.timeline li:eq(' + (count - 1) + ') .timeline-item .timeline-body').append(e.data);#}
-        {#        }#}
-        {#    };#}
-        {##}
-        {#    socket.onclose = function () {#}
-        {#        obj.append('<li><i class="fa fa-clock-o bg-gray"></i><div class="timeline-item"><h3 class="timeline-header"><a href="javascript:void(0)">任务执行完毕！</a></h3></div></li>')#}
-        {#    }#}
-        //})
+
+    function updateOrderStatus(obj, id, model, status, ticket) {
+        var btnObj = $(obj);
+        if (model == 'auth' || model == 'finish') {
+            if (model == 'auth') {
+                var txt = "工单:" + ticket + " 是否确认授权？";
+                var title = "部署工单授权";
+            } else if (model == 'finish') {
+                var txt = "工单:" + ticket + " 是否确认完成?";
+                var title = "部署工单完成";
+            }
+            ;
+
+            var option = {
+                title: title,
+                btn: parseInt("0011", 2),
+                onOk: function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/project/ticket_list/',
+                        data: {
+                            "id": id,
+                            "model": model,
+                            "ticket_status": status
+                        },
+                        success: function (response) {
+                            if (response["code"] == "200") {
+                                window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
+                                location.reload();
+                            } else {
+                                window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
+                            }
+                        },
+                        error: function (response) {
+                            window.wxc.xcConfirm("请求数据错误！", window.wxc.xcConfirm.typeEnum.error);
+                        },
+                    });
+                },
+                onCancel: function () {
+                },
+                onClose: function () {
+                }
+            }
+            window.wxc.xcConfirm(txt, "custom", option);
+        } else if (model == 'disable') {
+            window.wxc.xcConfirm("工单:" + ticket + " 撤销原因:", window.wxc.xcConfirm.typeEnum.input, {
+                onOk: function (result) {
+                    if (result.length == 0) {
+                        /* 如果没有输入字符串则直接退出 */
+                        return;
+                    }
+                    ;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/project/ticket_list/',
+                        data: {
+                            "model": model,
+                            'ticket_cancel': result,
+                            'id': id,
+                            "ticket_status": status
+                        },
+                        success: function (response) {
+                            if (response["code"] == "200") {
+                                window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
+                                location.reload();
+                            } else {
+                                window.wxc.xcConfirm("撤销失败：" + response["msg"], window.wxc.xcConfirm.typeEnum.error);
+                            }
+                            ;
+                            btnObj.removeAttr('disabled');
+                        },
+                        error: function (response) {
+                            btnObj.removeAttr('disabled');
+                            window.wxc.xcConfirm("服务器响应错误，撤销失败", window.wxc.xcConfirm.typeEnum.error);
+                        },
+                    });
+
+                }
+            })
+        }
+    }
+
+
 
     //获发布服务器列表
     function oBtServiceSelect(model) {
         $('#project_server').removeAttr("disabled");
-
         //获取平台ID
         var pobj = document.getElementById("ticket_platform");
         var pindex = pobj.selectedIndex;

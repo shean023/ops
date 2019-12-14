@@ -21,10 +21,10 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.plugins.callback import CallbackBase
 from ansible.inventory.manager import InventoryManager
 from ansible.vars.manager import VariableManager
-from projs.utils.deploy_websocket import DeployResultsCollector
+from projs.utils.ticket_deploy_websocket import DeployResultsCollector
 from conf.logger import ansible_logger
 from django.conf import settings
-
+from Cryptodome.PublicKey import RSA
 
 class ModuleResultsCollector(CallbackBase):
     """
@@ -244,7 +244,7 @@ class ANSRunner(object):
         self.options = Options(connection='smart',
                                module_path=None,
                                forks=50, timeout=10,
-                               remote_user=kwargs.get('remote_user', None), ask_pass=False, private_key_file=None,
+                               remote_user=kwargs.get('remote_user', None), ask_pass=False,#private_key_file=None,
                                ssh_common_args=None,
                                ssh_extra_args=None,
                                sftp_extra_args=None, strategy='free', scp_extra_args=None,
@@ -253,7 +253,9 @@ class ANSRunner(object):
                                become_user=kwargs.get('become_user', None), ask_value_pass=False, verbosity=None,
                                retry_files_enabled=False, check=False, listhosts=False,
                                listtasks=False, listtags=False, syntax=False, diff=True, gathering='smart',
-                               roles_path=settings.ANSIBLE_ROLE_PATH)
+                               roles_path=settings.ANSIBLE_ROLE_PATH,
+                               private_key_file='/home/aron/.ssh/id_rsa'
+                               )
         self.loader = DataLoader()
         self.inventory = MyInventory(resource=resource, loader=self.loader, sources=sources)
         self.variable_manager = VariableManager(loader=self.loader, inventory=self.inventory)
@@ -261,26 +263,27 @@ class ANSRunner(object):
         self.callback = None
         self.sock = sock
 
-    def run_module(self, host_list, module_name, module_args, deploy=False, send_msg=True):
+
+    def run_module(self, host_list, module_name, module_args, deploy=False, send_msg=True, d_type=None, task=None, tid=None):
         """
         run module from ansible ad-hoc.
         """
-        self.callback = DeployResultsCollector(self.sock, send_msg=send_msg) if deploy else ModuleResultsCollector(
+        self.callback = DeployResultsCollector(self.sock, send_msg=send_msg, d_type=d_type, task=task, tid=tid) if deploy else ModuleResultsCollector(
             sock=self.sock)
 
         play_source = dict(
             name="Ansible Play",
             hosts=host_list,
             gather_facts='no',
-            tasks=[dict(action=dict(module=module_name, args=module_args))]
+            tasks=[dict(action=dict(module=module_name, args=module_args))],
         )
 
         play = Play().load(play_source, variable_manager=self.variable_manager, loader=self.loader)
-
         # actually run it
         tqm = None
 
         try:
+
             tqm = TaskQueueManager(
                 inventory=self.inventory,
                 variable_manager=self.variable_manager,
@@ -289,10 +292,10 @@ class ANSRunner(object):
                 passwords=self.passwords,
                 stdout_callback=self.callback,
             )
-
             C.HOST_KEY_CHECKING = False  # 关闭第一次使用ansible连接客户端是输入命令
             tqm.run(play)
         except Exception as e:
+
             ansible_logger.error('执行{}失败，原因: {}'.format(module_name, e))
         finally:
             if tqm is not None:

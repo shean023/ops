@@ -4,7 +4,6 @@ from ast import literal_eval
 from django.shortcuts import render
 from django.http import JsonResponse
 import time
-
 from projs.models import *
 from django.contrib.auth.models import Group
 from users.models import UserProfile
@@ -91,13 +90,13 @@ def config_list(request):
 
 @permission_required('projs.deploy_project', raise_exception=True)
 def read_branch(request, pk):
-    print(pk)
     config = ProjectConfig.objects.get(id=pk)
     if request.method == 'GET':
         key = request.GET.get('key', None)
         mode = request.GET.get('mode', 'deploy')
+        env = request.GET.get('env','noenv')
         if config.repo == 'git':
-            git_tool = GitTools(repo_url=config.repo_url, path=config.src_dir, env='test')
+            git_tool = GitTools(repo_url=config.repo_url, path=config.src_dir, env=env)
             if key:
                 if key == 'model':
                     try:
@@ -247,7 +246,7 @@ def ticket_list(request):
         return render(request, 'projs/ticket_list.html', locals())
 
     elif request.method == "POST":
-        if request.POST.get('model') in ['disable', 'auth', 'finish']:
+        if request.POST.get('model') in ['auth']:
             try:
                 Project_Deploy_Ticket.objects.filter(id=request.POST.get('id')).update(
                     ticket_status=request.POST.get('ticket_status'),
@@ -267,6 +266,63 @@ def ticket_list(request):
                 return JsonResponse({'msg': "操作失败：" + str(e), "code": 500, 'data': []})
             return JsonResponse({'msg': "操作成功", "code": 200, 'data': []})
 
+        elif request.POST.get('model') in ['disable']:
+            try:
+                if request.user.is_superuser:
+                    Project_Deploy_Ticket.objects.filter(id=request.POST.get('id')).update(
+                        ticket_status=request.POST.get('ticket_status'),
+                        ticket_cancel=request.POST.get('ticket_cancel', None),
+                        modify_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                    )
+                else:
+                    dr=Project_Deploy_Record.objects.filter(d_ticket_id=request.POST.get('id'))
+                    if dr.count() == 0:
+                        Project_Deploy_Ticket.objects.filter(id=request.POST.get('id')).update(
+                            ticket_status=request.POST.get('ticket_status'),
+                            ticket_cancel=request.POST.get('ticket_cancel', None),
+                            modify_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                        )
+                    else:
+                        return JsonResponse({'msg': "已有发布记录，请联系管理员处理！", "code": 500, 'data': []})
+
+                    # sendDeployNotice.delay(order_id=request.POST.get('id'), mask='【已取消】')
+            except Exception as e:
+                return JsonResponse({'msg': "操作失败：" + str(e), "code": 500, 'data': []})
+            return JsonResponse({'msg': "操作成功", "code": 200, 'data': []})
+
+        elif request.POST.get('model') in ['finish']:
+            try:
+                count = 0
+                config = Project_Deploy_Ticket.objects.get(id=request.POST.get('id'))
+                if config.ticket_status == 0:
+                    for pid in config.ticket_platform.all():
+                        for ser in Assets.objects.filter(asset_projenv=config.ticket_config.proj_env.id).filter(
+                                asset_platform=pid).filter(asset_projapp__id=config.ticket_config.proj_app.id):
+                            dt = Project_Deploy_Record.objects.filter(deploy_ip=ser.asset_management_ip,
+                                                                      d_ticket_id=request.POST.get('id'))
+                            if dt.count() == 0:
+                                if ser.asset_status == 0:
+                                    count += 1
+                            else:
+                                if dt[0].deploy_status != 9:
+                                    count += 1
+                    if count == 0:
+                        try:
+                            Project_Deploy_Ticket.objects.filter(id=request.POST.get('id')).update(
+                                ticket_status=request.POST.get('ticket_status'),
+                                ticket_cancel=request.POST.get('ticket_cancel', None),
+                                modify_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                            )
+                            return JsonResponse({'msg': "操作成功", "code": 200, 'data': []})
+                        except Exception as e:
+                            return JsonResponse({'msg': "操作失败：" + str(e), "code": 500, 'data': []})
+                    else:
+                        return JsonResponse({'msg': "检测到有未发布的主机", "code": 500, 'data': []})
+                else:
+                    return JsonResponse({'msg': "不能重复修改工单状态", "code": 500, 'data': []})
+            except Exception as e:
+                return JsonResponse({'msg': "操作失败：" + str(e), "code": 500, 'data': []})
+
 
 def deploy_ticket(request, pk):
     deploy_ticket = Project_Deploy_Ticket.objects.get(id=pk)
@@ -276,7 +332,6 @@ def deploy_ticket(request, pk):
     elif request.method == "POST":
         if request.POST.get('query') in ['service', 'project', 'group', 'dserver']:
             pid = request.POST.get('pid')  # platformID
-            print(pid)
             serverList = []
             if request.POST.get('query') == 'dserver':
                 for ser in Assets.objects.filter(asset_projenv=deploy_ticket.ticket_config.proj_env.id).filter(
