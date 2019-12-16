@@ -56,46 +56,70 @@
                     <table id="deploy-list" class="table table-bordered table-striped">
                         <thead>
                         <tr>
-                            <th>项目名称</th>
-                            <th>项目环境</th>
-                            <th>操作类型</th>
-                            <th>Branch/Tag</th>
-                            <th>部署版本</th>
-                            <th>版本注释</th>
-                            <th>操作用户</th>
-                            <th>操作时间</th>
-                            <th>操作</th>
+                            <th>单号</th>
+                            <th>环境</th>
+                            <th>平台</th>
+                            <th>项目</th>
+                            <th>应用</th>
+                            <th>CommitID</th>
+                            <th>主机</th>
+                            <th>发布</th>
+                            <th>回滚</th>
+                            <th>更新时间</th>
+                            <th>状态</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for log in logs %}
                             <tr>
-                                <td>{{ log.project_config.project.project_name }}</td>
+                                <td><a href="{% url 'deploy_ticket' log.d_ticket_id.id %}"
+                                       target="blank">{{ log.d_ticket_id.ticket_no }}</a></td>
+                                <td>{{ log.d_ticket_id.ticket_config.proj_env.projenv_name }}</td>
+                                <td>{{ log.assets.asset_platform.platform_name }}</td>
+                                <td>{{ log.d_ticket_id.ticket_config.proj_name.projname_name }}</td>
                                 <td>
-                                    {% if log.project_config.project.project_env == 'test' %}
-                                        <span class="badge bg-green">{{ log.project_config.project.get_project_env_display }}</span>
-                                    {% elif log.project_config.project.project_env == 'fz' %}
-                                        <span class="badge bg-yellow">{{ log.project_config.project.get_project_env_display }}</span>
-                                    {% elif log.project_config.project.project_env == 'prod' %}
-                                        <span class="badge bg-red">{{ log.project_config.project.get_project_env_display }}</span>
-                                    {% endif %}
+                                    {{ log.d_ticket_id.ticket_config.proj_app.projapp_name }}
                                 </td>
-                                <td>
-                                    {% if log.d_type == 'deploy' %}
-                                        <small class="label label-info">{{ log.get_d_type_display }}</small>
-                                    {% elif log.d_type == 'rollback' %}
-                                        <small class="label label-warning">{{ log.get_d_type_display }}</small>
-                                    {% endif %}
-                                </td>
-                                <td>{{ log.branch_tag }}</td>
-                                <td>{{ log.release_name|slice:":7" }}</td>
-                                <td>{{ log.release_desc }}</td>
-                                <td>{{ log.deploy_user.username }}</td>
-                                <td>{{ log.c_time|date:"Y-m-d H:i:s" }}</td>
-                                <td>
-                                    <button type="button" class="btn btn-default" data-toggle="modal"
-                                            data-id={{ log.id }} data-target="#deploy-log">查看
+                                <td>{{ log.d_ticket_id.ticket_commit|slice:"7" }}-{{ log.d_ticket_id.ticket_config.proj_branch_tag }}</td>
+                                <td>{{ log.deploy_ip }}</td>
+                                <td>{% if log.deploy_status != 9 %}
+                                    <button type="button" class="btn btn-danger btn-xs" data-toggle="tooltip"
+                                            data-placement="left" title="{{ log.deploy_times }}">失败
                                     </button>
+                                {% else %}
+                                    <button type="button" class="btn btn-success btn-xs" data-toggle="tooltip"
+                                            data-placement="left" title="{{ log.deploy_times }}">成功
+                                    </button>
+                                {% endif %}
+                                </td>
+
+                                <td>{% if log.rollback_status == 1 %}
+                                    <button type="button" class="btn btn-success btn-xs" 　data-toggle="tooltip"
+                                            data-placement="left" title="{{ log.rollback_times }}">成功
+                                    </button>
+                                {% elif log.rollback_status == 0 %}
+                                    <button type="button" class="btn btn-info btn-xs">无</button>
+                                {% endif %}
+                                </td>
+                                <td>{{ log.update_date|date:"Y/m/d H:i  " }}</td>
+                                <td>
+                                    {% if log.d_ticket_id.ticket_status == 0 %}
+                                        <button type="button" class="btn btn-info btn-xs">已通过</button>
+                                    {% elif log.d_ticket_id.ticket_status == 1 %}
+                                        <button type="button" class="btn btn-danger btn-xs"
+                                                data-toggle="tooltip"
+                                                data-placement="left" title="{{ log.d_ticket_id.ticket_cancel }}">
+                                            <del>已撤销</del>
+                                        </button>
+
+                                    {% elif log.d_ticket_id.ticket_status == 2 %}
+                                        <button type="button" class="btn btn-warning btn-xs">审核中</button>
+
+                                    {% elif log.d_ticket_id.ticket_status == 3 %}
+                                        <button type="button" class="btn btn-success btn-xs">已部署</button>
+                                    {% elif log.d_ticket_id.ticket_status == 4 %}
+                                        <button type="button" class="btn  btn-dark btn-xs">已回滚</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
@@ -105,29 +129,6 @@
                 <!-- /.box-body -->
             </div>
             <!-- /.box -->
-
-            <!-- DeployLogModal  -->
-            <div class="modal fade bd-example-modal-lg" id="deploy-log">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">部署记录</h4>
-                        </div>
-                        <div class="modal-body">
-                            <ul class="timeline">
-
-                            </ul>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        </div>
-                    </div>
-                    <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-            </div>
         </div>
     </div>
     <!-- /.row -->
@@ -159,30 +160,6 @@
             });
         });
 
-        // 查看部署记录
-        $('#deploy-log').on('show.bs.modal', function (event) {
-            let button = $(event.relatedTarget); // Button that triggered the modal
-            let pk = button.data('id');
-            let modal = $(this);
-            let count = 0;
-            let obj = $('.timeline');
-            obj.empty();
-            $.get("{% url 'deploy_log' %}?pk=" + pk, function (res) {
-                if (res.code === 200) {
-                    for (let item of res.result) {
-                        if (item.indexOf('<p') === -1) {
-                            obj.append(item);
-                            count++
-                        } else {
-                            $('.timeline li:eq(' + (count - 1) + ') .timeline-item .timeline-body').append(item);
-                        }
-                    }
-                    obj.append('<li><i class="fa fa-clock-o bg-gray"></i><div class="timeline-item"><h3 class="timeline-header"><a href="javascript:void(0)">任务执行完毕！</a></h3></div></li>');
-                    modal.scrollTop = modal.scrollHeight;
-                }
-            });
-        });
-
         // 按日期搜索
         function searchLog() {
             let startTime = $('#LogStartTime').val();
@@ -211,18 +188,20 @@
                     deploy_table.clear().draw();
                     for (let i = 0; i < response.records.length; i++) {
                         let result = response.records[i];
-                        let run_time = $.format.date(result['c_time'], "yyyy-MM-dd HH:mm:ss");
+                        let run_time = $.format.date(result['update_time'], "yyyy-MM-dd HH:mm:ss");
 
                         deploy_table.row.add([
-                            result['project_name'],
-                            result['project_env'],
-                            result['d_type'],
-                            result['branch_tag'],
-                            result['release_name'],
-                            result['release_desc'],
-                            result['deploy_user'],
+                            result['ticket_no'],
+                            result['ticket_env'],
+                            result['ticket_pltf'],
+                            result['ticket_proj'],
+                            result['ticket_app'],
+                            result['cid'],
+                            result['host'],
+                            result['deploy'],
+                            result['rollback'],
                             run_time,
-                            `<button type="button" class="btn btn-default" data-toggle="modal" data-id=${result['id']} data-target="#deploy-log">查看</button>`
+                            result['status'],
                         ]).draw();
                     }
                 }

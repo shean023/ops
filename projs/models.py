@@ -56,6 +56,7 @@ class ProjectConfig(models.Model):
     post_deploy = models.TextField(blank=True, verbose_name='代码检出后操作', default='')
     prev_release = models.TextField(blank=True, verbose_name='切换版本前操作', default='')
     post_release = models.TextField(blank=True, verbose_name='切换版本后操作', default='')
+    versions = models.TextField(blank=True, verbose_name='存储部署过的版本', default='')
 
     class Meta:
         db_table = 'ops_project_config'
@@ -92,6 +93,7 @@ class Project_Deploy_Ticket(models.Model):  #工单记录表
         (1, '已拒绝'),
         (2, '审核中'),
         (3, '已部署'),
+        (4, '已回滚'),
     )
     LEVEL = (
         (0, '非紧急'),
@@ -130,12 +132,13 @@ class Project_Deploy_Record(models.Model):
         (6, '部署代码'),
         (9, '部署后任务'),
     )
+    assets = models.ForeignKey("assets.Assets", related_name='assets_deploy_record', on_delete=models.DO_NOTHING, blank=False, verbose_name='关联资产记录表')
     deploy_ip = models.GenericIPAddressField(verbose_name='发布IP=资产ID')
     deploy_status = models.IntegerField(choices=STATUS, default=0,verbose_name='发布状态', null=False)
     deploy_times = models.IntegerField(verbose_name='发布次数', default=0, null=False)
     rollback_status = models.IntegerField(default=0,verbose_name='回滚状态', null=False)
     rollback_times = models.IntegerField(verbose_name='回滚次数', default=0, null=False)
-    d_ticket_id = models.ForeignKey("Project_Deploy_Ticket", related_name='deploy_ticket', on_delete=models.CASCADE, blank=False, verbose_name='关联工单记录表')
+    d_ticket_id = models.ForeignKey("Project_Deploy_Ticket", related_name='deploy_ticket', on_delete=models.DO_NOTHING, blank=False, verbose_name='关联工单记录表')
     create_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now_add=True)
 

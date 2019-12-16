@@ -214,6 +214,8 @@
                                         {% if deploy_ticket.ticket_status == 0 %}
                                             <button type="button" class="btn btn-warning"
                                                     onclick="crunDeploy(this,'Rollback')">回滚
+                                            </button><button type="button" class="btn btn-warning"
+                                                    onclick='updateOrderStatus(this,{{ deploy_ticket.id }},"rollback_finish", 4, {{ deploy_ticket.ticket_no }})'>完成回滚
                                             </button>
                                             <button type="button" class="btn btn-success"
                                             onclick='updateOrderStatus(this,{{ deploy_ticket.id }},"finish", 3, {{ deploy_ticket.ticket_no }})'>完成部署
@@ -384,13 +386,16 @@
 
     function updateOrderStatus(obj, id, model, status, ticket) {
         var btnObj = $(obj);
-        if (model == 'auth' || model == 'finish') {
+        if (model == 'auth' || model == 'finish' || model == 'rollback_finish') {
             if (model == 'auth') {
                 var txt = "工单:" + ticket + " 是否确认授权？";
                 var title = "部署工单授权";
             } else if (model == 'finish') {
-                var txt = "工单:" + ticket + " 是否确认完成?";
+                var txt = "工单:" + ticket + " 是否确认部署完成?";
                 var title = "部署工单完成";
+            } else if (model == 'rollback_finish') {
+                var txt = "工单:" + ticket + " 是否确认完成回滚?";
+                var title = "回滚完成";
             }
             ;
 

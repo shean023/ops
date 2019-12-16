@@ -290,9 +290,10 @@ def ticket_list(request):
                 return JsonResponse({'msg': "操作失败：" + str(e), "code": 500, 'data': []})
             return JsonResponse({'msg': "操作成功", "code": 200, 'data': []})
 
-        elif request.POST.get('model') in ['finish']:
+        elif request.POST.get('model') in ['finish', 'rollback_finish']:
             try:
                 count = 0
+                rollback = 0
                 config = Project_Deploy_Ticket.objects.get(id=request.POST.get('id'))
                 if config.ticket_status == 0:
                     for pid in config.ticket_platform.all():
@@ -300,13 +301,22 @@ def ticket_list(request):
                                 asset_platform=pid).filter(asset_projapp__id=config.ticket_config.proj_app.id):
                             dt = Project_Deploy_Record.objects.filter(deploy_ip=ser.asset_management_ip,
                                                                       d_ticket_id=request.POST.get('id'))
-                            if dt.count() == 0:
-                                if ser.asset_status == 0:
-                                    count += 1
+
+                            if request.POST.get('model') == 'finish':
+                                if dt.count() == 0:
+                                    if ser.asset_status == 0:
+                                        count += 1
+                                elif dt[0].deploy_status != 9 or dt[0].rollback_status == 1:
+                                        count += 1
                             else:
-                                if dt[0].deploy_status != 9:
+                                if dt.count() != 0:
                                     count += 1
-                    if count == 0:
+                                    if dt[0].rollback_status == 0:
+                                        rollback += 1
+                    if request.POST.get('model') == 'rollback_finish' and count == 0:
+                        return JsonResponse({'msg': "检测到没有部署记录，请勿点回滚完成！", "code": 500, 'data': []})
+
+                    elif  request.POST.get('model') == 'finish' and count == 0 or  request.POST.get('model') == 'rollback_finish' and rollback == 0:
                         try:
                             Project_Deploy_Ticket.objects.filter(id=request.POST.get('id')).update(
                                 ticket_status=request.POST.get('ticket_status'),
@@ -317,7 +327,10 @@ def ticket_list(request):
                         except Exception as e:
                             return JsonResponse({'msg': "操作失败：" + str(e), "code": 500, 'data': []})
                     else:
-                        return JsonResponse({'msg': "检测到有未发布的主机", "code": 500, 'data': []})
+                        if request.POST.get('model') == 'finish':
+                            return JsonResponse({'msg': "检测到有未部署或有回滚记录的主机", "code": 500, 'data': []})
+                        else:
+                            return JsonResponse({'msg': "检测到有未回滚的主机", "code": 500, 'data': []})
                 else:
                     return JsonResponse({'msg': "不能重复修改工单状态", "code": 500, 'data': []})
             except Exception as e:
@@ -347,37 +360,37 @@ def deploy_ticket(request, pk):
 
 @admin_auth
 def deploy_log(request):
-    pk = request.GET.get('pk')
     start_time = request.GET.get('startTime')
     end_time = request.GET.get('endTime')
-    if pk:
-        result = literal_eval(DeployLog.objects.get(id=pk).result)
-        return JsonResponse({'code': 200, 'result': result})
-    elif start_time and end_time:
+
+    if start_time and end_time:
         new_end_time = datetime.datetime.strptime(end_time, '%Y-%m-%d') + datetime.timedelta(1)
         end_time = new_end_time.strftime('%Y-%m-%d')
         try:
             records = []
-            search_records = DeployLog.objects.select_related('project_config').select_related('deploy_user').filter(
-                c_time__gt=start_time, c_time__lt=end_time)
+            search_records = Project_Deploy_Record.objects.select_related('d_ticket_id').select_related('assets').filter(
+                create_date__gt=start_time, create_date__lt=end_time)
             for search_record in search_records:
                 record = {
                     'id': search_record.id,
-                    'project_name': search_record.project_config.project.project_name,
-                    'project_env': search_record.project_config.project.get_project_env_display(),
-                    'd_type': search_record.get_d_type_display(),
-                    'branch_tag': search_record.branch_tag,
-                    'release_name': search_record.release_name[:7],
-                    'release_desc': search_record.release_desc,
-                    'deploy_user': search_record.deploy_user.username,
-                    'c_time': search_record.c_time,
+                    'ticket_no': search_record.d_ticket_id.ticket_no,
+                    'ticket_env': search_record.d_ticket_id.ticket_config.proj_env.projenv_name,
+                    'ticket_pltf': search_record.assets.asset_platform.platform_name,
+                    'ticket_proj': search_record.d_ticket_id.ticket_config.proj_name.projname_name,
+                    'ticket_app': search_record.d_ticket_id.ticket_config.proj_app.projapp_name,
+                    'cid': search_record.d_ticket_id.ticket_commit[:7] + "-" + search_record.d_ticket_id.ticket_config.proj_branch_tag,
+                    'host': search_record.deploy_ip,
+                    'deploy': search_record.deploy_status,
+                    'rollback': search_record.rollback_status,
+                    'update_time': search_record.create_date,
+                    'status': search_record.d_ticket_id.ticket_status
                 }
                 records.append(record)
             return JsonResponse({'code': 200, 'records': records})
         except Exception as e:
             return JsonResponse({'code': 500, 'error': '查询失败：{}'.format(e)})
     else:
-        logs = DeployLog.objects.select_related('project_config').select_related('deploy_user').all()
+        logs = Project_Deploy_Record.objects.select_related('d_ticket_id').select_related('assets').all()
         return render(request, 'projs/deploy_log.html', locals())
 
 

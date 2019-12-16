@@ -57,7 +57,12 @@ class TicketDeployConsumer(WebsocketConsumer):
         else:
             self.redis_instance.set(unique_key, 1)
             ticket_no = self.config.ticket_no
-            if self.d_type == 'Deploy':
+            if self.d_type == 'Dcheck':
+                self.deploy_check(ok_msg)
+            elif self.config.ticket_status == 3 or self.config.ticket_status == 4:
+                self.send_save(fail_msg.format("工单已关闭，请联系管理员！"), close=True)
+                return
+            elif self.d_type == 'Deploy':
 
                 self.branch_tag = self.config.ticket_config.proj_branch_tag
                 commit = self.config.ticket_commit
@@ -144,8 +149,6 @@ class TicketDeployConsumer(WebsocketConsumer):
                     self.deploy(ticket_no, info, tool, step_msg, ok_msg, fail_msg, warn_msg)
                 else:
                     pass
-            elif self.d_type == 'Dcheck':
-                self.deploy_check(ok_msg)
             else:
                 pass
 
@@ -184,7 +187,6 @@ class TicketDeployConsumer(WebsocketConsumer):
             ds = Assets.objects.get(id=hs)
             dt = Project_Deploy_Record.objects.filter(deploy_ip=ds.asset_management_ip,
                                                       d_ticket_id=info.get('tid'))
-
             if dt.count() == 1:  # 是否有发布记录：有
                 if self.d_type == "Rollback":  # 不要移动这个代码段位置，否则会逻辑错误！必需要先判断是否是回滚
                     if dt[0].rollback_times != dt[0].deploy_times:
@@ -235,7 +237,8 @@ class TicketDeployConsumer(WebsocketConsumer):
                     ))
 
                     try:  # 创建发布记录表
-                        dtc = Project_Deploy_Record.objects.create(deploy_ip=ds.asset_management_ip,
+                        dtc = Project_Deploy_Record.objects.create(assets=ds,
+                                                                   deploy_ip=ds.asset_management_ip,
                                                                    deploy_times=1,
                                                                    d_ticket_id=tid,
                                                                    )
@@ -345,6 +348,7 @@ class TicketDeployConsumer(WebsocketConsumer):
                     self.send_save(fail_msg.format("目标服务器部署后任务异常 {}").format(e))
 
         elif self.d_type == 'Rollback':
+
             self.send_save(ok_msg.format("开始回滚！"))
             # 回滚代码
             try:
