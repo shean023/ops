@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block head %}
+    <link rel="stylesheet"
+          href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'modaal/css/modaal.min.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+
+<style>
+
+    /* dataTables列内容居中 */
+    #confd_tab > tbody > tr > td {
+        text-align: center;
+    }
+
+    /* dataTables表头居中 */
+    #confd_tab > thead:first-child > tr:first-child > th {
+        text-align: center;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+    <!-- Main row -->
+    <div class="row">
+        <!-- Left col -->
+        <div class="col-md-12">
+
+            <!-- TABLE: LATEST ORDERS -->
+            <div class="box box-info">
+
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">配置列表</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+
+                <div class="box-body">
+                    <div style="margin-bottom: 10px;height: 30px" class="row">
+                        <a href="{% url 'confd_create' %}" style="float: left; margin-left: 1%"
+                           class="btn btn-sm btn-primary" id="addbtn">创建配置项目</a>
+                    </div>
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <table id="confd_tab" name="confd_tab" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>配置名称</th>
+                                    <th>环境</th>
+                                    <th>平台</th>
+                                    <th>项目</th>
+                                    <th>应用</th>
+                                    <th>命名空间</th>
+                                    <th>路径</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for confd in confds %}
+                                    <tr>
+                                        <td>{{ confd.id }}</td>
+                                        <td>{{ confd.confd_name }}</td>
+                                        <td>{{ confd.asset_projenv.projenv_name }}</td>
+                                        <td>{{ confd.asset_platform.platform_name }}</td>
+                                        <td>{{ confd.asset_proj.projname_name }}</td>
+                                        <td>{{ confd.asset_projapp.projapp_name }}</td>
+                                        <td>{{ confd.confd_ns }}</td>
+                                        <td>/{{ confd.asset_projenv_id }}/{{ confd.asset_platform.id }}/{{ confd.asset_proj.id }}/{{ confd.asset_projapp.id }}/{{ confd.confd_ns }}</td>
+                                        <td>{{ confd.confd_memo }}</td>
+                                        <td>
+                                            <a href="{% url 'confd_detail' %}?id={{ confd.id }}">
+                                                    <button type="button" class="btn btn-success btn-xs modify">配置明细
+                                                    </button>
+                                                </a>
+                                            {% if request.user.is_superuser %}
+                                                <a href="{% url 'confd_modify' %}?id={{ confd.id }}">
+                                                    <button type="button" class="btn btn-success btn-xs modify">修改
+                                                    </button>
+                                                </a>
+                                            {% endif %}
+                                            {% if request.user.is_superuser %}
+                                            <button type="button" class="btn btn-danger btn-xs delete"
+                                                    data-id="{{ confd.id }}">删除
+                                            </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+
+{% endblock %}
+
+{% block js %}
+    <!-- Select2 -->
+    <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+    <!-- DataTables -->
+    <script src="{% static 'AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+<script>
+        $(function () {
+
+            confd_table = $('#confd_tab').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            // Initialize Select2 Elements
+            $('.select2').select2({
+                allowClear: true
+            });
+
+            $('.modaal-ajax').modaal({
+                type: 'ajax',
+                width: 800
+            });
+        });
+
+        // 删除project-conf
+        $('#confd_tab tbody').on('click', '.delete', function () {
+
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+            $.confirm({
+                title: 'Tips',
+                content: '确定要删除这条记录么？',
+                type: 'red',
+                buttons: {
+                    Ok: function () {
+                        $.ajax({
+                            url: '/api/confd/' + pk + '/',
+                            method: 'DELETE',
+                            success: function () {
+                                confd_table.row(tr_obj).remove().draw();
+                            },
+                            error: function (data) {
+                                $.alert({
+                                    title: 'Tips',
+                                    type: 'red',
+                                    content: '删除失败！' + data.responseText,
+                                })
+                            }
+                        })
+                    },
+                    Cancel: function () {
+                        //
+                    }
+                }
+            });
+        });
+
+</script>
+
+{% endblock %}

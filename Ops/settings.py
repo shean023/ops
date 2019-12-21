@@ -93,6 +93,8 @@ INSTALLED_APPS = [
     'haystack.apps.HaystackConfig',
     'dbmanager.apps.DbmanagerConfig',
     'commons.apps.CommonsConfig',
+    'confd.apps.ConfdConfig',
+    'pure_pagination',
 ]
 
 # 全局搜索配置
@@ -192,6 +194,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PAGINATION_SETTINGS = {
+    'PAGE_RANGE_DISPLAYED': 5,
+    'MARGIN_PAGES_DISPLAYED': 2,
+    'SHOW_FIRST_PAGE_WHEN_INVALID': True,
+}
+
 AUTH_USER_MODEL = 'users.UserProfile'
 
 # Internationalization
@@ -260,3 +268,6 @@ ADMIN_PASSWORD = 'asf23#!ds'
 GUACAMOLE_HOST = '192.168.100.16'
 GUACAMOLE_PORT = 8080
 GUACAMOLE_SERVER_PATH = 'guacamole'
+
+ETCD_HOST = '127.0.0.1'
+ETCD_PORT = '2379'

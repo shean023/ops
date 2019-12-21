@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block head %}
+    <link rel="stylesheet"
+          href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'modaal/css/modaal.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dist/css/xcConfirm.css' %}" />
+    <style>
+        /* dataTables列内容居中 */
+        #confd-tab > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #confd-tab > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+    <!-- Main row -->
+    <div class="row">
+        <!-- Left col -->
+        <div class="col-md-12">
+
+            <!-- TABLE: LATEST ORDERS -->
+            <div class="box box-info">
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">配置名称:{{ confd.confd_name }}&nbsp;&nbsp;&nbsp;&nbsp;命名空间:{{ confd.confd_ns }}&nbsp;&nbsp;&nbsp;&nbsp;路径:
+                        /{{ confd.asset_projenv_id }}/{{ confd.asset_platform.id }}/{{ confd.asset_proj.id }}/{{ confd.asset_projapp.id }}/{{ confd.confd_ns }}</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="col-sm-7 pull-left" style="margin-bottom: 3px; margin-top: 3px">
+                        <button class="btn btn-sm btn-success pull-left" data-toggle="modal" id="add-confd"
+                                data-target="#AddConfdModal">
+                            <i class="fa fa-plus-square"></i>
+                            <span class="bigger-110">新增Key</span>
+                        </button>
+                        <button class="btn btn-sm btn-success pull-left" id="deploy-confd"
+                                onclick="deployConfd(this, {{ confd.id }})">
+                            <i class="fa fa-plus-square"></i>
+                            <span class="bigger-110">发布Key</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-xs-12">
+                <div class="box">
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table id="confd-tab" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>发布状态</th>
+                                <th>Key</th>
+                                <th>Value</th>
+                                <th>备注</th>
+                                <th>最后修改人</th>
+                                <th>最后修改时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for key in keys %}
+                                <tr>
+                                    <td>{% if key.confd_deploy_status == 0 %}
+                                        <button type="button" class="btn btn-dark btn-xs">已发布</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-warning btn-xs">未发布</button>
+                                    {% endif %}
+                                    </td>
+                                    <td>{{ key.confd_key }}</td>
+                                    <td>{{ key.confd_value }}</td>
+                                    <td>{{ key.confd_memo }}</td>
+                                    <td>{{ key.confd_modified_user }}
+                                        {% if key.confd_status == 1 %}
+                                            <button type="button" class="btn btn-success btn-xs">新</button>
+                                        {% elif key.confd_status == 2 %}
+                                            <button type="button" class="btn btn-info btn-xs">改</button>
+                                        {% elif key.confd_status == 3 %}
+                                            <button type="button" class="btn btn-danger btn-xs">删</button>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ key.confd_modified_time|date:"Y/m/d H:i  " }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-success btn-xs modify" data-toggle="modal"
+                                                data-id="{{ key.id }}" data-target="#AddConfdModal">修改
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-xs delete"
+                                                data-id="{{ key.id }}">删除
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+
+                <!-- ProjenvModal  -->
+                <div class="modal fade" id="AddConfdModal" tabindex="-1" role="dialog"
+                     aria-labelledby="AddConfdModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title" id="AddConfdModalLabel">
+
+                                </h4>
+                            </div>
+                            <div class="modal-body">
+                                <form id="confd_info" class="main form-horizontal">
+                                    <fieldset>
+                                        <div class="form-group">
+                                            <label for="confd_key" class="col-sm-2 control-label">Key</label>
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" name="confd_key"
+                                                       id="confd_key" required/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="confd_value" class="col-sm-2 control-label">Value</label>
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" name="confd_value"
+                                                       id="confd_value" required/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="confd_memo" class="col-sm-2 control-label">备注</label>
+                                            <div class="col-sm-6">
+                                                <textarea class="form-control" name="confd_memo"
+                                                          id="confd_memo"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-24"></div>
+
+                                    </fieldset>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" id="confd_ops"></button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}
+
+{% block js %}
+
+    <!-- Select2 -->
+    <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+    <!-- DataTables -->
+    <script src="{% static 'AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+    <script src="{% static 'modaal/js/modaal.min.js' %}"></script>
+    <script src="{% static 'dist/js/xcConfirm.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script>
+        $(function () {
+            confd_tab = $('#confd-tab').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+            // Initialize Select2 Elements
+            $('.select2').select2({
+                allowClear: true
+            });
+            $('.modaal-ajax').modaal({
+                type: 'ajax',
+                width: 800
+            });
+        });
+
+        <!-- Confd操作 -->
+        let confd_table_tbody = $('#confd-tab tbody');
+        let confd_ops = $('#confd_ops');
+
+        // 新增Key
+        $('#add-confd').on('click', function () {
+            document.getElementById('confd_info').reset();
+            $('.modal-title').text('新增键值');
+            confd_ops.text('添加');
+
+            confd_ops.unbind('click').on('click', function () {
+                let data = $('#confd_info').serializeJson();
+                $.extend(data, {confd_name:'{{ confd.id }}', confd_modified_user: '{{ user.username }}', confd_ns: '{{ confd.confd_ns }}'})
+                $.ajax({
+                    url: '/api/confd_detail/',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        confd_tab.row.add([
+                            `<button type="button" class="btn btn-warning btn-xs">未发布</button>`,
+                            res.confd_key,
+                            res.confd_value,
+                            res.confd_memo,
+                            res.confd_modified_user + `<button type="button" class="btn btn-success btn-xs">新</button>`,
+                            res.confd_modified_time,
+                            `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal" data-id="${res.id}" data-target="#AddConfdModal">修改</button> <button type="button" class="btn btn-danger btn-xs delete" data-id="${res.id}">删除</button>`
+                        ]).draw();
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            })
+        });
+
+        // 更新Key
+        confd_table_tbody.on('click', '.modify', function () {
+            let key_id = $(this).attr('data-id');
+            let key_td_obj = $(this).parents('tr').children();
+            $('.modal-title').text('修改Key');
+            confd_ops.text('确认修改');
+            $('#confd_key').val(key_td_obj[1].innerText);
+            $('#confd_value').val(key_td_obj[2].innerText);
+            $('#confd_memo').val(key_td_obj[3].innerText);
+
+            confd_ops.unbind('click').on('click', function () {
+                let data = $('#confd_info').serializeJson();
+                $.extend(data, {confd_name:'{{ confd.id }}', confd_status:2, confd_modified_user: '{{ user.username }}', confd_ns: '{{ confd.confd_ns }}', confd_deploy_status:1},)
+                $.ajax({
+                    url: '/api/confd_detail/' + key_id + '/',
+                    type: 'PUT',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (res) {
+                        key_td_obj[0].innerText = "未发布"
+                        key_td_obj[1].innerText = res.confd_key;
+                        key_td_obj[2].innerText = res.confd_value;
+                        key_td_obj[3].innerText = res.confd_memo;
+                        key_td_obj[4].innerText = res.confd_modified_user + " 改";
+                        key_td_obj[5].innerText = res.confd_modified_time;
+                        $.alert({
+                            title: 'Tips',
+                            type: 'green',
+                            content: '修改完成！',
+                        })
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            });
+        });
+
+        // 删除Key
+        confd_table_tbody.on('click', '.delete', function () {
+            let key_id = $(this).attr('data-id');
+            let key_td_obj = $(this).parents('tr').children();
+
+            {% if perms.assets.delete_assetprovider %}
+                $.confirm({
+                    title: 'Tips',
+                    content: '确定要删除这条记录么？',
+                    type: 'red',
+                    buttons: {
+                        Ok: function () {
+                            confd_key=key_td_obj[1].innerText;
+                            confd_value=key_td_obj[2].innerText;
+                            let data = {};
+                            $.extend(data, {confd_ns:'{{ confd.confd_ns }}',confd_key: confd_key, confd_value: confd_value, confd_modified_user: '{{ user.username }}', confd_name: '{{ confd.id }}',confd_deploy_status:1, confd_status: 3})
+                            $.ajax({
+                                url: '/api/confd_detail/' + key_id + '/',
+                                type: 'PUT',
+                                data: JSON.stringify(data),
+                                dataType: 'json',
+                                contentType: "application/json",
+                                success: function (res) {
+                                    key_td_obj[0].innerText = "未发布"
+                                    key_td_obj[1].innerText = res.confd_key;
+                                    key_td_obj[2].innerText = res.confd_value;
+                                    key_td_obj[3].innerText = res.confd_memo;
+                                    key_td_obj[4].innerText = res.confd_modified_user + " 删";
+                                    key_td_obj[5].innerText = res.confd_modified_time;
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'green',
+                                        content: '修改完成！',
+                                    })
+                                },
+                                error: function (response) {
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'red',
+                                        content: response.responseText,
+                                    })
+                                }
+                            })
+                        },
+                        Cancel: function () {
+                            //
+                        }
+                    }
+                });
+            {% else %}
+                $.alert({
+                    title: 'Tips',
+                    type: 'red',
+                    content: '抱歉！您没有删除Key的权限！如有疑问，请联系管理员！',
+                });
+            {% endif %}
+        });
+
+        function deployConfd(obj, id) {
+            var btnObj = $(obj);
+            var txt = " 是否确认发布配置？";
+            var title = "发布配置";
+
+
+            var option = {
+                title: title,
+                btn: parseInt("0011", 2),
+                onOk: function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/confd/confd_deploy/',
+                        data: {
+                            "id": id,
+                        },
+                        success: function (response) {
+                            if (response["code"] == "200") {
+                                window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
+                                location.reload();
+                            } else {
+                                window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
+                            }
+                        },
+                        error: function (response) {
+                            window.wxc.xcConfirm("请求数据错误！", window.wxc.xcConfirm.typeEnum.error);
+                        },
+                    });
+                },
+                onCancel: function () {
+                },
+                onClose: function () {
+                }
+            }
+            window.wxc.xcConfirm(txt, "custom", option);
+        }
+
+       // 将数据JSON化
+        (function ($) {
+            $.fn.serializeJson = function () {
+                let serializeObj = {};
+                let array = this.serializeArray();
+                $(array).each(function () {
+                    if (serializeObj[this.name]) {
+                        if ($.isArray(serializeObj[this.name])) {
+                            serializeObj[this.name].push(this.value);
+                        } else {
+                            serializeObj[this.name] = [serializeObj[this.name], this.value];
+                        }
+                    } else {
+                        serializeObj[this.name] = this.value;
+                    }
+                });
+                return serializeObj;
+            };
+        })(jQuery);
+
+    </script>
+
+{% endblock %}

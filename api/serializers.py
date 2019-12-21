@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from builtins import print
 
+#from confd.models import Project_Confd
+from confd.models import Config_Confd, Confd_Detail
 from task.models import AnsibleInventory
 from rest_framework import serializers
 from assets.models import *
@@ -233,8 +235,19 @@ class DeployTicketSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class Config_confd(object):
+    pass
 
 
+class ConfigConfdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Config_Confd
+        fields = '__all__'
+
+class ConfdDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Confd_Detail
+        fields = '__all__'
 
 class AssetProviderSerializer(serializers.ModelSerializer):
     assets = AssetsSerializer(many=True, read_only=True)

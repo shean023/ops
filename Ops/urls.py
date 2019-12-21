@@ -35,5 +35,6 @@ urlpatterns = [
     path(r'plan/', include('plan.urls')),
     path(r'wiki/', include('wiki.urls')),
     path(r'db_config/', include('dbmanager.urls')),
+    path(r'confd/', include('confd.urls')),
     re_path(r'^media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT}),
 ]

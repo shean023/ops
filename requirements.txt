@@ -89,3 +89,5 @@ Whoosh==2.7.4
 xlrd==1.1.0
 xlwt==1.3.0
 zope.interface==4.5.0
+django-pure-pagination
+python-etcd==0.4.5

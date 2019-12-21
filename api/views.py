@@ -1,6 +1,7 @@
 import copy
 from rest_framework import viewsets, permissions
 from api.serializers import *
+from confd.models import Config_Confd
 
 
 class CustomDjangoModelPermission(permissions.DjangoModelPermissions):
@@ -106,6 +107,16 @@ class ProjTicketViewSet(viewsets.ModelViewSet):
 class DeployTicketViewSet(viewsets.ModelViewSet):
     queryset = Project_Deploy_Ticket.objects.all().order_by('id')
     serializer_class = DeployTicketSerializer
+    permission_classes = (CustomDjangoModelPermission,)
+
+class ConfdViewSet(viewsets.ModelViewSet):
+    queryset = Config_Confd.objects.all().order_by('id')
+    serializer_class = ConfigConfdSerializer
+    permission_classes = (CustomDjangoModelPermission,)
+
+class ConfdDetailViewSet(viewsets.ModelViewSet):
+    queryset = Confd_Detail.objects.all().order_by('id')
+    serializer_class = ConfdDetailSerializer
     permission_classes = (CustomDjangoModelPermission,)
 
 

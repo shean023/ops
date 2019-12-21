@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block head %}
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+
+    <style>
+        .col-sm-10 {
+            width: 40%;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <!-- Main row -->
+    <div class="row">
+        <!-- Left col -->
+        <div class="col-md-12">
+
+            <!-- TABLE: LATEST ORDERS -->
+            <div class="box box-info" style="display: inline-block; width: 49%">
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">创建配置</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+
+                <div class="box-body">
+                    <form method="post" action="" id="modify-confd" name="modify-confd" class="form-horizontal">
+                        <div class="form-group">
+                            <label for="asset_projenv" class="col-sm-2 control-label">环境</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="asset_projenv" id="asset_projenv" >
+                                    <option value="">请选择环境</option>
+                                    {% for project_env in proj_envs %}
+                                        <option value="{{ project_env.id }}">{{ project_env.projenv_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="asset_platform" class="col-sm-2 control-label">平台</label>
+                            <div class="input-group col-sm-10">
+                                <select class="form-control col-sm-4" name="asset_platform" id="asset_platform">
+                                    <option value="">请选择平台</option>
+                                    {% for platform_name in platform_names %}
+                                        <option value="{{ platform_name.id }}">{{ platform_name.platform_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="input-group-addon fresh_platform" data-toggle="tooltip"
+                                     data-placement="top"
+                                     title="平台改变列出对应项目" style="cursor: pointer">
+                                    <i class="fa fa-refresh"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="asset_proj" class="col-sm-2 control-label">项目</label>
+                            <div class="input-group col-sm-10">
+                                <select class="form-control col-sm-4" name="asset_proj" id="asset_proj" required>
+                                    <option value="">请选择项目</option>
+                                    {% for projname in proj_names %}
+                                    <option value="{{ projname.id }}" name="asset_proj">{{ projname.projname_name }}</option>
+                                {% endfor %}
+                                </select>
+                                <div class="input-group-addon fresh_proj" data-toggle="tooltip"
+                                     data-placement="top"
+                                     title="项目改变列出对应应用" style="cursor: pointer">
+                                    <i class="fa fa-refresh"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="asset_projapp" class="col-sm-2 control-label">应用</label>
+                            <div class="col-sm-10">
+                                <select class="form-control select2" multiple="multiple" required name="asset_projapp"
+                                        id="asset_projapp">
+                                    {% for app in projapps %}
+                                        <option value="{{ app.id }}" name="asset_projapp">{{ app.projapp_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="asset_projapp" class="col-sm-2 control-label">配置名称</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="confd_name" id="confd_name" required placeholder="请为该配置命名"
+                                       class="form-control"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confd_ns" class="col-sm-2 control-label">命名空间</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="confd_ns" id="confd_ns" required
+                                       placeholder="请用字母或数字，比如nginx_core,redis_master"
+                                       class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confd_memo" class="col-sm-2 control-label">备注</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" name="confd_memo" id="confd_memo"></textarea>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="button" class="btn btn-default pull-right" onclick="history.go(-1)">返回
+                            </button>
+                            <button type="button" class="btn btn-info pull-right modify-confd"
+                                    style="margin-right: 5px">修改
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+    <script>
+        $(function () {
+            // Initialize Select2 Elements
+            $('.select2').select2({
+                allowClear: true
+            });
+            $("[data-toggle='tooltip']").tooltip();
+
+            $.get('/api/confd/' + {{ pk }} +'/', function (res) {
+                $('#asset_projenv').val(res.asset_projenv).trigger('change');
+                $('#asset_platform').val(res.asset_platform).trigger('change');
+                $('#asset_proj').val(res.asset_proj).trigger('change');
+                $('#asset_projapp').val(res.asset_projapp).trigger('change');
+                $('#confd_name').val(res.confd_name);
+                $('#confd_ns').val(res.confd_ns);
+                $('#confd_memo').val(res.confd_memo);
+            });
+        });
+
+          //获取平台对应的项目列表
+        $('.fresh_platform').on('click', function () {
+            let asset_platform_id = $('#asset_platform').val();
+            $.ajax({
+                url: '/api/platform/' + asset_platform_id + '/',
+                type: 'GET',
+                success: function (res) {
+                    let asset_proj_obj = $('#asset_proj');
+                    let asset_projapp_obj = $('#asset_projapp');
+                    let asset_projs = res['projectname'];
+                    asset_proj_obj.html('');
+                    asset_projapp_obj.html('');
+                    for (let i = 0; i < asset_projs.length; i++) {
+                        asset_proj_obj.append(
+                            '<option value=' + asset_projs[i]['id'] + '>' + asset_projs[i]['projname_name'] + '</option>'
+                        )
+                    }
+                    if (asset_projs.length == 1) {
+                        asset_proj_obj.append(
+                            '<option value=' + "" + '>' + '' + '</option>'
+                        )
+                    }
+                }
+
+            })
+        });
+
+      //获取项目APP列表
+        $('.fresh_proj').on('click', function () {
+            let projname_id = $('#asset_proj').val();
+            $.ajax({
+                url: '/api/projname/' + projname_id + '/',
+                type: 'GET',
+                success: function (res) {
+                    let asset_projapp_obj = $('#asset_projapp');
+                    let asset_projapps = res['projectapp'];
+                    asset_projapp_obj.html('');
+                    for (let i = 0; i < asset_projapps.length; i++) {
+                        asset_projapp_obj.append(
+                            '<option value=' + asset_projapps[i]['id'] + '>' + asset_projapps[i]['projapp_name'] + '</option>'
+                        )
+                    }
+                }
+            })
+        });
+
+        // 添加配置
+        $('.add-confd').on('click', function () {
+            let data = $('#add-confd').serializeJson();
+            $.ajax({
+                url: '/api/confd/',
+                type: 'POST',
+                data: JSON.stringify(data),
+                dataType: 'json',
+                contentType: "application/json",
+                success: function () {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'green',
+                        content: '添加成功！',
+                    })
+                },
+                error: function (response) {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'red',
+                        content: response.responseText,
+                    })
+                }
+            })
+
+        });
+
+        // 修改配置
+        $('.modify-confd').on('click', function () {
+            let data = $('#modify-confd').serializeJson();
+            $.ajax({
+                url: '/api/confd/' + {{ pk }} +'/',
+                type: 'PUT',
+                data: JSON.stringify(data),
+                dataType: 'json',
+                contentType: "application/json",
+                success: function () {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'green',
+                        content: '修改成功！',
+                    })
+                },
+                error: function (response) {
+                    $.alert({
+                        title: 'Tips',
+                        type: 'red',
+                        content: response.responseText,
+                    })
+                }
+            })
+        });
+        // 将数据JSON化
+        (function ($) {
+            $.fn.serializeJson = function () {
+                let serializeObj = {};
+                let array = this.serializeArray();
+                $(array).each(function () {
+                    if (serializeObj[this.name]) {
+                        if ($.isArray(serializeObj[this.name])) {
+                            serializeObj[this.name].push(this.value);
+                        } else {
+                            serializeObj[this.name] = [serializeObj[this.name], this.value];
+                        }
+                    } else {
+                        if (this.name === 'ticket_platform') {
+                            serializeObj[this.name] = [this.value];
+                        } else {
+                            serializeObj[this.name] = this.value;
+                        }
+                    }
+                });
+                return serializeObj;
+            };
+        })(jQuery);
+
+    </script>
+
+
+{% endblock %}
