@@ -9,6 +9,13 @@ class UserProfile(AbstractUser):
         (2, '忙碌'),
         (3, '离开'),
     )
+    leader_ = (
+        (1, '普通员工'),
+        (0, '部门负责人')
+    )
+
+    leader_str = models.SmallIntegerField(choices=leader_, default=1, verbose_name='员工级别')
+    cnname = models.CharField(max_length=11, null=True, blank=True, verbose_name='中文姓名')
     mobile = models.CharField(max_length=11, null=True, blank=True, verbose_name='手机号码')
     image = models.ImageField(upload_to='images/%Y/%m/%d/', default='images/default.png', max_length=100)
     login_status = models.SmallIntegerField(choices=login_status_, default=1, verbose_name='登录状态')

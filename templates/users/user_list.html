@@ -59,6 +59,23 @@
                                                required/>
                                     </div>
                                 </div>
+                            <div class="form-group">
+                                    <label for="username" class="col-sm-2 control-label">中文名称</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="cnname" id="cnname"
+                                               required/>
+                                    </div>
+                                </div>
+                            <div class="form-group">
+                                    <label for="leader_str" class="col-sm-2 control-label">用户级别</label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control select2" name="leader_str" id="leader_str"
+                                                style="width: 100%;" required>
+                                            <option value="1">普通员工</option>
+                                            <option value="0" selected>部门负责人</option>
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div class="form-group">
                                     <label for="mobile" class="col-sm-2 control-label">手机号码</label>
@@ -133,6 +150,8 @@
                         <tr>
                             <th>ID</th>
                             <th>用户名称</th>
+                            <th>中文名称</th>
+                            <th>用户级别</th>
                             <th>超级管理员</th>
                             <th>所属组</th>
                             <th>拥有角色</th>
@@ -181,6 +200,16 @@
                 "columns": [
                     {data: 'id'},
                     {data: 'username'},
+                    {data: 'cnname'},
+                    {data: 'leader_str',
+                        render: function (data, type, full, meta) {
+                            if (data) {
+                                return '普通员工'
+                            } else {
+                                return '部门负责人'
+                            }
+                        }
+                    },
                     {
                         data: 'is_superuser',
                         render: function (data, type, full, meta) {
@@ -216,7 +245,7 @@
                     {data: 'mobile'},
                 ],
                 columnDefs: [{
-                    targets: 7,
+                    targets: 9,
                     render: function (data, type, row, meta) {
                         return `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal"
                                             data-id="${row.id}" data-target="#UserModal">更新
@@ -304,8 +333,11 @@
             $.get(`/users/edit_user/${user_id}/`, function (res) {
                 let data = res.data;
                 let is_superuser = data.is_superuser ? "1" : "0";
+                let leader_str = data.leader_str ? "1" : "0";
                 let is_active = data.is_active ? "1" : "0";
                 $('#username').val(data.username);
+                $('#cnname').val(data.cnname);
+                $('#leader_str').val(data.leader_str).trigger('change');;
                 $('#mobile').val(data.mobile);
                 $('#is_superuser').val(is_superuser).trigger('change');
                 $('#is_active').val(is_active).trigger('change');

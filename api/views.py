@@ -2,6 +2,7 @@ import copy
 from rest_framework import viewsets, permissions
 from api.serializers import *
 from confd.models import Config_Confd
+from ticket.models import TictetType
 
 
 class CustomDjangoModelPermission(permissions.DjangoModelPermissions):
@@ -118,7 +119,6 @@ class ConfdDetailViewSet(viewsets.ModelViewSet):
     queryset = Confd_Detail.objects.all().order_by('id')
     serializer_class = ConfdDetailSerializer
     permission_classes = (CustomDjangoModelPermission,)
-
 
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all().order_by('id')

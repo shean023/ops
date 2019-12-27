@@ -1,0 +1,16 @@
+.form-control, select {
+    border-radius: 0;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    color: #858585;
+    background-color: #fff;
+    border: 1px solid #d5d5d5
+}
+
+select {
+    padding: 3px 4px;
+    height: 35px
+}
+
+
+

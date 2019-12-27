@@ -1,6 +1,10 @@
+import json
+
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.shortcuts import render
+from requests import Response
+
 from users.models import UserProfile, UserPlan, UserRole
 from django.contrib.auth.models import Group, Permission
 from utils.decorators import admin_auth
@@ -95,6 +99,8 @@ def user_list(request):
         try:
             user_obj = UserProfile.objects.create(
                 username=username,
+                cnname=request.POST.get('cnname'),
+                leader_str=request.POST.get('leader_str'),
                 password=make_password(init_pass),
                 is_superuser=request.POST.get('is_superuser'),
                 is_active=request.POST.get('is_active'),
@@ -123,13 +129,32 @@ def user_list(request):
 
 @admin_auth
 def get_user(request):
-    users = []
-    try:
-        for u in UserProfile.objects.all():
-            users.append(get_user_data(u))
-        return JsonResponse({"code": 200, "data": users, "msg": "用户获取成功！"})
-    except Exception as e:
-        return JsonResponse({"code": 500, "data": None, "msg": "用户获取失败，原因：{}".format(e)})
+    if request.method == 'GET':
+        users = []
+        try:
+            for u in UserProfile.objects.all():
+                users.append(get_user_data(u))
+            return JsonResponse({"code": 200, "data": users, "msg": "用户获取成功！"})
+        except Exception as e:
+            return JsonResponse({"code": 500, "data": None, "msg": "用户获取失败，原因：{}".format(e)})
+
+    ## 获取用户(给页面表格下拉框准备， 前端js函数：getUsers)
+    elif request.method == 'POST' and request.POST.get('oper') == 'getUsers':
+        returnData = {'status': 0, 'message': '', 'data': []}
+        allData = UserProfile.objects.filter().all()
+        if allData:
+            userStr = ""  # 组合成适用于编辑框的select格式
+            for u in allData:
+                if userStr:
+                    userStr = userStr + ";" + str(u.id) + ":" + str(u.username)
+                else:
+                    userStr = str(u.id) + ":" + str(u.username)
+                returnData['data'].append({'id': u.id, 'name': u.username, 'cnname': u.cnname if u.cnname else u.username})
+            returnData['message'] = userStr
+        else:
+            returnData['status'] = 1
+            returnData['message'] = "error"
+        return JsonResponse(returnData)
 
 
 @admin_auth
@@ -138,6 +163,8 @@ def edit_user(request, pk):
     if request.method == 'POST':
         try:
             username = request.POST.get('username')
+            cnname = request.POST.get('cnname')
+            leader_str = request.POST.get('leader_str')
             is_superuser = request.POST.get('is_superuser')
             is_active = request.POST.get('is_active')
             mobile = request.POST.get('mobile')
@@ -145,6 +172,8 @@ def edit_user(request, pk):
             u_role = request.POST.getlist('u_role')
 
             user.username = username
+            user.cnname = cnname
+            user.leader_str = leader_str
             user.is_superuser = is_superuser
             user.is_active = is_active
             user.mobile = mobile
@@ -181,7 +210,7 @@ def delete_user(request, pk):
 
 
 def get_user_data(user, info=True):
-    data = {'id': user.id, 'username': user.username, 'is_superuser': user.is_superuser, 'is_active': user.is_active,
+    data = {'id': user.id, 'username': user.username, 'cnname': user.cnname if user.cnname else "无", 'leader_str':user.leader_str, 'is_superuser': user.is_superuser, 'is_active': user.is_active,
             'mobile': user.mobile, 'groups': [g.name if info else g.id for g in user.groups.all()],
             'u_role': [r.user_role_name if info else r.id for r in user.userrole_set.all()]}
     return data

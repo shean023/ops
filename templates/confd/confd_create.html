@@ -173,7 +173,7 @@
         $('.add-confd').on('click', function () {
             let data = $('#add-confd').serializeJson();
             $.ajax({
-                url: '/api/add_confd/',
+                url: '/api/confd/',
                 type: 'POST',
                 data: JSON.stringify(data),
                 dataType: 'json',

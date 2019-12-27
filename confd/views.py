@@ -1,6 +1,8 @@
 import os, etcd3
 from django.http import JsonResponse
 from django.shortcuts import render
+from etcd3.exceptions import ConnectionFailedError
+
 from confd.models import Config_Confd, Confd_Detail
 from assets.models import Assets, ServerAssets, ProjectName,ProjectApp,ProjectEnv,PlatformName
 from django.contrib.auth.decorators import permission_required
@@ -76,5 +78,7 @@ def confd_deploy(request):
                 return JsonResponse({'code': 200, 'msg': '发布成功！'})
             else:
                 return JsonResponse({'code': 500, 'msg': '未获取到ID'})
+        except ConnectionFailedError:
+            return JsonResponse({'code': 500, 'msg': '获取失败：etcd3无法连接，请联系管理员！'})
         except Exception as e:
             return JsonResponse({'code': 500, 'msg': '获取失败：{}'.format(e)})

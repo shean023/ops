@@ -94,7 +94,7 @@ INSTALLED_APPS = [
     'dbmanager.apps.DbmanagerConfig',
     'commons.apps.CommonsConfig',
     'confd.apps.ConfdConfig',
-    'pure_pagination',
+    'ticket.apps.TicketConfig',
 ]
 
 # 全局搜索配置

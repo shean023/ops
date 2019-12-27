@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block head %}
+    <link rel="stylesheet"
+          href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'modaal/css/modaal.min.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+    <link rel="stylesheel" href="{% static 'css/ui.jqgrid.css' %}">
+
+    <!-- ace styles -->
+    <link rel="stylesheet" href="/static/css/ticket.manage.css" />
+
+    <style>
+
+        /* dataTables列内容居中 */
+        #ticket_tab > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #ticket_tab > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <!-- Main row -->
+    <div class="row">
+        <!-- Left col -->
+        <div class="col-md-12">
+
+            <!-- TABLE: LATEST ORDERS -->
+            <div class="box box-info">
+
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">工单类型列表</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+
+                <div class="box-body">
+                    <div style="margin-bottom: 10px;height: 30px" class="row">
+                        <button class="btn btn-sm btn-success pull-left" data-toggle="modal" id="ticket_create"
+                                data-target="#modalCaseTypeOperating" style="float: left; margin-left: 1%" onclick="getUsers()">
+                            <i class="fa fa-plus-square"></i>
+                            <span class="bigger-110">创建类型工单</span>
+                        </button>
+                    </div>
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <table id="ticket_tab" name="ticket_tab" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>工单类型名称</th>
+                                    <th>审核流程</th>
+                                    <th>处理流程</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for confd in confds %}
+                                    <tr>
+                                        <td>{{ confd.id }}</td>
+                                        <td>{{ confd.confd_name }}</td>
+                                        <td>{{ confd.asset_projenv.projenv_name }}</td>
+                                        <td>{{ confd.asset_platform.platform_name }}</td>
+                                        <td>{{ confd.asset_proj.projname_name }}</td>
+                                        <td>{{ confd.asset_projapp.projapp_name }}</td>
+                                        <td>
+                                            <a href="{% url 'confd_detail' %}?id={{ confd.id }}">
+                                                <button type="button" class="btn btn-success btn-xs modify">配置明细
+                                                </button>
+                                            </a>
+                                            {% if request.user.is_superuser %}
+                                                <a href="{% url 'confd_modify' %}?id={{ confd.id }}">
+                                                    <button type="button" class="btn btn-success btn-xs modify">修改
+                                                    </button>
+                                                </a>
+                                            {% endif %}
+                                            {% if request.user.is_superuser %}
+                                                <button type="button" class="btn btn-danger btn-xs delete"
+                                                        data-id="{{ confd.id }}">删除
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+    <div class="modal fade bs-example-modal-lg" id="modalCaseTypeOperating" name="modalCaseTypeOperating" tabindex="-1"
+         role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="width:70%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="modal_operating_title">新增工单类型</h4>
+                    <input type="hidden" id="casetype_id" name="casetype_id" value="-1"/>
+                    <input type="hidden" id="user_id" name="user_id" value="{{ user.id }}"/>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="casetype_name">
+                                    类型名称 </label>
+
+                                <div class="col-sm-10">
+                                    <input id="casetype_name" name="casetype_name" type="text" placeholder="请输入工单类型名称"
+                                           class="col-xs-10 col-sm-8" style="height:1em;border:1px solid #dddddd;font-size: 14px; height:35px;width:70%; color: #555555; padding:0.8em;"/>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="casetype_executor">
+                                    工单处理人 </label>
+
+                                <div class="col-sm-10">
+                                    <select class="select2 col-sm-10" id="casetype_executor" name="casetype_executor" style="width:200px">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="casetype_checkleader">
+                                    审核流程 </label>
+
+                                <div class="col-sm-10">
+                                            <span class="firstcheckleader">
+                                                <select class="checkleader" name="firstcheckleader"
+                                                        id="firstcheckleader" style="width:100px;height: 35px"
+                                                        onchange="changeCheckLeader(this);">
+                                                    <option value="-1">默认上级</option>
+                                                    <option value="-2">指定人选</option>
+                                                </select>
+                                            </span>
+                                    <a class="btn btn-xs btn-primary" onclick="addCheckLeaderCSS(this)"
+                                       style="margin-left: 5px;" id="addcheckleader">添加一级</a>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="casetype_status">
+                                    状态 </label>
+
+                                <div class="col-sm-10">
+                                            <span>
+                                                <select class="select2" name="casetype_status" id="casetype_status" style="width:100px">
+                                                    <option value="1">启用</option>
+                                                    <option value="2">禁用</option>
+                                                </select>
+                                            </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div> <!-- END -->
+
+                <div class="modal-footer">
+                    <button class="btn btn-info" id="submit" name="submit" onclick="addCaseType();">
+                        <i class="icon-ok bigger-110"></i>
+                        提交
+                    </button>
+                    <!--
+                    &nbsp; &nbsp; &nbsp;
+                    <button class="btn btn-yellow" type="reset">
+                        <i class="icon-undo bigger-110"></i>
+                        重置
+                    </button>-->
+
+                    &nbsp; &nbsp; &nbsp;
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="icon-remove bigger-110"></i>
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.modal -->
+
+{% endblock %}
+
+{% block js %}
+    <!-- Select2 -->
+    <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+    <!-- DataTables -->
+    <script src="{% static 'AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+    <script src="{% static 'js/jqGrid/jquery.jqGrid.min.js' %}"></script>
+    <script src="{% static 'js/ticket/caseType.js' %}"></script>
+
+    <script>
+        $(function () {
+
+            ticket_table = $('#ticket_tab').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            // Initialize Select2 Elements
+            $('.select2').select2({
+                allowClear: true
+            });
+
+
+        });
+
+        {#// 删除project-conf#}
+        {#$('#confd_tab tbody').on('click', '.delete', function () {#}
+        {##}
+        {#    let pk = $(this).attr('data-id');#}
+        {#    let tr_obj = $(this).parents('tr');#}
+        {#    $.confirm({#}
+        {#        title: 'Tips',#}
+        {#        content: '确定要删除这条记录么？',#}
+        {#        type: 'red',#}
+        {#        buttons: {#}
+        {#            Ok: function () {#}
+        {#                $.ajax({#}
+        {#                    url: '/api/confd/' + pk + '/',#}
+        {#                    method: 'DELETE',#}
+        {#                    success: function () {#}
+        {#                        confd_table.row(tr_obj).remove().draw();#}
+        {#                    },#}
+        {#                    error: function (data) {#}
+        {#                        $.alert({#}
+        {#                            title: 'Tips',#}
+        {#                            type: 'red',#}
+        {#                            content: '删除失败！' + data.responseText,#}
+        {#                        })#}
+        {#                    }#}
+        {#                })#}
+        {#            },#}
+        {#            Cancel: function () {#}
+        {#                //#}
+        {#            }#}
+        {#        }#}
+        {#    });#}
+        //});
+
+    </script>
+
+{% endblock %}

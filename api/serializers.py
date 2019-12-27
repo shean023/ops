@@ -235,10 +235,6 @@ class DeployTicketSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class Config_confd(object):
-    pass
-
-
 class ConfigConfdSerializer(serializers.ModelSerializer):
     class Meta:
         model = Config_Confd
