@@ -438,144 +438,92 @@ function addCaseType() {
             'status': casetype_status_val,
 
         },
-        error: function () {
-            alert(post_type + " error");
+        success: function (response) {
+                            $('#modalCaseTypeOperating').modal('hide');
+                            if (response["code"] == "200") {
+                                window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
+                                location.reload();
+                            } else {
+                                window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
+                            }
+                        },
+        error: function (response) {
+            window.wxc.xcConfirm("请求数据错误！", window.wxc.xcConfirm.typeEnum.error);
         },
-        success: function (data) {
-            $('#modalCaseTypeOperating').modal('hide');
-            jQuery(casetype_grid).jqGrid('setGridParam', {}).trigger("reloadGrid");
-        }
     });
 }
 
 // 编辑工单类型
-function editCaseType(typeid) {
+// function editCaseType(typeid) {
+//
+//     getUsers();
+//     document.getElementById('casetype_id').value = typeid;
+//
+//     $.ajax({
+//         url: '/case/type/',
+//         type: "POST",
+//         dataType: "json",
+//         data: {'oper': "getCaseType", 'casetype_id': typeid},
+//         error: function () {
+//             alert("getCasetype error");
+//         },
+//         success: function (data) {
+//             //alert(data['id']+" , "+data['name']);
+//             document.getElementById('casetype_name').value = data['name'];
+//             for (i in data['executor']) {
+//                 var executor = data['executor'][i]
+//                 type_executor_val = executor.split("_")[0]
+//                 $("#casetype_executor").find("option[value='" + type_executor_val + "']").attr("selected", true);
+//             }
+//
+//             $("#casetype_status").find("option[value='" + data['status'] + "']").attr("selected", true);
+//
+//             var oplist = new Array();
+//             for (key_num in data['users']) {
+//                 oplist.push('<option value="' + data['users'][key_num]['id'] + '">' + data['users'][key_num]['cnname'] + '(' + data['users'][key_num]['name'] + ')</option>');
+//             }
+//
+//             $("#firstcheckleader").remove();
+//             var i = 0
+//             for (j in data['checkleader']) {
+//                 //alert(data['checkleader'][j]);
+//                 var checkleader = data['checkleader'][j];
+//                 var user_id = checkleader.split("_")[0]
+//                 var userinfo = checkleader.split("_")[1]
+//
+//                 if (user_id == "-1") {
+//                     if (i == 0) {
+//                         $("#addcheckleader").before('<span class="firstcheckleader"><select class="select2 checkleader" name="firstcheckleader" id="firstcheckleader" style="width:100px" onchange="changeCheckLeader(this);"><option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
+//                     } else {
+//                         $("#addcheckleader").before('<span class="morecheckleader"><span class="glyphicon glyphicon-arrow-right"></span><select class="select2 checkleader" onchange="changeCheckLeader(this);" style="width: 140px"> <option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
+//                     }
+//
+//                 } else {
+//
+//                     if (i == 0) {
+//                         $("#addcheckleader").before('<span class="firstcheckleader"><select class="select2 checkleader" name="firstcheckleader" id="firstcheckleader" style="width:140px" onchange="changeCheckLeader(this);"><option value="0">--选择指定审核人--</option>' + oplist.join('') + '</select></span>');
+//                         $("#firstcheckleader").find("option[value='" + user_id + "']").attr("selected", true);
+//                     } else {
+//                         $("#addcheckleader").before('<span class="morecheckleader"><span class="glyphicon glyphicon-arrow-right"></span><select class="select2 checkleader" name="checkleader_' + i + '" id="checkleader_' + i + '" onchange="changeCheckLeader(this);" style="width: 140px"><option value="0">--选择指定审核人--</option>' + oplist.join('') + '</select></span>');
+//
+//                         $("#checkleader_" + i).find("option[value='" + user_id + "']").attr("selected", true);
+//                     }
+//
+//                 }
+//
+//                 i = i + 1
+//             }
+//
+//             if (i > 1) {
+//                 if ($("#addcheckleader").next().is("a")) {
+//                 } else {
+//                     $("#addcheckleader").after('<a class="btn btn-xs btn-primary" onclick="delCheckLeaderCSS(this)" style="margin-left: 5px" id="delcheckleader">删除一级</a>')
+//                 }
+//             }
+//
+//         }
+//     });
+// }
 
-    getUsers();
-    document.getElementById('casetype_id').value = typeid;
 
-    $.ajax({
-        url: '/case/type/',
-        type: "POST",
-        dataType: "json",
-        data: {'oper': "getCaseType", 'casetype_id': typeid},
-        error: function () {
-            alert("getCasetype error");
-        },
-        success: function (data) {
-            //alert(data['id']+" , "+data['name']);
-            document.getElementById('casetype_name').value = data['name'];
-            for (i in data['executor']) {
-                var executor = data['executor'][i]
-                type_executor_val = executor.split("_")[0]
-                $("#casetype_executor").find("option[value='" + type_executor_val + "']").attr("selected", true);
-            }
-
-            $("#casetype_status").find("option[value='" + data['status'] + "']").attr("selected", true);
-
-            var oplist = new Array();
-            for (key_num in data['users']) {
-                oplist.push('<option value="' + data['users'][key_num]['id'] + '">' + data['users'][key_num]['cnname'] + '(' + data['users'][key_num]['name'] + ')</option>');
-            }
-
-            $("#firstcheckleader").remove();
-            var i = 0
-            for (j in data['checkleader']) {
-                //alert(data['checkleader'][j]);
-                var checkleader = data['checkleader'][j];
-                var user_id = checkleader.split("_")[0]
-                var userinfo = checkleader.split("_")[1]
-
-                if (user_id == "-1") {
-                    if (i == 0) {
-                        $("#addcheckleader").before('<span class="firstcheckleader"><select class="select2 checkleader" name="firstcheckleader" id="firstcheckleader" style="width:100px" onchange="changeCheckLeader(this);"><option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
-                    } else {
-                        $("#addcheckleader").before('<span class="morecheckleader"><span class="glyphicon glyphicon-arrow-right"></span><select class="select2 checkleader" onchange="changeCheckLeader(this);" style="width: 140px"> <option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
-                    }
-
-                } else {
-
-                    if (i == 0) {
-                        $("#addcheckleader").before('<span class="firstcheckleader"><select class="select2 checkleader" name="firstcheckleader" id="firstcheckleader" style="width:140px" onchange="changeCheckLeader(this);"><option value="0">--选择指定审核人--</option>' + oplist.join('') + '</select></span>');
-                        $("#firstcheckleader").find("option[value='" + user_id + "']").attr("selected", true);
-                    } else {
-                        $("#addcheckleader").before('<span class="morecheckleader"><span class="glyphicon glyphicon-arrow-right"></span><select class="select2 checkleader" name="checkleader_' + i + '" id="checkleader_' + i + '" onchange="changeCheckLeader(this);" style="width: 140px"><option value="0">--选择指定审核人--</option>' + oplist.join('') + '</select></span>');
-
-                        $("#checkleader_" + i).find("option[value='" + user_id + "']").attr("selected", true);
-                    }
-
-                }
-
-                i = i + 1
-            }
-
-            if (i > 1) {
-                if ($("#addcheckleader").next().is("a")) {
-                } else {
-                    $("#addcheckleader").after('<a class="btn btn-xs btn-primary" onclick="delCheckLeaderCSS(this)" style="margin-left: 5px" id="delcheckleader">删除一级</a>')
-                }
-            }
-
-        }
-    });
-}
-
-// 删除工单类型
-function delCaseType(typeid, typename) {
-    document.getElementById('casetype_id_list').value = typeid;
-    $("#suredellist").html('<li class="text-danger"><b> ID: </b>' + typeid + ' ; <b>类型名称: </b>' + typename + '</li>')
-};
-
-function sureDelCaseType() {
-
-    var var_type_id_list = $("#casetype_id_list").val();
-
-    $.ajax({
-        url: '/case/type/',
-        type: "POST",
-        dataType: "json",
-        data: {'oper': 'delCaseType', 'casetype_ids': var_type_id_list},
-        error: function () {
-            alert("xxx");
-        },
-        success: function (data) {
-            //alert("ok");
-            $('#modalCaseTypeOperating').modal('hide');
-            jQuery(casetype_grid).jqGrid('setGridParam', {}).trigger("reloadGrid");
-        }
-    });
-
-    $('#modalCaseTypeDelete').modal('hide');
-}
-
-// search
-var timeoutHnd;
-var flAuto = false;
-
-function doSearch(ev) {
-    if (!flAuto) {
-        return;
-    }
-    ;
-
-    if (timeoutHnd) {
-        clearTimeout(timeoutHnd);
-    }
-
-    timeoutHnd = setTimeout(gridReload, 1000);
-}
-
-function gridReload() {
-    var search_enname = jQuery("#search_enname").val() || "";
-    var search_cnname = jQuery("#search_cnname").val() || "";
-    jQuery(casetype_grid).jqGrid('setGridParam', {
-        url: "/case/type/?type=search&search_enname=" + search_enname + "&search_cnname=" + search_cnname,
-        page: 1
-    }).trigger("reloadGrid");
-}
-
-function enableAutosubmit(state) {
-    flAuto = state;
-    jQuery("#searchButton").attr("disabled", state);
-}
 

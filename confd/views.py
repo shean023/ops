@@ -21,8 +21,8 @@ def confd_create(request):
         proj_envs = ProjectEnv.objects.all()
         return render(request, 'confd/confd_create.html', locals())
     elif request.method == "POST":
-        print(request.POST.get('asset_projenv'))
-        print(request.POST.get('asset_platform'))
+        #print(request.POST.get('asset_projenv'))
+        #print(request.POST.get('asset_platform'))
         platform_names = PlatformName.objects.all()
         proj_envs = ProjectEnv.objects.all()
         return render(request, 'confd/confd_create.html', locals())
@@ -47,6 +47,7 @@ def confd_detail(request):
     keys = Confd_Detail.objects.filter(confd_name=confd)
     if pk:
         return render(request, 'confd/confd_detail.html', locals())
+
 
 @permission_required('projs.add_project', raise_exception=True)
 def confd_deploy(request):

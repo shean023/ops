@@ -3,11 +3,13 @@
 {% block head %}
     <link rel="stylesheet"
           href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+
     <!-- Select2 -->
     <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'modaal/css/modaal.min.css' %}">
     <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
     <link rel="stylesheel" href="{% static 'css/ui.jqgrid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dist/css/xcConfirm.css' %}" />
 
     <!-- ace styles -->
     <link rel="stylesheet" href="/static/css/ticket.manage.css" />
@@ -16,12 +18,12 @@
 
         /* dataTables列内容居中 */
         #ticket_tab > tbody > tr > td {
-            text-align: center;
+            text-align: left;
         }
 
         /* dataTables表头居中 */
         #ticket_tab > thead:first-child > tr:first-child > th {
-            text-align: center;
+            text-align: left;
         }
     </style>
 {% endblock %}
@@ -72,28 +74,23 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for confd in confds %}
+                                {% for tt in ttDatas %}
                                     <tr>
-                                        <td>{{ confd.id }}</td>
-                                        <td>{{ confd.confd_name }}</td>
-                                        <td>{{ confd.asset_projenv.projenv_name }}</td>
-                                        <td>{{ confd.asset_platform.platform_name }}</td>
-                                        <td>{{ confd.asset_proj.projname_name }}</td>
-                                        <td>{{ confd.asset_projapp.projapp_name }}</td>
-                                        <td>
-                                            <a href="{% url 'confd_detail' %}?id={{ confd.id }}">
-                                                <button type="button" class="btn btn-success btn-xs modify">配置明细
-                                                </button>
-                                            </a>
-                                            {% if request.user.is_superuser %}
-                                                <a href="{% url 'confd_modify' %}?id={{ confd.id }}">
-                                                    <button type="button" class="btn btn-success btn-xs modify">修改
-                                                    </button>
-                                                </a>
+                                        <td>{{ tt.id }}</td>
+                                        <td>{{ tt.name }}</td>
+                                        <td>{% autoescape off %}{{ tt.audit_model }}{% endautoescape %}</td>
+                                        <td>{% autoescape off %}{{ tt.exec_model }}{% endautoescape %}</td>
+                                        <td>{% if tt.status == 1 %}
+                                                启用
+                                            {% else %}
+                                                禁用
                                             {% endif %}
+                                        </td>
+                                        <td>{{ tt.ctime|date:"Y/m/d H:i  " }}</td>
+                                        <td>
                                             {% if request.user.is_superuser %}
-                                                <button type="button" class="btn btn-danger btn-xs delete"
-                                                        data-id="{{ confd.id }}">删除
+                                                <button class="btn btn-primary btn-xs edit" data-toggle="modal" data-target="#modalCaseTypeOperating" data-id="{{ tt.id }}">编辑</button>
+                                                <button type="button" class="btn btn-danger btn-xs delete" data-id="{{ tt.id }}">删除
                                                 </button>
                                             {% endif %}
                                         </td>
@@ -219,6 +216,7 @@
     <!-- DataTables -->
     <script src="{% static 'AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'dist/js/xcConfirm.js' %}" type="text/javascript" charset="utf-8"></script>
     <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
     <script src="{% static 'js/jqGrid/jquery.jqGrid.min.js' %}"></script>
     <script src="{% static 'js/ticket/caseType.js' %}"></script>
@@ -242,38 +240,122 @@
 
         });
 
-        {#// 删除project-conf#}
-        {#$('#confd_tab tbody').on('click', '.delete', function () {#}
-        {##}
-        {#    let pk = $(this).attr('data-id');#}
-        {#    let tr_obj = $(this).parents('tr');#}
-        {#    $.confirm({#}
-        {#        title: 'Tips',#}
-        {#        content: '确定要删除这条记录么？',#}
-        {#        type: 'red',#}
-        {#        buttons: {#}
-        {#            Ok: function () {#}
-        {#                $.ajax({#}
-        {#                    url: '/api/confd/' + pk + '/',#}
-        {#                    method: 'DELETE',#}
-        {#                    success: function () {#}
-        {#                        confd_table.row(tr_obj).remove().draw();#}
-        {#                    },#}
-        {#                    error: function (data) {#}
-        {#                        $.alert({#}
-        {#                            title: 'Tips',#}
-        {#                            type: 'red',#}
-        {#                            content: '删除失败！' + data.responseText,#}
-        {#                        })#}
-        {#                    }#}
-        {#                })#}
-        {#            },#}
-        {#            Cancel: function () {#}
-        {#                //#}
-        {#            }#}
-        {#        }#}
-        {#    });#}
-        //});
+        // 删除ticket_tab
+        $('#ticket_tab tbody').on('click', '.delete', function () {
+
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+            let key_td_obj = $(this).parents('tr').children();
+            $.confirm({
+                title: 'Tips',
+               // content: '确定要删除这条记录么？' + '<br><font color="red"> ' + "ID: "+ key_td_obj[0].innerText + "; 类型名称: " + key_td_obj[1].innerText + '</font>',
+                content: '确定要删除这条记录么？' + '<li class="text-danger"><b>' + "ID:" + '</b>' + key_td_obj[0].innerText + ' ; <b>类型名称: </b>' + key_td_obj[1].innerText + '</li>',
+                type: 'red',
+                buttons: {
+                    Ok: function () {
+                        $.ajax({
+                            url: '/ticket/ticket_edit/' + pk + '/',
+                            method: 'DELETE',
+                            success: function (response) {
+                                if (response["code"] == "200") {
+                                    ticket_table.row(tr_obj).remove().draw();
+                                    //window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
+                                    //location.reload();
+                                } else {
+                                    window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
+                                }
+                            },
+                            error: function (response) {
+                                window.wxc.xcConfirm("请求数据错误！", window.wxc.xcConfirm.typeEnum.error);
+
+                            },
+                        })
+                    },
+                    Cancel: function () {
+                        //
+                    }
+                }
+            });
+        });
+
+        //编辑工单类型
+        $('#ticket_tab tbody').on('click', '.edit', function () {
+
+            getUsers();
+            let pk = $(this).attr('data-id');
+            document.getElementById('casetype_id').value = pk;
+
+            $.ajax({
+                url: '/ticket/ticket_type/',
+                type: "POST",
+                dataType: "json",
+                data: {'oper': "getCaseType", 'tt_id': pk},
+                error: function (response) {
+                    window.wxc.xcConfirm("请求数据错误！", window.wxc.xcConfirm.typeEnum.error);
+                },
+                success: function (response) {
+                    if (response["code"] == "200") {
+                        data = response['data']
+                        //alert(data['id']+" , "+data['name']);
+                        document.getElementById('casetype_name').value = data['name'];
+                        for (i in data['executor']) {
+                            var executor = data['executor'][i]
+                            type_executor_val = executor.split("_")[0]
+                            //$("#casetype_executor").find("option[value='" + type_executor_val + "']").attr("selected", true);
+                            $('#casetype_executor').val(executor.split("_")[0]).trigger('change');
+                        }
+
+                        //$("#casetype_status").find("option[value='" + data['status'] + "']").attr("selected", true);
+                        $('#casetype_status').val(data['status']).trigger('change');
+
+                        var oplist = new Array();
+                        for (key_num in data['users']) {
+                            oplist.push('<option value="' + data['users'][key_num]['id'] + '">' + data['users'][key_num]['cnname'] + '(' + data['users'][key_num]['name'] + ')</option>');
+                        }
+
+                        $("#firstcheckleader").remove();
+                        var i = 0
+                        for (j in data['checkleader']) {
+                            //alert(data['checkleader'][j]);
+                            var checkleader = data['checkleader'][j];
+                            var user_id = checkleader.split("_")[0]
+                            var userinfo = checkleader.split("_")[1]
+
+                            if (user_id == "-1") {
+                                if (i == 0) {
+                                    $("#addcheckleader").before('<span class="firstcheckleader"><select class="select2 checkleader" name="firstcheckleader" id="firstcheckleader" style="width:100px" onchange="changeCheckLeader(this);"><option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
+                                } else {
+                                    $("#addcheckleader").before('<span class="morecheckleader"><span class="glyphicon glyphicon-arrow-right"></span><select class="select2 checkleader" onchange="changeCheckLeader(this);" style="width: 140px"> <option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
+                                }
+
+                            } else {
+
+                                if (i == 0) {
+                                    $("#addcheckleader").before('<span class="firstcheckleader"><select class="select2 checkleader" name="firstcheckleader" id="firstcheckleader" style="width:140px" onchange="changeCheckLeader(this);"><option value="0">--选择指定审核人--</option>' + oplist.join('') + '</select></span>');
+                                    $("#firstcheckleader").find("option[value='" + user_id + "']").attr("selected", true);
+                                } else {
+                                    $("#addcheckleader").before('<span class="morecheckleader"><span class="glyphicon glyphicon-arrow-right"></span><select class="select2 checkleader" name="checkleader_' + i + '" id="checkleader_' + i + '" onchange="changeCheckLeader(this);" style="width: 140px"><option value="0">--选择指定审核人--</option>' + oplist.join('') + '</select></span>');
+                                    $("#checkleader_" + i).find("option[value='" + user_id + "']").attr("selected", true);
+                                }
+
+                            }
+
+                            i = i + 1
+                        }
+
+                        if (i > 1) {
+                            if ($("#addcheckleader").next().is("a")) {
+                            } else {
+                                $("#addcheckleader").after('<a class="btn btn-xs btn-primary" onclick="delCheckLeaderCSS(this)" style="margin-left: 5px" id="delcheckleader">删除一级</a>')
+                            }
+                        }
+
+                    } else {
+                        window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
+                    }
+                },
+            });
+        })
 
     </script>
 
