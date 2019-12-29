@@ -5,6 +5,8 @@ from users import views
 
 urlpatterns = [
     path(r'user_list/', views.user_list, name='user_list'),
+    path(r'department/', views.department, name='department'),
+    path(r'get_department/', views.get_department, name='get_department'),
     path(r'get_user/', views.get_user, name='get_user'),
     path(r'group_list/', views.group_list, name='group_list'),
     path(r'get_group/', views.get_group, name='get_group'),
@@ -14,10 +16,12 @@ urlpatterns = [
     re_path(r'plan_info/(?P<pk>[0-9]+)/', views.plan_info, name='plan_info'),
     re_path(r'edit_user_role/(?P<pk>[0-9]+)/', views.edit_user_role, name='edit_user_role'),
     re_path(r'edit_group/(?P<pk>[0-9]+)/', views.edit_group, name='edit_group'),
+    re_path(r'edit_department/(?P<pk>[0-9]+)/', views.edit_department, name='edit_department'),
     re_path(r'edit_user/(?P<pk>[0-9]+)/', views.edit_user, name='edit_user'),
     re_path(r'delete_user_role/(?P<pk>[0-9]+)/', views.delete_user_role, name='delete_user_role'),
     re_path(r'delete_group/(?P<pk>[0-9]+)/', views.delete_group, name='delete_group'),
     re_path(r'delete_user/(?P<pk>[0-9]+)/', views.delete_user, name='delete_user'),
+    re_path(r'delete_department/(?P<pk>[0-9]+)/', views.delete_department, name='delete_department'),
     path(r'user_center/', views.user_center, name='user_center'),
     re_path(r'reset_password/(?P<pk>[0-9]+)/', views.reset_password, name='reset_password'),
 ]

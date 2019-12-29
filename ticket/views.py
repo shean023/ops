@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import permission_required
 from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse
+from kombu.utils import json
+
 from ticket.models import *
 from users.models import UserProfile
 
@@ -187,3 +189,131 @@ def ticket_type(request):
                         return JsonResponse({'code': 200, 'msg': '编辑工单类型更新数据成功'})
                     except Exception as e:
                         return JsonResponse({'code': 500, 'msg': '编辑工单类型更新数据异常： {}'.format(e)})
+
+
+@permission_required('projs.add_project', raise_exception=True)
+def ticket_create(request):
+    if request.method == 'GET':
+        tts = TictetType.objects.all()
+        return render(request, 'ticket/ticket_create.html', locals())
+
+    elif request.method == 'POST':
+        ## 添加工单
+        if request.POST.get('oper') == "addCase":
+            tt_id = int(request.POST.get('casetype'))
+            title = str(request.POST.get('casetitle'))
+            content = str(request.POST.get('caserequire'))
+            result = str(request.POST.get('caseresult'))
+            createuser_id = request.user
+            get_tt = TictetType.objects.get(id=tt_id)
+
+            status = 2  ## 判断是保存还是提交
+            if str(request.POST.get('type')) == 'save': status = 1
+
+            try:
+                ticket = Ticket.objects.create(
+                    title=title,
+                    tt_id=get_tt,
+                    createuser_id=createuser_id,
+                    content=content,
+                    result=result,
+                    status=status
+                )
+                # ## 添加审核人
+                for auditUser in get_tt.audit_model.all():
+                    if auditUser.user_id == -1:
+                        leaderUser = UserProfile.objects.filter(department_id=request.user.department_id, leader=0)
+                        if leaderUser.count():
+                            audituser_id = leaderUser[0].id
+                        else:
+                            Ticket.objects.get(id=ticket.id).delete()
+                            return JsonResponse({'code': 500, 'msg': '没有部门负责人，请联系管理员！'})
+                    else:
+                        audituser_id = auditUser.user_id
+
+                    TicketAudit.objects.create(
+                        t_id = ticket,
+                        user_id = UserProfile.objects.get(id=audituser_id),
+                        order = auditUser.order,
+                        status = 0
+                    )
+                # ## 添加执行人
+                for execUser in get_tt.exec_model.all():
+                    TicketExec.objects.create(
+                        t_id = ticket,
+                        user_id = UserProfile.objects.get(id=execUser.user_id),
+                        order = execUser.order,
+                        status = 0,
+                    )
+                # # ## 添加操作步骤
+                TicketOperation.objects.create(
+                    t_id = ticket,
+                    user_id=UserProfile.objects.get(id=request.user.id),
+                    status = 1,
+                    content = ""
+                )
+                return JsonResponse({'code': 200, 'msg': '创建工单成功'})
+            except Exception as e:
+                return JsonResponse({'code': 500, 'msg': '创建工单异常： {}'.format(e)})
+            # ## 添加工单
+            # addCase = case()
+            # addCase.title = caseTitle
+            # addCase.casetype_id = caseTypeID
+            # addCase.createuser_id = loginData['user']['id']
+            # addCase.content = caseRequire
+            # addCase.result = caseResult
+            # addCase.status = caseStatus
+            # db.session.add(addCase)
+            #
+            # ## 添加审核人
+            # for auditUser in getCaseType.audit_model:
+            #     if auditUser.user_id == -1:
+            #         leaderUser = user.query.filter(user.department_id == loginData['user']['department_id']).filter(
+            #             user.leader == 0).first()
+            #         audituser_id = leaderUser.id
+            #     else:
+            #         audituser_id = auditUser.user_id
+            #
+            #     addCaseAudit = caseaudit()
+            #     addCaseAudit.case_rs = addCase
+            #     addCaseAudit.user_id = audituser_id
+            #     addCaseAudit.order = auditUser.order
+            #     addCaseAudit.status = 0
+            #     db.session.add(addCaseAudit)
+            #
+            # ## 添加执行人
+            # for execUser in getCaseType.exec_model:
+            #     addCaseExec = caseexec()
+            #     addCaseExec.case_rs = addCase
+            #     addCaseExec.user_id = execUser.user_id  ##后续需要修改
+            #     addCaseExec.order = execUser.order
+            #     addCaseExec.status = 0
+            #     db.session.add(addCaseExec)
+            #
+            # ## 添加操作步骤
+            # addCaseOperation = caseoperation()
+            # addCaseOperation.case_rs = addCase
+            # addCaseOperation.user_id = loginData['user']['id']
+            # addCaseOperation.status = 1
+            # addCaseOperation.content = ""
+            # db.session.add(addCaseOperation)
+            #
+            # db.session.commit()
+            #
+            # return redirect("/case/mycreate/")
+
+@permission_required('projs.add_project', raise_exception=True)
+def ticket_execute(request):
+    pass
+
+@permission_required('projs.add_project', raise_exception=True)
+def ticket_check(request):
+    pass
+
+@permission_required('projs.add_project', raise_exception=True)
+def ticket_mycreate(request):
+    pass
+
+@permission_required('projs.add_project', raise_exception=True)
+def ticket_history(request):
+    pass

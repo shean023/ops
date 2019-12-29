@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block head %}
+    <link rel="stylesheet"
+          href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
+
+    <style>
+        /* dataTables列内容居中 */
+        #department > tbody > tr > td {
+            text-align: center;
+        }
+
+        /* dataTables表头居中 */
+        #department > thead:first-child > tr:first-child > th {
+            text-align: center;
+        }
+
+        .form-horizontal .form-group {
+            margin-right: -200px;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-7 pull-left" style="margin-bottom: 3px">
+            <button class="btn btn-sm btn-success pull-left" data-toggle="modal" data-target="#DepartmentModal"
+                    id="add-department">
+                <i class="fa fa-user-plus"></i>
+                <span class="bigger-110">新增部门</span>
+            </button>
+        </div>
+
+        <!-- DeplartmentModal  -->
+        <div class="modal fade" id="DepartmentModal" name="DepartmentModal" tabindex="-1" role="dialog" aria-labelledby="DepartmentModal"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="DepartmentModalLabel">
+
+                        </h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <form class="main form-horizontal" id="department_detail">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label for="name" class="col-sm-2 control-label">部门名称</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="name" name="name" required/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="enname" class="col-sm-2 control-label">英文名称</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="enname" name="enname" required/>
+                                    </div>
+                                </div>
+
+                                 <div class="form-group">
+                                    <label for="parent" class="col-sm-2 control-label">上级部门</label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control select2"  id="parent" name="parent"
+                                                style="width: 100%;">
+                                            <option value="0">顶级部门</option>
+                                            {% for dep in deps %}
+                                                <option value="{{ dep.id }}">{{ dep.name }}|{{ dep.enname }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="space-24"></div>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal"
+                                id="department_ops"></button>
+                    </div>
+
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+        <!--dataTable-->
+        <div class="col-xs-12">
+            <!-- /.box -->
+            <div class="box">
+                <div class="box-body">
+                    <table id="department" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>部门名称</th>
+                            <th>英文名称</th>
+                            <th>上级部门</th>
+                            <th>创建时间</th>
+                            <th>修改时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+    <!-- /.row -->
+
+{% endblock %}
+
+
+{% block js %}
+    <!-- Select2 -->
+    <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+    <!-- DataTables -->
+    <script src="{% static 'AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+
+    <script>
+        $(function () {
+            department_table = $('#department').DataTable({
+                "ordering": false,
+                retrieve: true,
+                ajax: {
+                    url: "{% url 'get_department' %}",
+                    method: "GET",
+                    "dataSrc": function (d) {
+                        return d.data
+                    }
+                },
+                "deferRender": true,
+                "columns": [
+                    {data: 'id'},
+                    {data: 'name'},
+                    {
+                        data: 'enname',
+
+                    },
+                    {
+                        data: 'parent',
+
+                    },
+                    {data: 'ctime' },
+                    {data: 'mtime'},
+
+                ],
+                columnDefs: [{
+                    targets: 6,
+                    render: function (data, type, row, meta) {
+                        return `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal"
+                                            data-target="#DepartmentModal" data-id="${row.id}">更新
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-xs delete" data-id="${row.id}">
+                                        删除
+                                    </button>
+                    `;
+                    }
+                }]
+            });
+        });
+
+        // Initialize Select2 Elements
+        $(function () {
+            $('.select2').select2({
+                allowClear: true
+            })
+        });
+
+        let department_tbody = $('#department tbody');
+        let department_ops = $('#department_ops');
+        // 新增部门
+        $('#add-department').on('click', function () {
+            $(".select2").val('').trigger('change');
+            $('.modal-title').text('新增部门');
+            department_ops.text('添加');
+
+            department_ops.unbind('click').on('click', function () {
+                let data = {
+                    name: $('#name').val(),
+                    enname: $('#enname').val(),
+                    parent: $('#parent').val()
+                };
+                $.ajax({
+                    url: "{% url 'department' %}",
+                    type: 'POST',
+                    data: data,
+                    traditional: true,
+                    dataType: 'json',
+                    success: function (res) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'green',
+                            content: res.msg
+                        });
+                        department_table.ajax.reload()
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: response.responseText,
+                        })
+                    }
+                })
+            })
+        });
+
+        // 更新部门
+        department_tbody.on('click', '.modify', function () {
+
+            let department_id = $(this).attr('data-id');
+            $('.modal-title').text('修改部门');
+            department_ops.text('确认修改');
+
+            $.get(`/users/edit_department/${department_id}/`, function (res) {
+                let data = res.data;
+                $('#name').val(data.name);
+                $('#enname').val(data.enname).trigger('change');
+                $('#parent').val(data.parent_id).trigger('change');
+            });
+
+            department_ops.unbind('click').on('click', function () {
+                let data = {
+                    name: $('#name').val(),
+                    enname: $('#enname').val(),
+                    parent: $('#parent').val()
+                };
+                $.ajax({
+                    url: `/users/edit_department/${department_id}/`,
+                    type: 'POST',
+                    data: data,
+                    traditional: true,
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res["code"] == "200") {
+                            $.alert({
+                                title: 'Tips',
+                                type: 'green',
+                                content: res.msg
+                            });
+                            department_table.ajax.reload()
+
+                        } else {
+                            $.alert({
+                                title: 'Tips',
+                                type: 'red',
+                                content: res.msg
+                            })
+
+                        }
+                    },
+                    error: function (response) {
+                        $.alert({
+                            title: 'Tips',
+                            type: 'red',
+                            content: data.responseText,
+                        })
+                    }
+                })
+            });
+        });
+
+        // 删除部门
+        department_tbody.on('click', '.delete', function () {
+
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+            $.confirm({
+                title: 'Tips',
+                content: '确定要删除这条记录么？',
+                type: 'red',
+                buttons: {
+                    Ok: function () {
+                        $.ajax({
+                            url: `/users/delete_department/${pk}/`,
+                            method: 'DELETE',
+                            success: function (res) {
+                                if (res["code"] == "200") {
+                                    department_table.row(tr_obj).remove().draw();
+                                } else {
+                                    $.alert({
+                                        title: 'Tips',
+                                        type: 'red',
+                                        content: res.msg
+                                    })
+                                }
+                            },
+                            error: function (data) {
+                                $.alert({
+                                    title: 'Tips',
+                                    type: 'red',
+                                    content: '删除失败！' + data.responseText,
+                                })
+                            }
+                        })
+                    },
+                    Cancel: function () {
+                        //
+                    }
+                }
+            });
+        });
+
+        //打开DepartmentModal 时触发
+        $('#DepartmentModal').on('hide.bs.modal', function () {
+            $("#name").empty();
+            $("#enname").empty();
+        })
+    </script>
+
+{% endblock %}
+

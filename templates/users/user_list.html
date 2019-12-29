@@ -59,20 +59,32 @@
                                                required/>
                                     </div>
                                 </div>
-                            <div class="form-group">
+                                <div class="form-group">
                                     <label for="username" class="col-sm-2 control-label">中文名称</label>
                                     <div class="col-sm-6">
                                         <input type="text" class="form-control" name="cnname" id="cnname"
                                                required/>
                                     </div>
                                 </div>
-                            <div class="form-group">
-                                    <label for="leader_str" class="col-sm-2 control-label">用户级别</label>
+                                <div class="form-group">
+                                    <label for="leader" class="col-sm-2 control-label">用户级别</label>
                                     <div class="col-sm-6">
-                                        <select class="form-control select2" name="leader_str" id="leader_str"
+                                        <select class="form-control select2" name="leader" id="leader"
                                                 style="width: 100%;" required>
                                             <option value="1">普通员工</option>
                                             <option value="0" selected>部门负责人</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="department" class="col-sm-2 control-label">部门</label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control select2" name="department" id="department"
+                                                style="width: 100%;" required>
+                                            {% for dep in deps %}
+                                                <option value="{{ dep.id }}">{{ dep.name }}|{{ dep.enname }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -152,6 +164,7 @@
                             <th>用户名称</th>
                             <th>中文名称</th>
                             <th>用户级别</th>
+                            <th>所属部门</th>
                             <th>超级管理员</th>
                             <th>所属组</th>
                             <th>拥有角色</th>
@@ -201,7 +214,8 @@
                     {data: 'id'},
                     {data: 'username'},
                     {data: 'cnname'},
-                    {data: 'leader_str',
+                    {
+                        data: 'leader',
                         render: function (data, type, full, meta) {
                             if (data) {
                                 return '普通员工'
@@ -209,6 +223,10 @@
                                 return '部门负责人'
                             }
                         }
+                    },
+                    {
+                        data: 'dep'
+
                     },
                     {
                         data: 'is_superuser',
@@ -245,7 +263,7 @@
                     {data: 'mobile'},
                 ],
                 columnDefs: [{
-                    targets: 9,
+                    targets:10,
                     render: function (data, type, row, meta) {
                         return `<button type="button" class="btn btn-success btn-xs modify" data-toggle="modal"
                                             data-id="${row.id}" data-target="#UserModal">更新
@@ -293,15 +311,15 @@
                             traditional: true,
                             dataType: 'json',
                             success: function (res) {
+                                user_table.ajax.reload()
                                 if (res.code === 200) {
                                     $.alert({
                                         title: 'Tips',
                                         type: 'green',
                                         content: res.msg,
                                     });
-                                    user_table.ajax.reload()
-                                }
-                                else {
+
+                                } else {
                                     $.alert({
                                         title: 'Tips',
                                         type: 'red',
@@ -333,11 +351,13 @@
             $.get(`/users/edit_user/${user_id}/`, function (res) {
                 let data = res.data;
                 let is_superuser = data.is_superuser ? "1" : "0";
-                let leader_str = data.leader_str ? "1" : "0";
+                let leader = data.leader ? "1" : "0";
                 let is_active = data.is_active ? "1" : "0";
                 $('#username').val(data.username);
                 $('#cnname').val(data.cnname);
-                $('#leader_str').val(data.leader_str).trigger('change');;
+                $('#leader').val(data.leader).trigger('change');
+                $('#department').val(data.dep_id).trigger('change');
+                ;
                 $('#mobile').val(data.mobile);
                 $('#is_superuser').val(is_superuser).trigger('change');
                 $('#is_active').val(is_active).trigger('change');
@@ -356,12 +376,13 @@
                     traditional: true,
                     dataType: 'json',
                     success: function (res) {
+                        user_table.ajax.reload()
                         $.alert({
                             title: 'Tips',
                             type: 'green',
                             content: res.msg,
                         });
-                        user_table.ajax.reload()
+
                     },
                     error: function (response) {
                         $.alert({

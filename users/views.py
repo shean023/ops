@@ -1,11 +1,10 @@
-import json
-
+import time
 from django.contrib.auth.hashers import make_password
+from django.core import serializers
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from requests import Response
-
-from users.models import UserProfile, UserPlan, UserRole
+from users.models import UserProfile, UserPlan, UserRole, Department
 from django.contrib.auth.models import Group, Permission
 from utils.decorators import admin_auth
 
@@ -100,7 +99,8 @@ def user_list(request):
             user_obj = UserProfile.objects.create(
                 username=username,
                 cnname=request.POST.get('cnname'),
-                leader_str=request.POST.get('leader_str'),
+                leader=request.POST.get('leader'),
+                department_id=Department.objects.get(id=int(request.POST.get('department'))),
                 password=make_password(init_pass),
                 is_superuser=request.POST.get('is_superuser'),
                 is_active=request.POST.get('is_active'),
@@ -124,7 +124,85 @@ def user_list(request):
             return JsonResponse({"code": 500, "data": None, "msg": "用户添加失败，原因：{}".format(e)})
     groups = Group.objects.all().select_related()
     u_roles = UserRole.objects.all()
+    deps = Department.objects.all()
     return render(request, 'users/user_list.html', locals())
+
+
+@admin_auth
+def department(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        enname = request.POST.get('enname')
+        parent = request.POST.get('parent')
+        try:
+            Department.objects.create(
+                name=name,
+                enname=enname,
+                parent=parent)
+            return JsonResponse({"code": 201, "data": None, "msg": "用户组添加成功！"})
+        except Exception as e:
+            return JsonResponse({"code": 500, "data": None, "msg": "用户组添加失败，原因：{}".format(e)})
+
+    deps = Department.objects.all()
+    return render(request, 'users/department.html', locals())
+
+@admin_auth
+def get_department(request):
+    deps = []
+    try:
+        for d in Department.objects.all():
+            deps.append(get_department_data(d))
+        return JsonResponse({"code": 200, "data": deps, "msg": "部门获取成功！"})
+    except Exception as e:
+        return JsonResponse({"code": 500, "data": None, "msg": "部门获取失败，原因：{}".format(e)})
+
+
+def get_department_data(department, info=True):
+    data = {'id': department.id, 'name': department.name, 'enname': department.enname,
+            'parent': "顶级部门" if department.parent == 0 else Department.objects.get(id=department.parent).name,
+            'parent_id': department.parent,
+            'ctime': department.ctime.strftime('%Y-%m-%d %H:%M:%S'), 'mtime': department.mtime.strftime('%Y-%m-%d %H:%M:%S')
+            }
+    print(data)
+    return data
+
+
+@admin_auth
+def edit_department(request, pk):
+    dep = Department.objects.filter(id=pk)
+    if request.method == 'POST':
+        try:
+            name = request.POST.get('name')
+            enname = request.POST.get('enname')
+            parent = request.POST.get('parent')
+            if pk == parent:
+                return JsonResponse({"code": 500, "data": None, "msg": "上级部门设置错误, 上级部门不能设置为本部门！"})
+            else:
+                dep.update(
+                    name=name,
+                    enname=enname,
+                    parent=parent,
+                    mtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                )
+                return JsonResponse({"code": 200, "data": None, "msg": "部门更新成功！"})
+        except Exception as e:
+            return JsonResponse({"code": 500, "data": None, "msg": "部门更新失败，原因：{}".format(e)})
+    data = get_department_data(dep[0])
+    return JsonResponse({"code": 200, "data": data, "msg": "部门获取成功！"})
+
+
+@admin_auth
+def delete_department(request, pk):
+    if request.method == 'DELETE':
+        try:
+            count = Department.objects.filter(parent=pk).count()
+            if count == 0:
+                Department.objects.get(id=pk).delete()
+                return JsonResponse({"code": 200, "data": None, "msg": "部门删除成功！"})
+            else:
+                return JsonResponse({"code": 500, "data": None, "msg": "部门删除失败，原因： 该部门为上级部门不能删除！"})
+        except Exception as e:
+            return JsonResponse({"code": 500, "data": None, "msg": "部门删除失败，原因：{}".format(e)})
 
 
 @admin_auth
@@ -164,7 +242,8 @@ def edit_user(request, pk):
         try:
             username = request.POST.get('username')
             cnname = request.POST.get('cnname')
-            leader_str = request.POST.get('leader_str')
+            leader = request.POST.get('leader')
+            department_id = Department.objects.get(id=request.POST.get('department'))
             is_superuser = request.POST.get('is_superuser')
             is_active = request.POST.get('is_active')
             mobile = request.POST.get('mobile')
@@ -173,7 +252,8 @@ def edit_user(request, pk):
 
             user.username = username
             user.cnname = cnname
-            user.leader_str = leader_str
+            user.leader = leader
+            user.department_id = department_id
             user.is_superuser = is_superuser
             user.is_active = is_active
             user.mobile = mobile
@@ -210,7 +290,7 @@ def delete_user(request, pk):
 
 
 def get_user_data(user, info=True):
-    data = {'id': user.id, 'username': user.username, 'cnname': user.cnname if user.cnname else "无", 'leader_str':user.leader_str, 'is_superuser': user.is_superuser, 'is_active': user.is_active,
+    data = {'id': user.id, 'username': user.username, 'cnname': user.cnname, 'leader':user.leader, 'dep_id': user.department_id.id, 'dep': user.department_id.name, 'is_superuser': user.is_superuser, 'is_active': user.is_active,
             'mobile': user.mobile, 'groups': [g.name if info else g.id for g in user.groups.all()],
             'u_role': [r.user_role_name if info else r.id for r in user.userrole_set.all()]}
     return data
