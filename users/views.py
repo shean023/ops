@@ -163,7 +163,6 @@ def get_department_data(department, info=True):
             'parent_id': department.parent,
             'ctime': department.ctime.strftime('%Y-%m-%d %H:%M:%S'), 'mtime': department.mtime.strftime('%Y-%m-%d %H:%M:%S')
             }
-    print(data)
     return data
 
 
@@ -290,7 +289,7 @@ def delete_user(request, pk):
 
 
 def get_user_data(user, info=True):
-    data = {'id': user.id, 'username': user.username, 'cnname': user.cnname, 'leader':user.leader, 'dep_id': user.department_id.id, 'dep': user.department_id.name, 'is_superuser': user.is_superuser, 'is_active': user.is_active,
+    data = {'id': user.id, 'username': user.username, 'cnname': user.cnname, 'leader': user.leader, 'dep_id': user.department_id.id if user.department_id.id else 'None', 'dep': user.department_id.name if user.department_id.name else 'None', 'is_superuser': user.is_superuser, 'is_active': user.is_active,
             'mobile': user.mobile, 'groups': [g.name if info else g.id for g in user.groups.all()],
             'u_role': [r.user_role_name if info else r.id for r in user.userrole_set.all()]}
     return data

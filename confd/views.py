@@ -53,7 +53,6 @@ def confd_detail(request):
 def confd_deploy(request):
     if request.method == 'POST':
         pk = request.POST.get('id')
-
         try:
             if pk:
                 confd = Config_Confd.objects.get(id=pk)

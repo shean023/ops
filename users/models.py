@@ -15,7 +15,7 @@ class UserProfile(AbstractUser):
     )
 
     leader = models.SmallIntegerField(choices=leader_, default=1, verbose_name='员工级别')
-    department_id = models.ForeignKey('Department', related_name='user_dep', on_delete=models.PROTECT, verbose_name='所属部门')
+    department_id = models.ForeignKey('Department', related_name='user_dep', null=True, default=1, on_delete=models.PROTECT, verbose_name='所属部门')
     cnname = models.CharField(max_length=11, null=True, blank=True, verbose_name='中文姓名')
     mobile = models.CharField(max_length=11, null=True, blank=True, verbose_name='手机号码')
     image = models.ImageField(upload_to='images/%Y/%m/%d/', default='images/default.png', max_length=100)

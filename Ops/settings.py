@@ -57,17 +57,17 @@ CELERY_ROUTES = {
 }
 
 # 执行ansible命令使用的redis信息
-REDIS_HOST = '192.168.238.129'
+REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 2
 REDIS_PASSWORD = None
 
 # mongodb配置信息
-MONGODB_HOST = '192.168.238.129'
+MONGODB_HOST = '127.0.0.1'
 MONGODB_PORT = 27017
-MONGODB_USER = 'dba'
-MONGODB_PASS = 'dba'
-RECORD_DB = 'records'
+MONGODB_USER = 'root'
+MONGODB_PASS = '123456'
+RECORD_DB = 'test'
 RECORD_COLL = 'ops'
 
 # Application definition
@@ -172,7 +172,7 @@ DATABASES = {
         'NAME': 'ops_ops',
         'USER': 'root',
         'PASSWORD': '123456',
-        'HOST': '192.168.238.129'
+        'HOST': '127.0.0.1'
     }
 }
 

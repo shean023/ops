@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dist/css/xcConfirm.css' %}" />
+    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
+
+    <!-- ace styles -->
+
+
+    <style>
+
+        /* dataTables列内容居中 */
+        #ticket_tab > tbody > tr > td {
+            text-align: left;
+        }
+
+        /* dataTables表头居中 */
+        #ticket_tab > thead:first-child > tr:first-child > th {
+            text-align: left;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <!-- Main row -->
+    <div class="row">
+        <!-- Left col -->
+        <div class="col-md-12">
+
+            <!-- TABLE: LATEST ORDERS -->
+            <div class="box box-info">
+
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">我的创建工单</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+
+                <div class="box-body">
+
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <table id="ticket_tab" name="ticket_tab" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>工单标题</th>
+                                    <th>工单类型</th>
+                                    <th>当前处理人</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for tt in ttDatas %}
+                                    <tr>
+                                        <td>{{ tt.id }}</td>
+                                        <td>{{ tt.title }}</td>
+                                        <td>{{ tt.casetype }}</td>
+                                        <td>{{ tt.user }}</td>
+                                        <td>{% if tt.status == 2 %}
+                                                <button type="button" class="btn btn-success btn-xs">{{ tt.status_choice }}</button>
+                                            {% else %}
+                                                <button type="button" class="btn btn-warning btn-xs">{{ tt.status_choice }}</button>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ tt.ctime|date:"Y/m/d H:i  " }}</td>
+                                        <td>
+                                            <a href='?type=detail&mtid={{ tt.id }}'><button class='btn btn-sm btn-info'>详情</button></a>
+                                            <button type="button" class="btn btn-sm btn-danger  delete" data-id="{{ tt.id }}">删除</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+{% endblock %}
+
+{% block js %}
+    <!-- Select2 -->
+
+    <!-- DataTables -->
+    <script src="{% static 'AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'dist/js/xcConfirm.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script src="{% static 'jquery-confirm/dist/jquery-confirm.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+
+    <script>
+        $(function () {
+
+            ticket_table = $('#ticket_tab').DataTable({
+                columnDefs: [{
+                    'targets': [-1],
+                    'orderable': false
+                }],
+                "order": [[0, "asc"]]
+            });
+
+            // Initialize Select2 Elements
+            $('.select2').select2({
+                allowClear: true
+            });
+
+
+        });
+
+        // 删除ticket_tab
+        $('#ticket_tab tbody').on('click', '.delete', function () {
+
+            let pk = $(this).attr('data-id');
+            let tr_obj = $(this).parents('tr');
+            let key_td_obj = $(this).parents('tr').children();
+            $.confirm({
+                title: 'Tips',
+               // content: '确定要删除这条记录么？' + '<br><font color="red"> ' + "ID: "+ key_td_obj[0].innerText + "; 类型名称: " + key_td_obj[1].innerText + '</font>',
+                content: '确定要删除这条记录么？' + '<li class="text-danger"><b>' + "ID:" + '</b>' + key_td_obj[0].innerText + ' ; <b>类型名称: </b>' + key_td_obj[1].innerText + '</li>',
+                type: 'red',
+                buttons: {
+                    Ok: function () {
+                        $.ajax({
+                            url: '/ticket/ticket_mydel/' + pk + '/',
+                            method: 'DELETE',
+                            success: function (response) {
+                                if (response["code"] == "200") {
+                                    ticket_table.row(tr_obj).remove().draw();
+                                    //window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
+                                    //location.reload();
+                                } else {
+                                    window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
+                                }
+                            },
+                            error: function (response) {
+                                window.wxc.xcConfirm("请求数据错误！", window.wxc.xcConfirm.typeEnum.error);
+
+                            },
+                        })
+                    },
+                    Cancel: function () {
+                        //
+                    }
+                }
+            });
+        });
+    </script>
+
+{% endblock %}

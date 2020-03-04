@@ -58,18 +58,19 @@ class TicketAuditModel(models.Model):
         verbose_name = '执行流程表'
         verbose_name_plural = '执行流程'
 
+
 class Ticket(models.Model):
     '''
     需求工单
     '''
 
     title = models.CharField(max_length=64, verbose_name='工单标题')
-    tt_id = models.ForeignKey('TictetType', verbose_name='工单类型',on_delete=models.DO_NOTHING)
-    createuser_id = models.ForeignKey('users.UserProfile', verbose_name='工单创建人',on_delete=models.DO_NOTHING)
+    tt_id = models.ForeignKey('TictetType', verbose_name='工单类型', on_delete=models.DO_NOTHING)
+    createuser_id = models.ForeignKey('users.UserProfile', verbose_name='工单创建人', on_delete=models.DO_NOTHING)
     content = models.TextField(blank=True, null=True, verbose_name='工单需求 json 数据')
     result = models.TextField(blank=True, null=True, verbose_name='工单结果 json 数据')
-    auditNum = models.SmallIntegerField(blank=False, null=False, default=0,verbose_name='第几个审核人, 为当前审核人（顺序)')
-    execNum = models.SmallIntegerField(blank=False, null=False, default=0,verbose_name='第几个执行人，为当前执行人（顺序）')
+    auditNum = models.SmallIntegerField(blank=False, null=False, default=0, verbose_name='第几个审核人, 为当前审核人（顺序)')
+    execNum = models.SmallIntegerField(blank=False, null=False, default=0, verbose_name='第几个执行人，为当前执行人（顺序）')
     # 审核状态
     STATUS = ((1, '待提交'),
                   (2, '审核中'),
@@ -83,13 +84,13 @@ class Ticket(models.Model):
                   (10, '完成关闭'),
                   (11, '驳回关闭'),
                   (12, '撤销关闭'),
-                  )
+              )
     status = models.IntegerField(choices=STATUS, default='2', verbose_name='工单状态')
     ctime = models.DateTimeField(auto_now_add=True, blank=True, null=True, verbose_name='工单创建时间')
     mtime = models.DateTimeField(auto_now=True, blank=True, verbose_name='工单最后修改时间')
-    auditflow = models.SmallIntegerField(blank=False, null=False, default=0,verbose_name='执行流')
-    execflow = models.SmallIntegerField(blank=False, null=False, default=0,verbose_name='审核流')
-    operation = models.SmallIntegerField(blank=False, null=False, default=0,verbose_name='操作记录')
+    auditflow = models.SmallIntegerField(blank=False, null=False, default=0, verbose_name='审核流')
+    execflow = models.SmallIntegerField(blank=False, null=False, default=0, verbose_name='执行流')
+    operation = models.SmallIntegerField(blank=False, null=False, default=0, verbose_name='操作记录')
 
     class Meta:
         db_table = 'ops_ticket_ticket'
@@ -98,9 +99,9 @@ class Ticket(models.Model):
 
 
 class TicketAudit(models.Model):
-    '''
+    """
     工单审核流程（多个审核人）
-    '''
+    """
     STATUS = (
         (0, '未审核'),
         (1, '已审核'),
@@ -118,9 +119,9 @@ class TicketAudit(models.Model):
 
 
 class TicketExec(models.Model):
-    '''
+    """
     工单执行人流程（多个执行人）
-    '''
+    """
     STATUS = (
         (0, '未审核'),
         (1, '已审核'),
@@ -138,9 +139,9 @@ class TicketExec(models.Model):
 
 
 class TicketOperation(models.Model):
-    '''
+    """
     工单操作表
-    '''
+    """
     STATUS = (
         (1, '提交'),
         (2, '审核通过'),

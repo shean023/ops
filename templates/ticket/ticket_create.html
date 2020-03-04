@@ -1,176 +1,198 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block head %}
-    <link rel="stylesheet" type="text/css" href="{% static 'dist/css/xcConfirm.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'dist/css/xcConfirm.css' %}"/>
 
 {% endblock %}
 {% block content %}
-    <div class="main-content">
 
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
 
-        <div class="page-content">
-            <div class="row">
-                <div class="col-xs-12">
-                    <!-- PAGE CONTENT BEGINS -->
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">创建工单</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i
+                                class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
 
-                    <div class="tabbable">
-                        <ul class="nav nav-tabs padding-18 tab-size-bigger" id="myTab">
-                            <li class="active">
-                                <a data-toggle="tab" href="#faq-tab-1">
-                                    通用类
-                                </a>
-                            </li>
+                <div class="box-body">
+                    <ul class="nav nav-tabs padding-18 tab-size-bigger" id="myTab">
+                        <li class="active">
+                            <a data-toggle="tab" href="#faq-tab-1">
+                                通用类
+                            </a>
+                        </li>
 
-                            <li>
-                                <a data-toggle="tab" href="#faq-tab-2">
-                                    资源/权限类
-                                </a>
-                            </li>
+                        <li>
+                            <a data-toggle="tab" href="#faq-tab-2">
+                                资源/权限类
+                            </a>
+                        </li>
 
-                            <li>
-                                <a data-toggle="tab" href="#faq-tab-3">
-                                    操作/执行类
-                                </a>
-                            </li>
+                        <li>
+                            <a data-toggle="tab" href="#faq-tab-3">
+                                操作/执行类
+                            </a>
+                        </li>
 
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                                    其他
-                                    <!--<i class="icon-caret-down"></i>-->
-                                </a>
+                        <li class="dropdown">
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                                其他
+                                <!--<i class="icon-caret-down"></i>-->
+                            </a>
 
-                                <ul class="dropdown-menu dropdown-lighter dropdown-125">
-                                    <li>
-                                        <a data-toggle="tab" href="#faq-tab-4"> 测试1 </a>
-                                    </li>
+                            <ul class="dropdown-menu dropdown-lighter dropdown-125">
+                                <li>
+                                    <a data-toggle="tab" href="#faq-tab-4"> 测试1 </a>
+                                </li>
 
-                                    <li>
-                                        <a data-toggle="tab" href="#faq-tab-4"> 测试2 </a>
-                                    </li>
-                                </ul>
-                            </li><!-- /.dropdown -->
-                        </ul>
+                                <li>
+                                    <a data-toggle="tab" href="#faq-tab-4"> 测试2 </a>
+                                </li>
+                            </ul>
+                        </li><!-- /.dropdown -->
+                    </ul>
 
-                        <div class="tab-content no-border padding-24">
-                            <div id="faq-tab-1" class="tab-pane fade in active">
+                    <div class="tab-content no-border padding-24">
+                        <div id="faq-tab-1" class="tab-pane fade in active">
                             <br>
                             <br>
                             <br>
 
-                                <div class="space-8"></div>
+                            <div class="space-8"></div>
 
-                                <div id="faq-list-1" class="panel-group accordion-style1 accordion-style2">
-                                    <form class="form-horizontal">
-{#                                        {% csrf_token %}#}
-                                        <div class="form-group">
-                                            <label class="col-sm-3 control-label no-padding-right" for="casetype"> 工单类型 </label>
+                            <div id="faq-list-1" class="panel-group accordion-style1 accordion-style2">
+                                <form class="form-horizontal">
+                                    {#                                        {% csrf_token %}#}
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right" for="casetype">
+                                            工单类型 </label>
 
-                                            <div class="col-sm-9">
-                                                <select class="form-control select2" id="casetype" name="casetype" style="width:60%;height:35px" required>
-                                                        <option value=""> --请选择工单类型-- </option>
-                                                    {% for tt in tts %}
-                                                        <option value="{{ tt.id }}">{{ tt.name }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control select2" id="casetype" name="casetype"
+                                                    style="width:60%;height:35px" required>
+                                                <option value=""> --请选择工单类型--</option>
+                                                {% for tt in tts %}
+                                                    <option value="{{ tt.id }}">{{ tt.name }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
-                                        <div class="form-group">
-                                            <label class="col-sm-3 control-label no-padding-right" for="casetitle"> 标题 </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right" for="casetitle">
+                                            标题 </label>
 
-                                            <div class="col-sm-9">
-                                                <input id="casetitle" name="casetitle" type="text" placeholder="请输入需求标题" class="form-control" style="width:60%;height:35px" required/>
-                                            </div>
+                                        <div class="col-sm-9">
+                                            <input id="casetitle" name="casetitle" type="text"
+                                                   placeholder="请输入需求标题" class="form-control"
+                                                   style="width:60%;height:35px" required/>
                                         </div>
+                                    </div>
 
-                                        <div class="space-4"></div>
+                                    <div class="space-4"></div>
 
-                                        <div class="form-group">
-                                            <label class="col-sm-3 control-label no-padding-right" for="caserequire"> 需求 </label>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right"
+                                               for="caserequire"> 需求 </label>
 
-                                            <div class="col-sm-9">
-                                                <textarea id="caserequire" name="caserequire" class="form-control" style="width:60%;height:200px"  placeholder="请输入你的需求" required></textarea>
-                                            </div>
+                                        <div class="col-sm-9">
+                                                    <textarea id="caserequire" name="caserequire" class="form-control"
+                                                              style="width:60%;height:200px" placeholder="请输入你的需求"
+                                                              required></textarea>
                                         </div>
+                                    </div>
 
-                                        <div class="space-4"></div>
+                                    <div class="space-4"></div>
 
-                                        <div class="form-group hide">
-                                            <label class="col-sm-3 control-label no-padding-right " for="caseresult"> 结果 </label>
+                                    <div class="form-group hide">
+                                        <label class="col-sm-3 control-label no-padding-right "
+                                               for="caseresult"> 结果 </label>
 
-                                            <div class="col-sm-9">
-                                                <textarea id="caseresult" name="caseresult" class="col-xs-10 col-sm-8"  placeholder="请输入处理结果"></textarea>
-                                            </div>
+                                        <div class="col-sm-9">
+                                                    <textarea id="caseresult" name="caseresult"
+                                                              class="col-xs-10 col-sm-8"
+                                                              placeholder="请输入处理结果"></textarea>
                                         </div>
+                                    </div>
 
-                                        <div class="space-4"></div>
-                                    </form>
-                                    <div class="clearfix form-actions">
-                                        <div class="col-md-offset-4 col-md-9">
+                                    <div class="space-4"></div>
+                                </form>
+                                <div class="clearfix form-actions">
+                                    <div class="col-md-offset-4 col-md-9">
 
-                                            <button class="btn btn-info" type="submit" id="submit" name="submit"
-                                                    value="submit" onclick="addTicket(this,'submit', 'addCase');">提交
-                                            </button>
-                                            &nbsp &nbsp; &nbsp;
-                                            <button class="btn btn-warning" type="submit" id="save" name="save"
-                                                    value="save" onclick="addTicket(this,'save', 'addCase');">保存
-                                            </button>
-                                            &nbsp; &nbsp; &nbsp;
-                                            <button class="btn" type="reset">
-                                                <i class="icon-undo bigger-110"></i>
-                                                重置
-                                            </button>
-                                        </div>
+                                        <button class="btn btn-info" type="submit" id="submit" name="submit"
+                                                value="submit" onclick="addTicket(this,'submit', 'addCase');">提交
+                                        </button>
+                                        &nbsp &nbsp; &nbsp;
+                                        <button class="btn btn-warning" type="submit" id="save" name="save"
+                                                value="save" onclick="addTicket(this,'save', 'addCase');">保存
+                                        </button>
+                                        &nbsp; &nbsp; &nbsp;
+                                        <button class="btn" type="reset">
+                                            <i class="icon-undo bigger-110"></i>
+                                            重置
+                                        </button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div id="faq-tab-2" class="tab-pane fade">
-                                <h4 class="blue">
-                                    <i class="green icon-user bigger-110"></i>
-                                    资源/权限类
-                                </h4>
+                        <div id="faq-tab-2" class="tab-pane fade">
+                            <h4 class="blue">
+                                <i class="green icon-user bigger-110"></i>
+                                资源/权限类
+                            </h4>
 
-                                <div class="space-8"></div>
+                            <div class="space-8"></div>
 
-                                <div id="faq-list-2" class="panel-group accordion-style1 accordion-style2">
+                            <div id="faq-list-2" class="panel-group accordion-style1 accordion-style2">
 
-                                </div>
                             </div>
+                        </div>
 
-                            <div id="faq-tab-3" class="tab-pane fade">
-                                <h4 class="blue">
-                                    <i class="orange icon-credit-card bigger-110"></i>
-                                    Payment Questions
-                                </h4>
+                        <div id="faq-tab-3" class="tab-pane fade">
+                            <h4 class="blue">
+                                <i class="orange icon-credit-card bigger-110"></i>
+                                Payment Questions
+                            </h4>
 
-                                <div class="space-8"></div>
+                            <div class="space-8"></div>
 
-                                <div id="faq-list-3" class="panel-group accordion-style1 accordion-style2">
+                            <div id="faq-list-3" class="panel-group accordion-style1 accordion-style2">
 
-                                </div>
                             </div>
+                        </div>
 
-                            <div id="faq-tab-4" class="tab-pane fade">
-                                <h4 class="blue">
-                                    <i class="purple icon-magic bigger-110"></i>
-                                    操作/执行类
-                                </h4>
+                        <div id="faq-tab-4" class="tab-pane fade">
+                            <h4 class="blue">
+                                <i class="purple icon-magic bigger-110"></i>
+                                操作/执行类
+                            </h4>
 
-                                <div class="space-8"></div>
+                            <div class="space-8"></div>
 
-                                <div id="faq-list-4" class="panel-group accordion-style1 accordion-style2">
+                            <div id="faq-list-4" class="panel-group accordion-style1 accordion-style2">
 
-                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- PAGE CONTENT ENDS -->
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.page-content -->
+            </div>
 
-    </div><!-- /.main-content -->
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+    </div>
+
 {% endblock %}
 
 {% block js %}

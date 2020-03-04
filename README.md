@@ -73,7 +73,7 @@ cp conf/get_mem.py /path/to/your ansible python module location  ##可以使用a
 九、启动服务
 > 需要将Ops目录中的settings.py celery.py按照实际情况更改
 ```
-python manage.py makemigrations users assets dbmanager fort plan projs task wiki
+python manage.py makemigrations users assets projs dbmanager fort plan  task wiki confd ticket
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver 0.0.0.0:8000

@@ -2,34 +2,129 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3e6d896c-1d3b-475a-bb0e-fd8a0c73dd4f" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/assets/platform.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/assets/proj_app.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/assets/proj_env.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/assets/proj_name.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../iamdc/.idea/iamdc.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../iamdc/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../iamdc/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../iamdc/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../iamdc/.idea/rSettings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../iamdc/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/rSettings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/ticket/ticket_mycheck.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/ticket/ticket_mycheck_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/ticket/ticket_mycreate.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/ticket/ticket_mydetail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/ticket/ticket_myexecute.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/ticket/ticket_myexecute_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../iamdc/ops/case/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/../iamdc/ops/case/api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../iamdc/ops/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/../iamdc/ops/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../iamdc/ops/static/js/ops/caseExecute.js" beforeDir="false" afterPath="$PROJECT_DIR$/../iamdc/ops/static/js/ops/caseExecute.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../iamdc/ops/static/js/ops/caseMyCreate.js" beforeDir="false" afterPath="$PROJECT_DIR$/../iamdc/ops/static/js/ops/caseMyCreate.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../iamdc/ops/templates/case/caseMyCreate.html" beforeDir="false" afterPath="$PROJECT_DIR$/../iamdc/ops/templates/case/caseMyCreate.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../iamdc/ops/users/login.py" beforeDir="false" afterPath="$PROJECT_DIR$/../iamdc/ops/users/login.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/Ops.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Ops.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Ops/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Ops/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/migrations/0002_auto_20191121_1645.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/migrations/0003_assets_asset_hostname.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/migrations/0004_auto_20191205_1556.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/migrations/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/utils/webssh.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/utils/webssh.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/celeryd.conf" beforeDir="false" afterPath="$PROJECT_DIR$/conf/celeryd.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/all.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/all.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/ansible.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/ansible.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/assets/add_asset.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/assets/add_asset.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/assets/add_base_asset.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/assets/add_base_asset.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/assets/assets_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/assets/assets_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/assets/update_asset.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/assets/update_asset.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/projs/proj_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/projs/proj_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0002_auto_20191219_2031.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0003_config_confd.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0004_auto_20191219_2048.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0005_confd_detail.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0006_auto_20191220_1933.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0007_auto_20191220_2057.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0008_auto_20191221_1323.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0009_auto_20191221_1430.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/0010_auto_20191221_1513.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/confd/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/confd/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dbmanager/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dbmanager/migrations/0002_auto_20191121_1645.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dbmanager/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fort/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fort/migrations/0002_auto_20191121_1645.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fort/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pri.pem" beforeDir="false" afterPath="$PROJECT_DIR$/pri.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0002_auto_20191121_1645.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0003_auto_20191125_1649.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0004_auto_20191125_1826.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0005_auto_20191126_1613.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0006_auto_20191126_1710.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0007_auto_20191126_1713.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0008_project_config_ticket_mail_notice.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0009_project_config_ticket_proj_role.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0010_project_config_ticket_proj_branch_tag.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0011_auto_20191130_1539.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0012_auto_20191130_1542.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0013_remove_project_config_ticket_proj_branch_tag.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0014_auto_20191130_1547.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0015_auto_20191130_1609.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0016_auto_20191130_1744.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0017_auto_20191130_1957.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0018_auto_20191202_1502.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0019_auto_20191202_1730.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0020_auto_20191202_1732.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0021_auto_20191202_2145.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0022_auto_20191203_1618.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0023_auto_20191210_1946.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0024_auto_20191211_2140.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0025_auto_20191212_2038.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0026_auto_20191212_2104.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0027_auto_20191212_2110.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0028_auto_20191212_2116.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0029_auto_20191213_1442.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0030_project_deploy_record_rollback_status.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0031_auto_20191216_1957.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0032_auto_20191216_2006.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0033_auto_20191216_2010.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0034_auto_20191216_2013.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0035_auto_20191216_2013.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/0036_projectconfig_versions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projs/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/task/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/task/migrations/0002_auto_20191121_1645.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/task/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/assets/cabinet_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/assets/cabinet_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/confd/apply_vhost.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/confd/vhost_detail.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/confd/vhost_list - 鍓湰.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/confd/vhost_list.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/paginator.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/ticket/ticket_create.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/ticket/ticket_create.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/migrations/0002_auto_20191226_1839.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/migrations/0003_auto_20191226_1847.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/migrations/0004_auto_20191228_2300.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/migrations/0005_auto_20191228_2340.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/migrations/0006_auto_20191228_2345.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/ticket/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ticket/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticket/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ticket/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/migrations/0002_userprofile_cnname.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/migrations/0003_userprofile_leader_str.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/migrations/0004_auto_20191229_0353.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/migrations/0005_remove_userprofile_department_id.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/migrations/0006_auto_20191229_1352.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/migrations/0007_auto_20191229_1515.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/migrations/0008_auto_20191229_1730.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/users/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wiki/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/wiki/migrations/__init__.py" beforeDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -53,36 +148,38 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1TEeNlS59PIBBoTCszsJo6D8lR3" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Downloads/OpsManage" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/templates/ticket" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/templates/ticket" />
+      <recent name="$PROJECT_DIR$/static/css" />
+      <recent name="$PROJECT_DIR$/static/ace" />
       <recent name="$PROJECT_DIR$/templates/assets" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/static/ace/js" />
+    </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager" selected="Python.ops">
+  <component name="RunManager" selected="Python.xdrip-script">
     <configuration name="ops" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Ops" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -105,15 +202,38 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Ops" type="Python.DjangoServer" factoryName="Django server">
-      <module name="Ops" />
+    <configuration name="xdrip-script" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="xdrip-script" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../xdrip-script" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../xdrip-script/xdrip-script.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Ops" type="Python.DjangoServer" factoryName="Django server">
+      <module name="Ops" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="DJANGO_SETTINGS_MODULE" value="Ops.settings" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/venv/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -128,17 +248,43 @@
       <option name="customRunCommand" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="Flask" type="Python.FlaskServer" nameIsGenerated="true">
+      <module name="iamdc" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/../iamdc/venv/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../iamdc" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Django server.Ops" />
+      <item itemvalue="Flask server.Flask" />
       <item itemvalue="Python.ops" />
+      <item itemvalue="Python.xdrip-script" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.xdrip-script" />
         <item itemvalue="Python.ops" />
       </list>
     </recent_temporary>
   </component>
   <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
     <option name="showServicesTree" value="false" />
   </component>
   <component name="SvnConfiguration">
@@ -162,6 +308,23 @@
       <workItem from="1573709769084" duration="26786000" />
       <workItem from="1573806772835" duration="10933000" />
       <workItem from="1574054247777" duration="16646000" />
+      <workItem from="1578451830998" duration="3103000" />
+      <workItem from="1578459481386" duration="1663000" />
+      <workItem from="1578461171284" duration="891000" />
+      <workItem from="1578462622710" duration="1022000" />
+      <workItem from="1578463651593" duration="3035000" />
+      <workItem from="1578467285573" duration="906000" />
+      <workItem from="1578474145469" duration="235000" />
+      <workItem from="1578536844180" duration="33244000" />
+      <workItem from="1582013134534" duration="1795000" />
+      <workItem from="1582016140099" duration="330000" />
+      <workItem from="1582016525838" duration="390000" />
+      <workItem from="1582017311360" duration="34000" />
+      <workItem from="1582017367845" duration="14558000" />
+      <workItem from="1582133237525" duration="4191000" />
+      <workItem from="1582559892640" duration="25233000" />
+      <workItem from="1582736876022" duration="104536000" />
+      <workItem from="1583340323433" duration="596000" />
     </task>
     <servers />
   </component>
@@ -180,5 +343,80 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="588" y="214" width="800" height="677" key="#Notifications" timestamp="1578467264840">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="588" y="214" width="800" height="677" key="#Notifications/67.27.1853.1053@67.27.1853.1053" timestamp="1578467264840" />
+    <state x="401" y="396" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578466914872">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="401" y="396" key="#com.intellij.execution.impl.EditConfigurationsDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1578466914872" />
+    <state x="726" y="299" width="524" height="507" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1582737264876">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="726" y="299" width="524" height="507" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1582737264876" />
+    <state x="776" y="310" width="424" height="484" key="FileChooserDialogImpl" timestamp="1578463917509">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="776" y="310" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1053@67.27.1853.1053" timestamp="1578463917509" />
+    <state width="1799" height="215" key="GridCell.Tab.0.bottom" timestamp="1582140682481">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1799" height="215" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1582140682481" />
+    <state width="1799" height="215" key="GridCell.Tab.0.center" timestamp="1582140682476">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1799" height="215" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1582140682476" />
+    <state width="1799" height="215" key="GridCell.Tab.0.left" timestamp="1582140682474">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1799" height="215" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1582140682474" />
+    <state width="1799" height="215" key="GridCell.Tab.0.right" timestamp="1582140682478">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1799" height="215" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1582140682478" />
+    <state width="1799" height="339" key="GridCell.Tab.1.bottom" timestamp="1581961202732">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1799" height="339" key="GridCell.Tab.1.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1581961202732" />
+    <state width="1799" height="339" key="GridCell.Tab.1.center" timestamp="1581961202730">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1799" height="339" key="GridCell.Tab.1.center/67.27.1853.1053@67.27.1853.1053" timestamp="1581961202730" />
+    <state width="1799" height="339" key="GridCell.Tab.1.left" timestamp="1581961202730">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1799" height="339" key="GridCell.Tab.1.left/67.27.1853.1053@67.27.1853.1053" timestamp="1581961202730" />
+    <state width="1799" height="339" key="GridCell.Tab.1.right" timestamp="1581961202731">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1799" height="339" key="GridCell.Tab.1.right/67.27.1853.1053@67.27.1853.1053" timestamp="1581961202731" />
+    <state x="333" y="174" key="SettingsEditor" timestamp="1582559933412">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="333" y="174" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1582559933412" />
+    <state x="164" y="553" width="1653" height="855" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog" timestamp="1582838359834">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="164" y="553" width="1653" height="855" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1582838359834" />
+    <state x="167" y="125" width="1653" height="855" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1583308017115">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="167" y="125" width="1653" height="855" key="com.intellij.history.integration.ui.views.FileHistoryDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1583308017115" />
+    <state x="653" y="408" key="com.intellij.ide.util.TipDialog" timestamp="1583340327044">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="653" y="408" key="com.intellij.ide.util.TipDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1583340327044" />
+    <state x="656" y="257" width="672" height="678" key="search.everywhere.popup" timestamp="1582736899178">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="656" y="257" width="672" height="678" key="search.everywhere.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1582736899178" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/ops$xdrip_script.coverage" NAME="xdrip-script Coverage Results" MODIFIED="1582137739819" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../xdrip-script" />
+    <SUITE FILE_PATH="coverage/ops$ops.coverage" NAME="ops Coverage Results" MODIFIED="1578463693241" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api" />
+    <SUITE FILE_PATH="coverage/ops$Flask.coverage" NAME="Flask Coverage Results" MODIFIED="1578464090698" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../iamdc" />
   </component>
 </project>
