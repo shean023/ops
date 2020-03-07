@@ -50,13 +50,13 @@ class TicketAuditModel(models.Model):
     """
     tt_id = models.ForeignKey('TictetType', related_name='audit_model', verbose_name='工单类型表',
                               on_delete=models.CASCADE)
-    user_id = models.IntegerField(verbose_name='执行人（可以配置负数表示自动执行）')
+    user_id = models.IntegerField(verbose_name='审核人（可以配置负数表示自动执行）')
     order = models.SmallIntegerField(verbose_name='执行顺序')
 
     class Meta:
         db_table = 'ops_ticket_auditmodel'
-        verbose_name = '执行流程表'
-        verbose_name_plural = '执行流程'
+        verbose_name = '审核流程表'
+        verbose_name_plural = '审核流程'
 
 
 class Ticket(models.Model):
@@ -73,17 +73,17 @@ class Ticket(models.Model):
     execNum = models.SmallIntegerField(blank=False, null=False, default=0, verbose_name='第几个执行人，为当前执行人（顺序）')
     # 审核状态
     STATUS = ((1, '待提交'),
-                  (2, '审核中'),
-                  (3, '执行人确认中'),
-                  (4, '执行人执行中'),
-                  (5, '执行人延期执行中'),
-                  (6, '执行完成,用户确认中'),
-                  (7, '审核驳回,等待用户确认'),
-                  (8, '执行驳回,等待用户确认'),
-                  (9, '用户确认不通过,等待执行重做'),
-                  (10, '完成关闭'),
-                  (11, '驳回关闭'),
-                  (12, '撤销关闭'),
+              (2, '审核中'),
+              (3, '执行人确认中'),
+              (4, '执行人执行中'),
+              (5, '执行人延期执行中'),
+              (6, '执行完成,用户确认中'),
+              (7, '审核驳回,等待用户确认'),
+              (8, '执行驳回,等待用户确认'),
+              (9, '用户确认不通过,等待执行重做'),
+              (10, '完成关闭'),
+              (11, '驳回关闭'),
+              (12, '撤销关闭'),
               )
     status = models.IntegerField(choices=STATUS, default='2', verbose_name='工单状态')
     ctime = models.DateTimeField(auto_now_add=True, blank=True, null=True, verbose_name='工单创建时间')
@@ -143,6 +143,7 @@ class TicketOperation(models.Model):
     工单操作表
     """
     STATUS = (
+        (0, '保存'),
         (1, '提交'),
         (2, '审核通过'),
         (3, '审核不通过'),

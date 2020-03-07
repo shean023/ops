@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block head %}
-    <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
     <!-- Select2 -->
     <link rel="stylesheet" href="{% static 'AdminLTE/bower_components/select2/dist/css/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'modaal/css/modaal.min.css' %}">
     <link rel="stylesheet" href="{% static 'jquery-confirm/dist/jquery-confirm.min.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dist/css/xcConfirm.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'dist/css/xcConfirm.css' %}"/>
 
     <!-- ace styles -->
-    <link rel="stylesheet" href="/static/css/ticket.manage.css" />
+    <link rel="stylesheet" href="/static/css/ticket.manage.css"/>
 
     <style>
 
@@ -50,7 +51,7 @@
                 <div class="box-body">
                     <div style="margin-bottom: 10px;height: 30px" class="row">
                         <button class="btn btn-sm btn-success pull-left" data-toggle="modal" id="ticket_create"
-                                data-target="#modalCaseTypeOperating" style="float: left; margin-left: 1%" onclick="getUsers()">
+                                data-target="#modalCaseTypeOperating" style="float: left; margin-left: 1%">
                             <i class="fa fa-plus-square"></i>
                             <span class="bigger-110">创建类型工单</span>
                         </button>
@@ -78,16 +79,19 @@
                                         <td>{% autoescape off %}{{ tt.audit_model }}{% endautoescape %}</td>
                                         <td>{% autoescape off %}{{ tt.exec_model }}{% endautoescape %}</td>
                                         <td>{% if tt.status == 1 %}
-                                                启用
-                                            {% else %}
-                                                禁用
-                                            {% endif %}
+                                            启用
+                                        {% else %}
+                                            禁用
+                                        {% endif %}
                                         </td>
                                         <td>{{ tt.ctime|date:"Y/m/d H:i  " }}</td>
                                         <td>
                                             {% if request.user.is_superuser %}
-                                                <button class="btn btn-primary btn-xs edit" data-toggle="modal" data-target="#modalCaseTypeOperating" data-id="{{ tt.id }}">编辑</button>
-                                                <button type="button" class="btn btn-danger btn-xs delete" data-id="{{ tt.id }}">删除
+                                                <button class="btn btn-primary btn-xs edit" data-toggle="modal"
+                                                        data-target="#modalCaseTypeOperating" data-id="{{ tt.id }}">编辑
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-xs delete"
+                                                        data-id="{{ tt.id }}">删除
                                                 </button>
                                             {% endif %}
                                         </td>
@@ -130,20 +134,11 @@
 
                                 <div class="col-sm-10">
                                     <input id="casetype_name" name="casetype_name" type="text" placeholder="请输入工单类型名称"
-                                           class="col-xs-10 col-sm-8" style="height:1em;border:1px solid #dddddd;font-size: 14px; height:35px;width:70%; color: #555555; padding:0.8em;"/>
+                                           class="col-xs-10 col-sm-8"
+                                           style="height:1em;border:1px solid #dddddd;font-size: 14px; height:35px;width:70%; color: #555555; padding:0.8em;"/>
                                 </div>
                             </div>
-                            <div class="space-4"></div>
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label no-padding-right" for="casetype_executor">
-                                    工单处理人 </label>
-
-                                <div class="col-sm-10">
-                                    <select class="select2 col-sm-10" id="casetype_executor" name="casetype_executor" style="width:200px">
-                                    </select>
-                                </div>
-                            </div>
                             <div class="space-4"></div>
 
                             <div class="form-group">
@@ -153,7 +148,7 @@
                                 <div class="col-sm-10">
                                             <span class="firstcheckleader">
                                                 <select class="checkleader" name="firstcheckleader"
-                                                        id="firstcheckleader" style="width:100px;height: 35px"
+                                                        id="firstcheckleader" style="width:140px;height: 35px"
                                                         onchange="changeCheckLeader(this);">
                                                     <option value="-1">默认上级</option>
                                                     <option value="-2">指定人选</option>
@@ -167,12 +162,32 @@
                             <div class="space-4"></div>
 
                             <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="casetype_executor">
+                                    工单处理人 </label>
+
+                                <div class="col-sm-10">
+                                   <span class="casetype_executor">
+                                        <select class="executor" id="casetype_executor" name="casetype_executor"
+                                                style="width:140px;height: 35px" onchange="changeExecutor(this);">
+                                            <option value="-1">默认上级</option>
+                                            <option value="-2">指定人选</option>
+                                        </select>
+                                   </span>
+                                    <a class="btn btn-xs btn-primary" onclick="addExecutorCSS(this)"
+                                       style="margin-left: 5px;" id="addExector">添加一级</a>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                            <div class="form-group">
                                 <label class="col-sm-2 control-label no-padding-right" for="casetype_status">
                                     状态 </label>
 
                                 <div class="col-sm-10">
                                             <span>
-                                                <select class="select2" name="casetype_status" id="casetype_status" style="width:100px">
+                                                <select class="select" name="casetype_status" id="casetype_status"
+                                                        style="width:100px">
                                                     <option value="1">启用</option>
                                                     <option value="2">禁用</option>
                                                 </select>
@@ -244,7 +259,7 @@
             let key_td_obj = $(this).parents('tr').children();
             $.confirm({
                 title: 'Tips',
-               // content: '确定要删除这条记录么？' + '<br><font color="red"> ' + "ID: "+ key_td_obj[0].innerText + "; 类型名称: " + key_td_obj[1].innerText + '</font>',
+                // content: '确定要删除这条记录么？' + '<br><font color="red"> ' + "ID: "+ key_td_obj[0].innerText + "; 类型名称: " + key_td_obj[1].innerText + '</font>',
                 content: '确定要删除这条记录么？' + '<li class="text-danger"><b>' + "ID:" + '</b>' + key_td_obj[0].innerText + ' ; <b>类型名称: </b>' + key_td_obj[1].innerText + '</li>',
                 type: 'red',
                 buttons: {
@@ -277,7 +292,7 @@
         //编辑工单类型
         $('#ticket_tab tbody').on('click', '.edit', function () {
 
-            getUsers();
+            //getUsers();
             let pk = $(this).attr('data-id');
             document.getElementById('casetype_id').value = pk;
 
@@ -290,16 +305,21 @@
                     window.wxc.xcConfirm("请求数据错误！", window.wxc.xcConfirm.typeEnum.error);
                 },
                 success: function (response) {
+                    let userinfo;
+                    let user_id;
                     if (response["code"] == "200") {
+                        let j;
                         data = response['data']
                         //alert(data['id']+" , "+data['name']);
                         document.getElementById('casetype_name').value = data['name'];
+                        /***
                         for (i in data['executor']) {
                             var executor = data['executor'][i]
                             type_executor_val = executor.split("_")[0]
                             //$("#casetype_executor").find("option[value='" + type_executor_val + "']").attr("selected", true);
                             $('#casetype_executor').val(executor.split("_")[0]).trigger('change');
                         }
+                         ***/
 
                         //$("#casetype_status").find("option[value='" + data['status'] + "']").attr("selected", true);
                         $('#casetype_status').val(data['status']).trigger('change');
@@ -310,16 +330,16 @@
                         }
 
                         $("#firstcheckleader").remove();
-                        var i = 0
+                        let i = 0;
                         for (j in data['checkleader']) {
                             //alert(data['checkleader'][j]);
                             var checkleader = data['checkleader'][j];
-                            var user_id = checkleader.split("_")[0]
-                            var userinfo = checkleader.split("_")[1]
+                            user_id = checkleader.split("_")[0];
+                            userinfo = checkleader.split("_")[1];
 
                             if (user_id == "-1") {
                                 if (i == 0) {
-                                    $("#addcheckleader").before('<span class="firstcheckleader"><select class="select2 checkleader" name="firstcheckleader" id="firstcheckleader" style="width:100px" onchange="changeCheckLeader(this);"><option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
+                                    $("#addcheckleader").before('<span class="firstcheckleader"><select class="select2 checkleader" name="firstcheckleader" id="firstcheckleader" style="width:140px" onchange="changeCheckLeader(this);"><option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
                                 } else {
                                     $("#addcheckleader").before('<span class="morecheckleader"><span class="glyphicon glyphicon-arrow-right"></span><select class="select2 checkleader" onchange="changeCheckLeader(this);" style="width: 140px"> <option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
                                 }
@@ -343,6 +363,43 @@
                             if ($("#addcheckleader").next().is("a")) {
                             } else {
                                 $("#addcheckleader").after('<a class="btn btn-xs btn-primary" onclick="delCheckLeaderCSS(this)" style="margin-left: 5px" id="delcheckleader">删除一级</a>')
+                            }
+                        }
+
+                        $("#casetype_executor").remove();
+                        i = 0;
+                        for (j in data['executor']) {
+                            //alert(data['executor'][j]);
+                            const executor = data['executor'][j];
+                            user_id = executor.split("_")[0];
+                            userinfo = executor.split("_")[1];
+
+                            if (user_id == "-1") {
+                                if (i == 0) {
+                                    $("#addExector").before('<span class="casetype_executor"><select class="executor" name="casetype_executor" id="casetype_executor" style="width:140px" onchange="changeExecutor(this);"><option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
+                                } else {
+                                    $("#addExector").before('<span class="moreexecutor"><span class="glyphicon glyphicon-arrow-right"></span><select class="select2 executor" onchange="changeExecutor(this);" style="width: 140px"> <option value="-1" selected>默认上级</option><option value = "-2">指定人选</option></select></span>');
+                                }
+
+                            } else {
+
+                                if (i == 0) {
+                                    $("#addExector").before('<span class="casetype_executor"><select class="executor" name="casetype_executor" id="casetype_executor" style="width:140px" onchange="changeExecutor(this);"><option value="0">--选择工单处理人--</option>' + oplist.join('') + '</select></span>');
+                                    $("#casetype_executor").find("option[value='" + user_id + "']").attr("selected", true);
+                                } else {
+                                    $("#addExector").before('<span class="moreexecutor"><span class="glyphicon glyphicon-arrow-right"></span><select class="select2 executor" name="executor_' + i + '" id="executor_' + i + '" onchange="changeExecutor(this);" style="width: 140px"><option value="0">--选择工单执行人--</option>' + oplist.join('') + '</select></span>');
+                                    $("#executor_" + i).find("option[value='" + user_id + "']").attr("selected", true);
+                                }
+
+                            }
+
+                            i = i + 1
+                        }
+
+                        if (i > 1) {
+                            if ($("#addExector").next().is("a")) {
+                            } else {
+                                $("#addExector").after('<a class="btn btn-xs btn-primary" onclick="delCheckLeaderCSS(this)" style="margin-left: 5px" id="delexecutor">删除一级</a>')
                             }
                         }
 

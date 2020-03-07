@@ -1,0 +1,7 @@
+/upload/*
+/.python-version
+/__pycache__
+/venv
+/screenshot
+/.idea
+/media

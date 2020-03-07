@@ -322,7 +322,9 @@ desired effect
                             </span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{% url 'ticket_manage' %}"><i class="glyphicon glyphicon-book"></i>工单管理</a></li>
+                            {% if user.is_superuser %}
+                                <li><a href="{% url 'ticket_manage' %}"><i class="glyphicon glyphicon-book"></i>工单管理</a></li>
+                            {% endif %}
                             <li><a href="{% url 'ticket_create' %}"><i class="glyphicon glyphicon-book"></i>创建工单</a></li>
                             <li><a href="{% url 'ticket_execute' %}"><i class="glyphicon glyphicon-book"></i>我的待办工单</a></li>
                             <li><a href="{% url 'ticket_check' %}"><i class="glyphicon glyphicon-book"></i>我的审核工单</a></li>

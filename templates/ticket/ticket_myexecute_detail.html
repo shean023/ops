@@ -630,7 +630,7 @@
                     success: function (response) {
                         if (response["code"] == "200") {
                             //window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
-                            window.location.href = "/ticket/ticket_execute/?type=detail&mtid=" + ticketid
+                            window.location.href = "/ticket/ticket_execute/";
 
                         } else {
                             window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
@@ -654,7 +654,7 @@
                     success: function (response) {
                         if (response["code"] == "200") {
                             //window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
-                            window.location.href = "/ticket/ticket_execute/?type=detail&mtid=" + ticketid
+                            window.location.href = "/ticket/ticket_execute/";
 
                         } else {
                             window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
@@ -685,7 +685,12 @@
                     success: function (response) {
                         if (response["code"] == "200") {
                             //window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
-                            window.location.href = "/ticket/ticket_execute/?type=detail&mtid=" + ticketid
+                            if (type === 'execSave') {
+                                window.location.href = "/ticket/ticket_execute/?type=detail&mtid=" + ticketid;
+                            } else {
+                                window.location.href = "/ticket/ticket_execute/";
+                            }
+
 
                         } else {
                             window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
@@ -721,7 +726,7 @@
                 success: function (response) {
                     if (response["code"] == "200") {
                         //window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.success);
-                        window.location.href = "/ticket/ticket_execute/?type=detail&mtid=" + ticketid
+                        window.location.href = "/ticket/ticket_execute/?type=detail&mtid=" + ticketid;
 
                     } else {
                         window.wxc.xcConfirm(response["msg"], window.wxc.xcConfirm.typeEnum.error);
