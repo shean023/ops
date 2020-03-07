@@ -1,7 +1,8 @@
 /upload/*
-/.python-version
-/__pycache__
+.python-version
+__pycache__/*
 /venv
 /screenshot
-/.idea
+.idea
 /media
+migrations/*
