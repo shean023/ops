@@ -56,7 +56,8 @@ def login(request):
             auth.login(request, user)
             request.session['username'] = username
             if remember_me:
-                request.session.set_expiry(60 * 60 * 24 * 7)
+                #request.session.set_expiry(60 * 60 * 24 * 7)
+                request.session.set_expiry(600)
             else:
                 request.session.set_expiry(0)
             UserProfile.objects.filter(username=username).update(
